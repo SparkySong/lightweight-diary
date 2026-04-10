@@ -1,6 +1,6 @@
 
 
-# 轻量日记 (Lightweight Diary)
+# 轻体日记 (Lightweight Diary)
 
 一个基于微信小程序云开发的轻量级日记应用，支持饮食记录和生活日志的云端存储与管理。
 
