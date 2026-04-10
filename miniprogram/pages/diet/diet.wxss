@@ -293,6 +293,13 @@
   text-align: center;
 }
 .food-cal::placeholder { color: #8888a0; font-size: 24rpx; }
+.cal-unit {
+  font-size: 24rpx;
+  color: #fdcb6e;
+  font-weight: 600;
+  margin-left: 8rpx;
+  white-space: nowrap;
+}
 .remove-food {
   font-size: 36rpx;
   color: #e17055;

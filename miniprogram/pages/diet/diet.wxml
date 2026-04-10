@@ -62,6 +62,7 @@
           <view class="food-item">
             <input class="food-name" placeholder="食物名称" value="{{item.name}}" data-idx="{{foodIdx}}" bindinput="onFoodNameInput" bindfocus="onFoodNameInput" />
             <input class="food-cal" type="digit" placeholder="卡路里" value="{{item.calories}}" data-idx="{{foodIdx}}" bindinput="onFoodCalInput" />
+            <text class="cal-unit">kcal</text>
             <view class="remove-food" data-idx="{{foodIdx}}" bindtap="removeFoodItem">−</view>
           </view>
           <!-- 食物搜索建议 - 单独显示，不影响布局 -->
