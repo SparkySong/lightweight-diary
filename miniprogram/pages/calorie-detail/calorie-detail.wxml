@@ -163,18 +163,19 @@
       </block>
     </view>
     <view class="target-hint">
-      <text class="hint-text">💡 根据您的减重目标自动计算，也可自定义每日摄入目标</text>
+      <text class="hint-text"><text class="tips-label">💡</text> 根据您的减重目标自动计算，也可自定义每日摄入目标</text>
+      <text class="hint-text"><text class="tips-label">tips</text> 男性建议每日食物摄入量1800-2200千卡，女性为1500-1800千卡</text>
     </view>
   </view>
 
   <!-- 单位切换 -->
-  <view class="unit-card">
+  <!-- <view class="unit-card">
     <text class="unit-label">📐 单位切换</text>
     <view class="unit-options">
       <text class="unit-option {{unit === 'kcal' ? 'active' : ''}}" bindtap="switchUnit" data-unit="kcal">大卡</text>
       <text class="unit-option {{unit === 'kj' ? 'active' : ''}}" bindtap="switchUnit" data-unit="kj">千焦</text>
     </view>
-  </view>
+  </view> -->
 
   <!-- 热量说明 -->
   <view class="info-card">

@@ -422,11 +422,29 @@ Page({
   toggleAddPanel() {
     // 打开面板时重置为当天日期
     if (!this.data.showAddPanel) {
-      this.setTodayDate();
-      // 重置表单状态
+      // 设置今天日期
+      const d = new Date();
+      const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      
+      // 查找今天+早餐的记录
+      let newEditRecordId = '';
+      let newFoods = [{ name: '', calories: '' }];
+      let newIsEditing = false;
+      
+      const dayData = this.data.allDays.find(d => d.date === today);
+      if (dayData) {
+        const mealRecord = dayData.records.find(r => r.mealType === 'breakfast');
+        if (mealRecord) {
+          newEditRecordId = mealRecord._id;
+          newFoods = mealRecord.foods.map(f => ({ ...f }));
+          newIsEditing = true;
+        }
+      }
+      
       this.setData({
-        isEditing: false,
-        editRecordId: '',
+        inputDate: today,
+        isEditing: newIsEditing,
+        editRecordId: newEditRecordId,
         mealType: 'breakfast',
         mealTypes: [
           { key: 'breakfast', label: '🌅 早餐', selected: true },
@@ -434,9 +452,14 @@ Page({
           { key: 'dinner', label: '🌙 晚餐', selected: false },
           { key: 'snack', label: '🍪 加餐', selected: false }
         ],
-        foods: [{ name: '', calories: '' }],
+        foods: newFoods,
         totalCalPreview: 0
       });
+      
+      // 计算总热量
+      if (newIsEditing) {
+        this.calcTotalCal();
+      }
     }
     this.setData({ showAddPanel: !this.data.showAddPanel });
   },
@@ -450,7 +473,34 @@ Page({
     const mealTypes = this.data.mealTypes.map(m => ({
       ...m, selected: m.key === key
     }));
+    
     this.setData({ mealType: key, mealTypes });
+    
+    // 无论是否编辑模式，都尝试加载该日期+餐食的数据
+    const currentDate = this.data.inputDate;
+    let newEditRecordId = '';
+    let newFoods = [{ name: '', calories: '' }];
+    let newIsEditing = false;
+    
+    // 查找该日期下对应餐食的记录
+    const dayData = this.data.allDays.find(d => d.date === currentDate);
+    if (dayData) {
+      const mealRecord = dayData.records.find(r => r.mealType === key);
+      if (mealRecord) {
+        // 找到记录，加载数据
+        newEditRecordId = mealRecord._id;
+        newFoods = mealRecord.foods.map(f => ({ ...f }));
+        newIsEditing = true;
+      }
+    }
+    
+    this.setData({
+      editRecordId: newEditRecordId,
+      foods: newFoods,
+      isEditing: newIsEditing
+    });
+    
+    this.calcTotalCal();
   },
 
   onFoodNameInput(e) {
@@ -653,6 +703,8 @@ Page({
       foods.push({ ...item });
     }
     this.setData({ foods });
+    // 更新总热量预览
+    this.calcTotalCal();
   },
 
   showToast(msg) {

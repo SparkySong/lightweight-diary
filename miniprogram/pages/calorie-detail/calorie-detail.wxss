@@ -601,6 +601,21 @@
 .hint-text {
   font-size: 22rpx;
   color: #8888a0;
+  display: block;
+  margin-bottom: 8rpx;
+}
+
+.tips-label {
+  display: inline-block;
+  font-size: 20rpx;
+  color: #6c5ce7;
+  width: 32rpx;
+  text-align: center;
+  background: #6c5ce720;
+  padding: 2rpx 10rpx;
+  border-radius: 6rpx;
+  margin-right: 8rpx;
+  font-weight: 600;
 }
 
 /* 单位切换 */

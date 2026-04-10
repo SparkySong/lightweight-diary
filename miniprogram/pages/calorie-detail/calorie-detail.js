@@ -213,15 +213,6 @@ Page({
     
     console.log('meals:', JSON.stringify(meals));
     
-    // 如果没有数据，显示示例数据用于演示
-    const hasData = todayRecords.length > 0;
-    if (!hasData) {
-      meals.breakfast = 450;
-      meals.lunch = 580;
-      meals.dinner = 320;
-      meals.snack = 150;
-    }
-    
     const totalCal = Object.values(meals).reduce((a, b) => a + b, 0);
     // 目标热量上限5000，防止存储异常值导致计算溢出
     const targetCal = Math.min(this.data.customTarget || 1500, 5000);
@@ -310,18 +301,16 @@ Page({
       const dayNames = ['日', '一', '二', '三', '四', '五', '六'];
       const dayName = dayNames[date.getDay()];
       
-      // 如果当天没有数据，使用模拟数据（仅用于演示）
-      const displayCal = totalCal > 0 ? totalCal : Math.round(targetCal * (0.6 + Math.random() * 0.6));
-      
+      // 直接使用真实数据，没有数据则为0
       weekData.push({
         date: dateStr,
         day: dayName,
-        cal: displayCal,
-        isOver: displayCal > targetCal,
-        percent: Math.round(displayCal / targetCal * 100)
+        cal: totalCal,
+        isOver: totalCal > targetCal,
+        percent: totalCal > 0 ? Math.round(totalCal / targetCal * 100) : 0
       });
       
-      if (displayCal > targetCal) {
+      if (totalCal > targetCal) {
         overLimitDays++;
       }
     }
