@@ -164,7 +164,7 @@
     </view>
     <view class="target-hint">
       <text class="hint-text"><text class="tips-label">💡</text> 根据您的减重目标自动计算，也可自定义每日摄入目标</text>
-      <text class="hint-text"><text class="tips-label">tips</text> 男性建议每日食物摄入量1800-2200千卡，女性为1500-1800千卡</text>
+      <text class="hint-text"><text class="tips-label">tips</text> 建议男性每日食物摄入量1800-2200千卡，女性为1500-1800千卡</text>
     </view>
   </view>
 

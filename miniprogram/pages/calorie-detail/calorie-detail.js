@@ -137,8 +137,6 @@ Page({
 
   async loadRecords() {
     try {
-      wx.showLoading({ title: '加载中...' });
-      
       const res = await wx.cloud.callFunction({ name: 'getDietRecords', data: {} });
       // 云函数返回的是 days 格式，每个day包含records数组
       const allDays = res.result.days || [];
@@ -171,8 +169,6 @@ Page({
       // 计算近7天数据
       this.calculateWeekData(allRecords);
       
-      wx.hideLoading();
-      
       // 绘制图表
       setTimeout(() => {
         this.drawPieChart();
@@ -182,7 +178,6 @@ Page({
       
     } catch (e) {
       console.error('加载饮食记录失败', e);
-      wx.hideLoading();
       // 即使出错也显示示例图表
       setTimeout(() => {
         this.drawPieChart();
@@ -662,7 +657,9 @@ Page({
     userSettings.dailyCalorieTarget = target;
     wx.setStorageSync('userSettings', userSettings);
     
-    this.showToast('目标已保存');
+    // 使用自定义 toast（已优化层级）
+    this.showToast('目标已设定 🎯');
+    
     this.setData({ showTargetInput: false });
     this.loadRecords();
   },
