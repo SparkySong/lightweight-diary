@@ -579,6 +579,38 @@
   color: #8888a0;
 }
 .record-list { margin-top: 8rpx; }
+
+/* 记录列表滚动容器 */
+.records-scroll {
+  height: 720rpx;
+  margin-top: 8rpx;
+}
+
+/* 加载更多 */
+.load-more {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24rpx 0;
+  gap: 12rpx;
+}
+.load-more-text {
+  font-size: 24rpx;
+  color: #8888a0;
+}
+.loading-spinner {
+  width: 32rpx;
+  height: 32rpx;
+  border: 3rpx solid #2a2a3a;
+  border-top-color: #6c5ce7;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 .record-item {
   display: flex;
   justify-content: space-between;
@@ -785,3 +817,21 @@
   box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.4);
 }
 .toast.show { transform: translateX(-50%) translateY(0); }
+
+/* 浅色主题加载更多 */
+.theme-light .load-more-text {
+  color: #868e96;
+}
+.theme-light .loading-spinner {
+  border-color: #dee2e6;
+  border-top-color: #6c5ce7;
+}
+.theme-light .record-item {
+  border-top-color: #dee2e6;
+}
+.theme-light .record-date {
+  color: #868e96;
+}
+.theme-light .record-weight {
+  color: #212529;
+}

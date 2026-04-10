@@ -4,6 +4,9 @@ const _ = db.command;
 
 const app = getApp();
 
+// 分页配置
+const PAGE_SIZE = 15;
+
 Page({
   data: {
     records: [],
@@ -56,7 +59,13 @@ Page({
     showEditPanel: false,
     editRecordId: '',
     editDate: '',
-    editWeight: ''
+    editWeight: '',
+    // 分页加载相关
+    allRecords: [],           // 存储所有记录
+    displayedRecords: [],     // 当前显示的记录
+    hasMoreRecords: true,     // 是否有更多记录
+    isLoadingMore: false,     // 是否正在加载更多
+    pageSize: PAGE_SIZE       // 每页加载数量
   },
 
   onLoad() {
@@ -155,14 +164,64 @@ Page({
         name: 'getRecords',
         data: { range: this.data.chartRange }
       });
-      const records = res.result.data || [];
-      this.setData({ records });
-      this.updateStats(records);
-      this.drawChart(records);
-      this.calcStreak(records);
+      const allRecords = res.result.data || [];
+      
+      // 初始化分页数据
+      const displayedRecords = allRecords.slice(0, PAGE_SIZE);
+      const hasMoreRecords = allRecords.length > PAGE_SIZE;
+      
+      this.setData({ 
+        records: displayedRecords,
+        allRecords: allRecords,
+        displayedRecords: displayedRecords,
+        hasMoreRecords: hasMoreRecords,
+        isLoadingMore: false
+      });
+      
+      this.updateStats(displayedRecords);
+      this.drawChart(allRecords);
+      this.calcStreak(allRecords);
     } catch (e) {
       console.error('加载记录失败', e);
     }
+  },
+  
+  // 加载更多记录
+  loadMoreRecords() {
+    if (this.data.isLoadingMore || !this.data.hasMoreRecords) {
+      return;
+    }
+
+    this.setData({ isLoadingMore: true });
+
+    const currentLength = this.data.displayedRecords.length;
+    const allRecords = this.data.allRecords;
+    const nextPage = allRecords.slice(currentLength, currentLength + PAGE_SIZE);
+    
+    if (nextPage.length === 0) {
+      this.setData({ 
+        hasMoreRecords: false,
+        isLoadingMore: false 
+      });
+      return;
+    }
+
+    const newDisplayedRecords = [...this.data.displayedRecords, ...nextPage];
+    const hasMoreRecords = newDisplayedRecords.length < allRecords.length;
+
+    this.setData({
+      records: newDisplayedRecords,
+      displayedRecords: newDisplayedRecords,
+      hasMoreRecords: hasMoreRecords,
+      isLoadingMore: false
+    });
+    
+    this.updateStats(newDisplayedRecords);
+  },
+
+  // 滚动到底部触发加载更多
+  onRecordsScrollToLower() {
+    this.loadMoreRecords();
   },
 
   async loadGoal() {

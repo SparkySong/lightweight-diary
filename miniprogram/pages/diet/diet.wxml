@@ -100,29 +100,44 @@
     <text class="empty-hint">点击上方按钮开始记录</text>
   </view>
 
-  <view class="day-group" wx:for="{{days}}" wx:key="date" wx:for-item="day">
-    <view class="day-header">
-      <text class="day-date">{{day.date}}</text>
-      <text class="day-total">{{day.totalCal}} kcal</text>
+  <!-- 记录列表滚动容器 -->
+  <scroll-view 
+    class="records-scroll"
+    scroll-y
+    bindscrolltolower="onScrollToLower"
+    lower-threshold="100"
+    wx:if="{{days.length > 0}}">
+    <view class="day-group" wx:for="{{days}}" wx:key="date" wx:for-item="day">
+      <view class="day-header">
+        <text class="day-date">{{day.date}}</text>
+        <text class="day-total">{{day.totalCal}} kcal</text>
+      </view>
+
+      <view class="card meal-card" wx:for="{{day.records}}" wx:key="_id" wx:for-item="meal" data-meal="{{meal}}" bindtap="onEditDiet">
+        <view class="meal-header">
+          <text class="meal-type-label">{{meal.mealLabel}}</text>
+          <view class="meal-actions">
+            <text class="meal-cal">{{meal.totalCal}} kcal</text>
+            <view class="edit-icon" catchtap="onEditDiet" data-meal="{{meal}}">✏️</view>
+            <view class="delete-btn" data-id="{{meal._id}}" catchtap="onDeleteDiet">✕</view>
+          </view>
+        </view>
+        <view class="food-tags">
+          <view class="food-tag" wx:for="{{meal.foods}}" wx:index="idx2" wx:for-item="food" wx:for-index2="fi">
+            <text>{{food.name}}</text>
+            <text class="food-tag-cal" wx:if="{{food.calories}}">{{food.calories}}cal</text>
+          </view>
+        </view>
+      </view>
     </view>
 
-    <view class="card meal-card" wx:for="{{day.records}}" wx:key="_id" wx:for-item="meal" data-meal="{{meal}}" bindtap="onEditDiet">
-      <view class="meal-header">
-        <text class="meal-type-label">{{meal.mealLabel}}</text>
-        <view class="meal-actions">
-          <text class="meal-cal">{{meal.totalCal}} kcal</text>
-          <view class="edit-icon" catchtap="onEditDiet" data-meal="{{meal}}">✏️</view>
-          <view class="delete-btn" data-id="{{meal._id}}" catchtap="onDeleteDiet">✕</view>
-        </view>
-      </view>
-      <view class="food-tags">
-        <view class="food-tag" wx:for="{{meal.foods}}" wx:index="idx2" wx:for-item="food" wx:for-index2="fi">
-          <text>{{food.name}}</text>
-          <text class="food-tag-cal" wx:if="{{food.calories}}">{{food.calories}}cal</text>
-        </view>
-      </view>
+    <!-- 加载更多提示 -->
+    <view class="load-more" wx:if="{{hasMore || isLoadingMore}}">
+      <view class="loading-spinner" wx:if="{{isLoadingMore}}"></view>
+      <text class="load-more-text" wx:if="{{isLoadingMore}}">加载中...</text>
+      <text class="load-more-text" wx:elif="{{!hasMore}}">— 已加载全部 —</text>
     </view>
-  </view>
+  </scroll-view>
 
   <view class="footer">
     <text>🥗 饮食控制是减肥成功的关键</text>

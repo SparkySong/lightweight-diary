@@ -178,23 +178,39 @@
       <text class="empty-emoji">📭</text>
       <text class="empty-text">还没有记录，开始你的第一次打卡吧！</text>
     </view>
-    <view class="record-list" wx:else>
-      <view class="record-item" wx:for="{{records}}" wx:key="_id" wx:for-item="record" data-record="{{record}}" bindtap="onEditRecord">
-        <view class="record-left">
-          <text class="record-date">{{record.dateStr}}</text>
-          <text class="record-weight">{{record.weight}} kg</text>
-        </view>
-        <view class="record-right">
-          <text class="record-diff {{record.diffClass}}" wx:if="{{record.diff !== undefined && record.diff !== null}}">
-            <block wx:if="{{record.diff < 0}}">↓{{(-record.diff)}}</block>
-            <block wx:elif="{{record.diff > 0}}">↑{{record.diff}}</block>
-            <block wx:else>→</block>
-          </text>
-          <view class="edit-icon" catchtap="onEditRecord" data-record="{{record}}">✏️</view>
-          <view class="delete-btn" data-id="{{record._id}}" data-date="{{record.date}}" catchtap="onDelete">✕</view>
+    
+    <!-- 记录列表滚动容器 -->
+    <scroll-view 
+      class="records-scroll"
+      scroll-y
+      bindscrolltolower="onRecordsScrollToLower"
+      lower-threshold="100"
+      wx:if="{{records.length > 0}}">
+      <view class="record-list">
+        <view class="record-item" wx:for="{{records}}" wx:key="_id" wx:for-item="record" data-record="{{record}}" bindtap="onEditRecord">
+          <view class="record-left">
+            <text class="record-date">{{record.dateStr}}</text>
+            <text class="record-weight">{{record.weight}} kg</text>
+          </view>
+          <view class="record-right">
+            <text class="record-diff {{record.diffClass}}" wx:if="{{record.diff !== undefined && record.diff !== null}}">
+              <block wx:if="{{record.diff < 0}}">↓{{(-record.diff)}}</block>
+              <block wx:elif="{{record.diff > 0}}">↑{{record.diff}}</block>
+              <block wx:else>→</block>
+            </text>
+            <view class="edit-icon" catchtap="onEditRecord" data-record="{{record}}">✏️</view>
+            <view class="delete-btn" data-id="{{record._id}}" data-date="{{record.date}}" catchtap="onDelete">✕</view>
+          </view>
         </view>
       </view>
-    </view>
+      
+      <!-- 加载更多提示 -->
+      <view class="load-more" wx:if="{{hasMoreRecords || isLoadingMore}}">
+        <view class="loading-spinner" wx:if="{{isLoadingMore}}"></view>
+        <text class="load-more-text" wx:if="{{isLoadingMore}}">加载中...</text>
+        <text class="load-more-text" wx:elif="{{!hasMoreRecords}}">— 已加载全部 —</text>
+      </view>
+    </scroll-view>
   </view>
 
   <view class="footer">

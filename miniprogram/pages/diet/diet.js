@@ -1,6 +1,9 @@
 // pages/diet/diet.js
 const app = getApp();
 
+// 分页配置
+const PAGE_SIZE = 10;
+
 // 本地食物数据库（卡路里单位：每份/100g千卡）
 const foodDatabase = [
   // 主食类
@@ -331,7 +334,13 @@ Page({
     searchActiveIndex: -1,
     showSearchPanel: false,
     // 总热量预览
-    totalCalPreview: 0
+    totalCalPreview: 0,
+    // 分页加载相关
+    allDays: [],           // 存储所有数据
+    displayedDays: [],     // 当前显示的数据
+    hasMore: true,         // 是否有更多数据
+    isLoadingMore: false,  // 是否正在加载更多
+    pageSize: PAGE_SIZE    // 每页加载数量
   },
 
   onLoad() {
@@ -356,10 +365,58 @@ Page({
   async loadRecords() {
     try {
       const res = await wx.cloud.callFunction({ name: 'getDietRecords', data: {} });
-      this.setData({ days: res.result.days || [] });
+      const allDays = res.result.days || [];
+      
+      // 初始化分页数据
+      const displayedDays = allDays.slice(0, PAGE_SIZE);
+      const hasMore = allDays.length > PAGE_SIZE;
+      
+      this.setData({ 
+        days: displayedDays,
+        allDays: allDays,
+        displayedDays: displayedDays,
+        hasMore: hasMore,
+        isLoadingMore: false
+      });
     } catch (e) {
       console.error('加载饮食记录失败', e);
     }
+  },
+
+  // 加载更多数据
+  loadMore() {
+    if (this.data.isLoadingMore || !this.data.hasMore) {
+      return;
+    }
+
+    this.setData({ isLoadingMore: true });
+
+    const currentLength = this.data.displayedDays.length;
+    const allDays = this.data.allDays;
+    const nextPage = allDays.slice(currentLength, currentLength + PAGE_SIZE);
+    
+    if (nextPage.length === 0) {
+      this.setData({ 
+        hasMore: false,
+        isLoadingMore: false 
+      });
+      return;
+    }
+
+    const newDisplayedDays = [...this.data.displayedDays, ...nextPage];
+    const hasMore = newDisplayedDays.length < allDays.length;
+
+    this.setData({
+      days: newDisplayedDays,
+      displayedDays: newDisplayedDays,
+      hasMore: hasMore,
+      isLoadingMore: false
+    });
+  },
+
+  // 滚动到底部触发加载更多
+  onScrollToLower() {
+    this.loadMore();
   },
 
   toggleAddPanel() {
