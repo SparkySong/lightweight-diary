@@ -1,0 +1,8 @@
+{
+  "usingComponents": {},
+  "navigationBarTitleText": "热量分析",
+  "navigationBarBackgroundColor": "#0f0f13",
+  "navigationBarTextStyle": "white",
+  "navigationStyle": "default",
+  "enablePullDownRefresh": false
+}

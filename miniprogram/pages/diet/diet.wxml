@@ -21,6 +21,16 @@
     <text class="subtitle">管住嘴，迈开腿 🏃</text>
   </view>
 
+  <!-- 热量分析入口卡片 -->
+  <view class="calorie-analysis-card" bindtap="goToCalorieAnalysis">
+    <view class="analysis-icon">📊</view>
+    <view class="analysis-content">
+      <text class="analysis-title">热量分析</text>
+      <text class="analysis-desc">查看每日热量摄入与达标情况</text>
+    </view>
+    <view class="analysis-arrow">›</view>
+  </view>
+
   <!-- Add Button / Panel -->
   <view class="add-section" wx:if="{{!showAddPanel}}">
     <button class="btn-add" bindtap="toggleAddPanel">➕ 记录饮食</button>

@@ -660,6 +660,13 @@ Page({
     setTimeout(() => this.setData({ toastShow: false }), 2000);
   },
   
+  // 跳转到热量分析页面
+  goToCalorieAnalysis() {
+    wx.navigateTo({
+      url: '/pages/calorie-detail/calorie-detail'
+    });
+  },
+  
   // 主题相关方法
   initTheme() {
     const theme = app.getTheme();

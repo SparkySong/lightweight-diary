@@ -1,0 +1,197 @@
+<!--pages/calorie-detail/calorie-detail.wxml-->
+<page class="{{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}}">
+<page-meta 
+  background-text-style="{{currentTheme === 'light' ? 'light' : 'dark'}}" 
+  background-color="{{currentTheme === 'light' ? '#f8f9fa' : '#0f0f13'}}"
+  background-color-top="{{currentTheme === 'light' ? '#f8f9fa' : '#0f0f13'}}"
+  background-color-bottom="{{currentTheme === 'light' ? '#f8f9fa' : '#0f0f13'}}" />
+
+<view class="container {{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}}">
+  <!-- 今日热量总览卡片 -->
+  <view class="overview-card {{statusClass}}">
+    <view class="overview-header">
+      <text class="overview-title">🍱 今日热量总览</text>
+      <text class="overview-date">{{todayDate}}</text>
+    </view>
+    
+    <view class="overview-main">
+      <view class="cal-circle {{statusClass}}">
+        <text class="cal-current">{{todayData.totalCal}}</text>
+        <text class="cal-unit">大卡</text>
+      </view>
+      
+      <view class="overview-stats">
+        <view class="stat-item">
+          <text class="stat-label">目标</text>
+          <text class="stat-value">{{todayData.targetCal}} kcal</text>
+        </view>
+        <view class="stat-item">
+          <text class="stat-label">剩余</text>
+          <text class="stat-value {{statusClass}}">{{todayData.remainingCal >= 0 ? '+' : ''}}{{todayData.remainingCal}} kcal</text>
+        </view>
+        <view class="stat-item">
+          <text class="stat-label">热量缺口</text>
+          <text class="stat-value {{statusClass}}">{{todayData.deficit >= 0 ? '+' : ''}}{{todayData.deficit}} kcal</text>
+        </view>
+      </view>
+    </view>
+    
+    <view class="status-badge {{statusClass}}">
+      <text class="status-icon">{{statusIcon}}</text>
+      <text class="status-text">{{statusText}}</text>
+    </view>
+  </view>
+
+  <!-- 今日三餐热量占比（饼图） -->
+  <view class="chart-card">
+    <text class="card-title">📊 今日三餐热量占比</text>
+    <view class="pie-detail-container">
+      <view class="pie-chart-area">
+        <canvas type="2d" canvas-id="pieChart" id="pieChart" class="chart-canvas"></canvas>
+        <view class="pie-center">
+          <text class="pie-center-value">{{todayData.totalCal}}</text>
+          <text class="pie-center-label">大卡</text>
+        </view>
+      </view>
+      <view class="pie-legend-area">
+        <view class="pie-legend-item" wx:for="{{mealLegend}}" wx:key="name">
+          <view class="pie-legend-header">
+            <view class="pie-legend-dot" style="background: {{item.color}}"></view>
+            <text class="pie-legend-name">{{item.name}}</text>
+            <text class="pie-legend-percent">{{item.percent}}%</text>
+          </view>
+          <view class="pie-legend-bar-bg">
+            <view class="pie-legend-bar-fill" style="width: {{item.percent}}%; background: {{item.color}}"></view>
+          </view>
+          <text class="pie-legend-cal">{{item.cal}} kcal</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 近7天热量趋势（折线图） -->
+  <view class="chart-card">
+    <text class="card-title">📈 近7天热量趋势</text>
+    <view class="line-chart-container">
+      <canvas canvas-id="lineChart" id="lineChart" class="chart-canvas-line" style="width:100%;height:250rpx"></canvas>
+    </view>
+    <view class="chart-hint">
+      <text class="hint-item">⚪ 白点：达标</text>
+      <text class="hint-item">🔴 红点：超标</text>
+    </view>
+    <view class="week-summary">
+      <text class="summary-label">近7天超标天数：</text>
+      <text class="summary-value danger">{{overLimitDays}} 天</text>
+    </view>
+  </view>
+
+  <!-- 今日三餐热量对比（柱状图） -->
+  <view class="chart-card">
+    <text class="card-title">📊 今日三餐热量对比</text>
+    <view class="bar-chart-container">
+      <canvas canvas-id="barChart" id="barChart" class="chart-canvas-bar" style="width:100%;height:200rpx"></canvas>
+    </view>
+    <view class="meal-recommend">
+      <view class="recommend-item" wx:for="{{mealRecommend}}" wx:key="name">
+        <text class="recommend-name">{{item.name}}</text>
+        <text class="recommend-range {{item.isOver ? 'over' : ''}}">{{item.actual}}/{{item.target}} kcal</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 智能建议区 -->
+  <view class="advice-card">
+    <text class="card-title">💡 {{adviceTitle}}</text>
+    
+    <view class="advice-content">
+      <!-- 超标情况 -->
+      <block wx:if="{{todayData.totalCal >= todayData.targetCal}}">
+        <view class="advice-row warning">
+          <text class="advice-icon">⚠️</text>
+          <text class="advice-text">今日热量超标{{Math.abs(todayData.remainingCal)}}大卡</text>
+        </view>
+        <view class="advice-row">
+          <text class="advice-icon">🔍</text>
+          <text class="advice-text">超标原因：{{overReason}}</text>
+        </view>
+      </block>
+      
+      <!-- 建议内容 -->
+      <view class="advice-list">
+        <text class="advice-label">📋 调整建议：</text>
+        <view class="advice-item" wx:for="{{adviceList}}" wx:key="index">
+          <text class="advice-num">{{index + 1}}.</text>
+          <text class="advice-desc">{{item}}</text>
+        </view>
+      </view>
+      
+      <!-- 推荐替代方案 -->
+      <view class="alt-card" wx:if="{{altList && altList.length > 0}}">
+        <text class="alt-title">{{altTitle}}</text>
+        <view class="alt-items">
+          <text class="alt-item" wx:for="{{altList}}" wx:key="index">{{item}}</text>
+        </view>
+      </view>
+      
+      <!-- 达标鼓励 -->
+      <view class="encourage" wx:if="{{todayData.totalCal >= todayData.targetCal * 0.7 && todayData.totalCal < todayData.targetCal * 0.8}}">
+        <text class="encourage-text">🎯 控卡小能手，继续保持！</text>
+      </view>
+      
+      <!-- 热量不足提醒 -->
+      <view class="advice-row warning" wx:if="{{todayData.totalCal < todayData.targetCal * 0.7 && todayData.totalCal > 0}}">
+        <text class="advice-icon">⚠️</text>
+        <text class="advice-text">热量摄入偏低，请注意均衡营养</text>
+      </view>
+    </view>
+  </view>
+
+<!-- 热量目标设置 -->
+  <view class="target-card">
+    <view class="target-header">
+      <text class="target-title">⚙️ 每日热量目标</text>
+    </view>
+    <view class="target-setting">
+      <block wx:if="{{showTargetInput}}">
+        <text class="target-input-label">自定义目标（大卡）：</text>
+        <input class="target-input" type="number" value="{{customTarget}}" bindinput="onTargetInput" placeholder="如：1500" />
+        <button class="btn-save-target" bindtap="saveTarget">保存</button>
+      </block>
+      <block wx:else>
+        <text class="target-current">当前目标：{{customTarget}} 大卡</text>
+        <text class="edit-target-btn" bindtap="editTarget">修改</text>
+      </block>
+    </view>
+    <view class="target-hint">
+      <text class="hint-text">💡 根据您的减重目标自动计算，也可自定义每日摄入目标</text>
+    </view>
+  </view>
+
+  <!-- 单位切换 -->
+  <view class="unit-card">
+    <text class="unit-label">📐 单位切换</text>
+    <view class="unit-options">
+      <text class="unit-option {{unit === 'kcal' ? 'active' : ''}}" bindtap="switchUnit" data-unit="kcal">大卡</text>
+      <text class="unit-option {{unit === 'kj' ? 'active' : ''}}" bindtap="switchUnit" data-unit="kj">千焦</text>
+    </view>
+  </view>
+
+  <!-- 热量说明 -->
+  <view class="info-card">
+    <text class="info-title">📖 热量计算说明</text>
+    <view class="info-content">
+      <text class="info-text">• 热量缺口 = 摄入热量 - 目标消耗\n• 负数表示热量不足（有利于减脂）\n• 三餐推荐比例：早餐30%、午餐40%、晚餐30%\n• 超标≥80%目标时提醒，≥100%时强预警</text>
+    </view>
+  </view>
+
+  <!-- 查看食谱按钮 -->
+  <button class="btn-recipe" bindtap="goToRecipe">🥗 查看低卡食谱</button>
+
+  <view class="footer">
+    <text>数据每日自动更新</text>
+  </view>
+</view>
+
+<!-- Toast -->
+<view class="toast {{toastShow ? 'show' : ''}}">{{toastMsg}}</view>
+</page>

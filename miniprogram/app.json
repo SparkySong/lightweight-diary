@@ -1,7 +1,8 @@
 {
   "pages": [
     "pages/index/index",
-    "pages/diet/diet"
+    "pages/diet/diet",
+    "pages/calorie-detail/calorie-detail"
   ],
   "window": {
     "navigationBarBackgroundColor": "#0f0f13",

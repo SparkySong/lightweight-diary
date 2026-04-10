@@ -1,0 +1,867 @@
+/* pages/calorie-detail/calorie-detail.wxss */
+@import "/styles/simple-theme.wxss";
+@import "/styles/theme.wxss";
+
+/* 安全区域适配 - 使用系统导航栏后不需要顶部padding */
+.container {
+  padding: 30rpx;
+  padding-bottom: 120rpx;
+  min-height: 100vh;
+}
+
+/* 今日热量总览卡片 */
+.overview-card {
+  background: #1a1a24;
+  border-radius: 24rpx;
+  padding: 28rpx 24rpx;
+  border: 2rpx solid #2a2a3a;
+  margin-bottom: 24rpx;
+  position: relative;
+  overflow: hidden;
+}
+
+.overview-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6rpx;
+  background: linear-gradient(90deg, #00b894, #6c5ce7);
+}
+
+.overview-card.danger::before {
+  background: linear-gradient(90deg, #e17055, #d63031);
+}
+
+.overview-card.warning::before {
+  background: linear-gradient(90deg, #fdcb6e, #e17055);
+}
+
+.overview-card.low::before {
+  background: linear-gradient(90deg, #74b9ff, #0984e3);
+}
+
+.overview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.overview-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #e8e8ef;
+}
+
+.overview-date {
+  font-size: 24rpx;
+  color: #8888a0;
+}
+
+.overview-main {
+  display: flex;
+  align-items: center;
+  gap: 30rpx;
+  margin-bottom: 20rpx;
+}
+
+.cal-circle {
+  width: 180rpx;
+  height: 180rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6c5ce720, #6c5ce710);
+  border: 4rpx solid #6c5ce7;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.cal-circle.danger {
+  background: linear-gradient(135deg, #e1705520, #e1705510);
+  border-color: #e17055;
+}
+
+.cal-circle.warning {
+  background: linear-gradient(135deg, #fdcb6e20, #fdcb6e10);
+  border-color: #fdcb6e;
+}
+
+.cal-circle.low {
+  background: linear-gradient(135deg, #74b9ff20, #74b9ff10);
+  border-color: #74b9ff;
+}
+
+.cal-circle.success {
+  background: linear-gradient(135deg, #00b89420, #00b89410);
+  border-color: #00b894;
+}
+
+.cal-current {
+  font-size: 44rpx;
+  font-weight: 700;
+  color: #e8e8ef;
+}
+
+.cal-unit {
+  font-size: 22rpx;
+  color: #8888a0;
+}
+
+.overview-stats {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.stat-label {
+  font-size: 24rpx;
+  color: #8888a0;
+}
+
+.stat-value {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #e8e8ef;
+}
+
+.stat-value.danger {
+  color: #e17055;
+}
+
+.stat-value.warning {
+  color: #fdcb6e;
+}
+
+.stat-value.success {
+  color: #00b894;
+}
+
+.stat-value.low {
+  color: #74b9ff;
+}
+
+.status-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  padding: 12rpx 20rpx;
+  background: #00b89420;
+  border-radius: 30rpx;
+  border: 1rpx solid #00b89440;
+  width: fit-content;
+  margin: 0 auto;
+}
+
+.status-badge.danger {
+  background: #e1705520;
+  border-color: #e1705540;
+}
+
+.status-badge.warning {
+  background: #fdcb6e20;
+  border-color: #fdcb6e40;
+}
+
+.status-badge.low {
+  background: #74b9ff20;
+  border-color: #74b9ff40;
+}
+
+.status-icon {
+  font-size: 28rpx;
+}
+
+.status-text {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #00b894;
+}
+
+.status-badge.danger .status-text {
+  color: #e17055;
+}
+
+.status-badge.warning .status-text {
+  color: #fdcb6e;
+}
+
+.status-badge.low .status-text {
+  color: #74b9ff;
+}
+
+/* 图表卡片 */
+.chart-card {
+  background: #1a1a24;
+  border-radius: 24rpx;
+  padding: 24rpx;
+  border: 1rpx solid #2a2a3a;
+  margin-bottom: 24rpx;
+}
+
+.card-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #e8e8ef;
+  margin-bottom: 20rpx;
+  display: block;
+}
+
+/* 饼图布局 - 左侧环形图 + 右侧占比列表 */
+.pie-detail-container {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+}
+
+.pie-chart-area {
+  position: relative;
+  width: 240rpx;
+  height: 240rpx;
+  flex-shrink: 0;
+}
+
+.chart-canvas {
+  width: 240rpx;
+  height: 240rpx;
+}
+
+.pie-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 110rpx;
+  height: 110rpx;
+  background: var(--card-bg, #0f0f13);
+  border-radius: 50%;
+}
+
+.pie-center-value {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: var(--text-primary, #e8e8ef);
+}
+
+.pie-center-label {
+  font-size: 20rpx;
+  color: var(--text-secondary, #8888a0);
+}
+
+/* 饼图右侧图例列表 */
+.pie-legend-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.pie-legend-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6rpx;
+}
+
+.pie-legend-header {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+}
+
+.pie-legend-dot {
+  width: 14rpx;
+  height: 14rpx;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.pie-legend-name {
+  font-size: 26rpx;
+  color: var(--text-secondary, #8888a0);
+  flex: 1;
+}
+
+.pie-legend-percent {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: var(--text-primary, #e8e8ef);
+}
+
+.pie-legend-bar-bg {
+  width: 100%;
+  height: 8rpx;
+  background: var(--bar-bg, #1a1a24);
+  border-radius: 4rpx;
+  overflow: hidden;
+}
+
+.pie-legend-bar-fill {
+  height: 100%;
+  border-radius: 4rpx;
+  transition: width 0.3s ease;
+}
+
+.pie-legend-cal {
+  font-size: 22rpx;
+  color: var(--text-secondary, #8888a0);
+}
+
+/* 折线图 */
+.line-chart-container {
+  width: 100%;
+  height: 250rpx;
+}
+
+.chart-canvas-line {
+  width: 100%;
+  height: 250rpx;
+}
+
+.chart-hint {
+  display: flex;
+  gap: 30rpx;
+  justify-content: center;
+  margin-top: 16rpx;
+}
+
+.hint-item {
+  font-size: 22rpx;
+  color: #8888a0;
+}
+
+.week-summary {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10rpx;
+  margin-top: 16rpx;
+  padding: 12rpx 20rpx;
+  background: #0f0f13;
+  border-radius: 12rpx;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.summary-label {
+  font-size: 24rpx;
+  color: #8888a0;
+}
+
+.summary-value {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #e8e8ef;
+}
+
+.summary-value.danger {
+  color: #e17055;
+}
+
+/* 柱状图 */
+.bar-chart-container {
+  width: 100%;
+  height: 200rpx;
+}
+
+.chart-canvas-bar {
+  width: 100%;
+  height: 200rpx;
+}
+
+.meal-recommend {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 16rpx;
+}
+
+.recommend-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4rpx;
+}
+
+.recommend-name {
+  font-size: 22rpx;
+  color: #8888a0;
+}
+
+.recommend-range {
+  font-size: 24rpx;
+  font-weight: 600;
+  color: #e8e8ef;
+}
+
+.recommend-range.over {
+  color: #e17055;
+}
+
+/* 智能建议卡片 */
+.advice-card {
+  background: #1a1a24;
+  border-radius: 24rpx;
+  padding: 24rpx;
+  border: 1rpx solid #2a2a3a;
+  margin-bottom: 24rpx;
+}
+
+.advice-content {
+  margin-top: 16rpx;
+}
+
+.advice-row {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  padding: 12rpx 16rpx;
+  background: #0f0f13;
+  border-radius: 12rpx;
+  margin-bottom: 12rpx;
+}
+
+.advice-row.warning {
+  background: #fdcb6e15;
+  border: 1rpx solid #fdcb6e30;
+}
+
+.advice-icon {
+  font-size: 28rpx;
+}
+
+.advice-text {
+  font-size: 26rpx;
+  color: #e8e8ef;
+}
+
+.advice-list {
+  margin-top: 16rpx;
+}
+
+.advice-label {
+  font-size: 24rpx;
+  color: #8888a0;
+  display: block;
+  margin-bottom: 12rpx;
+}
+
+.advice-item {
+  display: flex;
+  gap: 8rpx;
+  margin-bottom: 8rpx;
+}
+
+.advice-num {
+  font-size: 24rpx;
+  color: #6c5ce7;
+  font-weight: 600;
+}
+
+.advice-desc {
+  font-size: 24rpx;
+  color: #e8e8ef;
+  flex: 1;
+}
+
+/* 替代推荐 */
+.alt-card {
+  margin-top: 16rpx;
+  padding: 16rpx;
+  background: #00b89415;
+  border: 1rpx solid #00b89430;
+  border-radius: 12rpx;
+}
+
+.alt-title {
+  font-size: 24rpx;
+  font-weight: 600;
+  color: #00b894;
+  display: block;
+  margin-bottom: 12rpx;
+}
+
+.alt-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10rpx;
+}
+
+.alt-item {
+  font-size: 22rpx;
+  color: #e8e8ef;
+  padding: 8rpx 16rpx;
+  background: #0f0f13;
+  border-radius: 20rpx;
+}
+
+/* 鼓励语 */
+.encourage {
+  margin-top: 16rpx;
+  text-align: center;
+}
+
+.encourage-text {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #00b894;
+}
+
+/* 目标设置卡片 */
+.target-card {
+  background: #1a1a24;
+  border-radius: 24rpx;
+  padding: 24rpx;
+  border: 1rpx solid #2a2a3a;
+  margin-bottom: 24rpx;
+}
+
+.target-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.target-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #e8e8ef;
+}
+
+.target-setting {
+  margin-top: 20rpx;
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.target-input-label {
+  font-size: 24rpx;
+  color: #8888a0;
+  flex-shrink: 0;
+}
+
+.target-input {
+  flex: 1;
+  background: #0f0f13;
+  border: 1rpx solid #2a2a3a;
+  border-radius: 12rpx;
+  padding: 14rpx 16rpx;
+  font-size: 28rpx;
+  color: #e8e8ef;
+}
+
+.btn-save-target {
+  padding: 14rpx 24rpx;
+  background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+  border: none;
+  border-radius: 12rpx;
+  font-size: 24rpx;
+  color: white;
+  font-weight: 600;
+}
+
+.btn-save-target::after {
+  border: none;
+}
+
+.target-current {
+  flex: 1;
+  font-size: 26rpx;
+  color: #6c5ce7;
+  font-weight: 600;
+}
+
+.edit-target-btn {
+  font-size: 24rpx;
+  color: #6c5ce7;
+  padding: 8rpx 16rpx;
+  background: #6c5ce720;
+  border-radius: 8rpx;
+}
+
+.target-hint {
+  margin-top: 16rpx;
+}
+
+.hint-text {
+  font-size: 22rpx;
+  color: #8888a0;
+}
+
+/* 单位切换 */
+.unit-card {
+  background: #1a1a24;
+  border-radius: 24rpx;
+  padding: 24rpx;
+  border: 1rpx solid #2a2a3a;
+  margin-bottom: 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.unit-label {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #e8e8ef;
+}
+
+.unit-options {
+  display: flex;
+  gap: 16rpx;
+}
+
+.unit-option {
+  padding: 10rpx 24rpx;
+  background: #0f0f13;
+  border: 1rpx solid #2a2a3a;
+  border-radius: 20rpx;
+  font-size: 24rpx;
+  color: #8888a0;
+}
+
+.unit-option.active {
+  background: #6c5ce720;
+  border-color: #6c5ce7;
+  color: #6c5ce7;
+}
+
+/* 热量说明卡片 */
+.info-card {
+  background: #1a1a24;
+  border-radius: 24rpx;
+  padding: 24rpx;
+  border: 1rpx solid #2a2a3a;
+  margin-bottom: 24rpx;
+}
+
+.info-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #e8e8ef;
+  display: block;
+  margin-bottom: 16rpx;
+}
+
+.info-content {
+  background: #0f0f13;
+  border-radius: 12rpx;
+  padding: 16rpx;
+}
+
+.info-text {
+  font-size: 24rpx;
+  color: #8888a0;
+  line-height: 1.8;
+}
+
+/* 查看食谱按钮 */
+.btn-recipe {
+  width: 100%;
+  background: linear-gradient(135deg, #00b894, #00cec9);
+  border: none;
+  border-radius: 20rpx;
+  color: white;
+  font-size: 30rpx;
+  font-weight: 600;
+  padding: 22rpx 0;
+  margin-bottom: 24rpx;
+}
+
+.btn-recipe::after {
+  border: none;
+}
+
+/* Footer */
+.footer {
+  text-align: center;
+  padding: 20rpx 0;
+  font-size: 24rpx;
+  color: #555570;
+}
+
+/* Toast */
+.toast {
+  position: fixed;
+  top: calc(env(safe-area-inset-top) + 100rpx);
+  left: 50%;
+  transform: translateX(-50%) translateY(-200rpx);
+  background: #1a1a24;
+  border: 1rpx solid #00b894;
+  color: #00b894;
+  padding: 20rpx 40rpx;
+  border-radius: 20rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+  z-index: 10000;
+  transition: transform 0.3s ease;
+  box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.4);
+}
+
+.toast.show {
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ========== 浅色主题样式 ========== */
+.theme-light .overview-card,
+.theme-light .chart-card,
+.theme-light .advice-card,
+.theme-light .target-card,
+.theme-light .unit-card,
+.theme-light .info-card {
+  background: #ffffff;
+  border-color: #dee2e6;
+}
+
+.theme-light .overview-card::before {
+  background: linear-gradient(90deg, #40c057, #4c6ef5);
+}
+
+.theme-light .overview-card.danger::before {
+  background: linear-gradient(90deg, #fa5252, #e03131);
+}
+
+.theme-light .overview-card.warning::before {
+  background: linear-gradient(90deg, #fab005, #fd7e14);
+}
+
+.theme-light .overview-card.low::before {
+  background: linear-gradient(90deg, #74c0fc, #339af0);
+}
+
+.theme-light .cal-circle {
+  background: linear-gradient(135deg, #4c6ef520, #4c6ef510);
+  border-color: #4c6ef5;
+}
+
+.theme-light .cal-circle.danger {
+  background: linear-gradient(135deg, #fa525220, #fa525210);
+  border-color: #fa5252;
+}
+
+.theme-light .cal-circle.warning {
+  background: linear-gradient(135deg, #fab00520, #fab00510);
+  border-color: #fab005;
+}
+
+.theme-light .cal-circle.low {
+  background: linear-gradient(135deg, #74c0fc20, #74c0fc10);
+  border-color: #74c0fc;
+}
+
+.theme-light .cal-circle.success {
+  background: linear-gradient(135deg, #40c05720, #40c05710);
+  border-color: #40c057;
+}
+
+.theme-light .cal-current,
+.theme-light .overview-title {
+  color: #212529;
+}
+
+.theme-light .overview-date,
+.theme-light .stat-label,
+.theme-light .card-title,
+.theme-light .stat-value,
+.theme-light .advice-text,
+.theme-light .advice-desc,
+.theme-light .recommend-range,
+.theme-light .pie-legend-name,
+.theme-light .pie-legend-cal {
+  color: #495057;
+}
+
+.theme-light .stat-value.warning,
+.theme-light .summary-value.danger,
+.theme-light .recommend-range.over {
+  color: #e03131;
+}
+
+.theme-light .stat-value.success {
+  color: #2b8a3e;
+}
+
+.theme-light .stat-value.low {
+  color: #1971c2;
+}
+
+.theme-light .pie-center {
+  background: #ffffff;
+}
+
+.theme-light .pie-legend-bar-bg {
+  background: #dee2e6;
+}
+
+.theme-light .pie-legend-percent,
+.theme-light .pie-legend-name {
+  color: #212529;
+}
+
+.theme-light .status-badge,
+.theme-light .advice-row,
+.theme-light .alt-card,
+.theme-light .info-content,
+.theme-light .target-input,
+.theme-light .unit-option {
+  background: #f8f9fa;
+}
+
+.theme-light .advice-row.warning {
+  background: #fff3bf;
+  border-color: #ffc078;
+}
+
+.theme-light .alt-card {
+  background: #d3f9d8;
+  border-color: #8ce99a;
+}
+
+.theme-light .alt-item {
+  background: #ffffff;
+}
+
+.theme-light .alt-title {
+  color: #2b8a3e;
+}
+
+.theme-light .unit-option.active {
+  background: #e7f5ff;
+  border-color: #4c6ef5;
+  color: #4c6ef5;
+}
+
+.theme-light .btn-save-target {
+  background: linear-gradient(135deg, #4c6ef5, #748ffc);
+}
+
+.theme-light .target-current {
+  color: #4c6ef5;
+}
+
+.theme-light .edit-target-btn {
+  color: #4c6ef5;
+  background: #4c6ef520;
+}
+
+.theme-light .toast {
+  background: #ffffff;
+  border-color: #40c057;
+  color: #40c057;
+  box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.1);
+}
