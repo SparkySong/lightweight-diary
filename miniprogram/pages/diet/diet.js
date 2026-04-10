@@ -17,7 +17,10 @@ Page({
     toastMsg: '',
     toastShow: false,
     // 主题相关
-    currentTheme: 'dark'
+    currentTheme: 'dark',
+    // 编辑相关
+    isEditing: false,
+    editRecordId: ''
   },
 
   onLoad() {
@@ -29,6 +32,8 @@ Page({
     this.loadRecords();
     // 重新检查主题状态，确保页面显示正确的主题
     this.initTheme();
+    // 更新tabBar主题
+    app.applyThemeToTabBar();
   },
 
   setTodayDate() {
@@ -47,6 +52,23 @@ Page({
   },
 
   toggleAddPanel() {
+    // 打开面板时重置为当天日期
+    if (!this.data.showAddPanel) {
+      this.setTodayDate();
+      // 重置表单状态
+      this.setData({
+        isEditing: false,
+        editRecordId: '',
+        mealType: 'breakfast',
+        mealTypes: [
+          { key: 'breakfast', label: '🌅 早餐', selected: true },
+          { key: 'lunch', label: '☀️ 午餐', selected: false },
+          { key: 'dinner', label: '🌙 晚餐', selected: false },
+          { key: 'snack', label: '🍪 加餐', selected: false }
+        ],
+        foods: [{ name: '', calories: '' }]
+      });
+    }
     this.setData({ showAddPanel: !this.data.showAddPanel });
   },
 
@@ -97,7 +119,7 @@ Page({
   },
 
   async onSubmit() {
-    const { inputDate, mealType, foods } = this.data;
+    const { inputDate, mealType, foods, isEditing, editRecordId } = this.data;
 
     if (!inputDate) { this.showToast('请选择日期'); return; }
 
@@ -108,6 +130,11 @@ Page({
 
     wx.showLoading({ title: '保存中...' });
     try {
+      // 如果是编辑模式，先删除原记录
+      if (isEditing && editRecordId) {
+        await wx.cloud.callFunction({ name: 'deleteDietRecord', data: { id: editRecordId } });
+      }
+      
       const res = await wx.cloud.callFunction({
         name: 'addDietRecord',
         data: {
@@ -118,10 +145,12 @@ Page({
         }
       });
       if (res.result.success) {
-        this.showToast('记录成功 🍽️');
+        this.showToast(isEditing ? '记录已更新 ✏️' : '记录成功 🍽️');
         this.setData({
           foods: [{ name: '', calories: '' }],
-          showAddPanel: false
+          showAddPanel: false,
+          isEditing: false,
+          editRecordId: ''
         });
         this.loadRecords();
       }
@@ -147,6 +176,41 @@ Page({
           }
         }
       }
+    });
+  },
+
+  // 编辑饮食记录
+  onEditDiet(e) {
+    const meal = e.currentTarget.dataset.meal;
+    const mealTypes = this.data.mealTypes.map(m => ({
+      ...m, selected: m.key === meal.mealType
+    }));
+    this.setData({
+      isEditing: true,
+      editRecordId: meal._id,
+      inputDate: meal.date,
+      mealType: meal.mealType,
+      mealTypes: mealTypes,
+      foods: meal.foods.map(f => ({ ...f })),
+      showAddPanel: true
+    });
+  },
+
+  // 取消编辑
+  cancelEdit() {
+    this.setData({
+      isEditing: false,
+      editRecordId: '',
+      inputDate: '',
+      mealType: 'breakfast',
+      mealTypes: [
+        { key: 'breakfast', label: '🌅 早餐', selected: true },
+        { key: 'lunch', label: '☀️ 午餐', selected: false },
+        { key: 'dinner', label: '🌙 晚餐', selected: false },
+        { key: 'snack', label: '🍪 加餐', selected: false }
+      ],
+      foods: [{ name: '', calories: '' }],
+      showAddPanel: false
     });
   },
 

@@ -1,5 +1,5 @@
 <!--pages/index/index.wxml-->
-<page class="{{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}}" bindtap="onPageTap">
+<page class="{{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}}" bindtap="onPageTap" catchtap="onCancelGoalInput">
 <!-- 页面元信息，用于动态设置背景色和下拉刷新样式 -->
 <page-meta 
   background-text-style="{{currentTheme === 'light' ? 'light' : 'dark'}}" 
@@ -130,12 +130,16 @@
   </view>
 
   <!-- Goal -->
-  <view class="card">
-    <text class="card-title">🎯 目标体重</text>
-    <view class="goal-input-wrap" wx:if="{{showGoalInput}}">
+  <view class="card goal-card" >
+    <view class="goal-header">
+      <text class="card-title">🎯 目标体重</text>
+      <text catchtap="onEditGoal" class="goal-edit-hint" wx:if="{{goalWeight && !showGoalInput}}">✏️ 点击修改</text>
+    </view>
+    <view class="goal-input-wrap" wx:if="{{showGoalInput}}" catchtap="stopPropagation">
       <view class="input-row">
         <input class="weight-input goal-input" type="digit" placeholder="目标体重 kg" value="{{inputGoal}}" bindinput="onGoalInput" confirm-type="done" bindconfirm="onSetGoal" />
         <button class="btn-goal" bindtap="onSetGoal">设定</button>
+        <view class="btn-cancel-small" bindtap="onCancelGoal">取消</view>
       </view>
     </view>
     <view wx:if="{{goalWeight && !showGoalInput}}">
@@ -146,6 +150,9 @@
       <view class="progress-bar">
         <view class="progress-fill" style="width: {{goalProgressWidth}}%;"></view>
       </view>
+    </view>
+    <view class="goal-empty" wx:if="{{!goalWeight && !showGoalInput}}">
+      <text>点击设置目标体重 🎯</text>
     </view>
   </view>
 
@@ -176,7 +183,7 @@
       <text class="empty-text">还没有记录，开始你的第一次打卡吧！</text>
     </view>
     <view class="record-list" wx:else>
-      <view class="record-item" wx:for="{{records}}" wx:key="_id" wx:for-item="record">
+      <view class="record-item" wx:for="{{records}}" wx:key="_id" wx:for-item="record" data-record="{{record}}" bindtap="onEditRecord">
         <view class="record-left">
           <text class="record-date">{{record.dateStr}}</text>
           <text class="record-weight">{{record.weight}} kg</text>
@@ -187,7 +194,8 @@
             <block wx:elif="{{record.diff > 0}}">↑{{record.diff}}</block>
             <block wx:else>→</block>
           </text>
-          <view class="delete-btn" data-id="{{record._id}}" data-date="{{record.date}}" bindtap="onDelete">✕</view>
+          <view class="edit-icon" catchtap="onEditRecord" data-record="{{record}}">✏️</view>
+          <view class="delete-btn" data-id="{{record._id}}" data-date="{{record.date}}" catchtap="onDelete">✕</view>
         </view>
       </view>
     </view>
@@ -200,6 +208,22 @@
 
 <!-- 编辑身高时的遮罩层 -->
 <view class="height-edit-mask {{showHeightInput ? 'show' : ''}}" bindtap="onMaskTap"></view>
+
+<!-- 编辑体重弹窗 -->
+<view class="edit-panel-mask {{showEditPanel ? 'show' : ''}}" bindtap="closeEditPanel"></view>
+<view class="edit-panel {{showEditPanel ? 'show' : ''}}">
+  <view class="edit-panel-header">
+    <text class="edit-panel-title">✏️ 修改体重</text>
+    <text class="edit-panel-date">{{editDate}}</text>
+  </view>
+  <view class="edit-panel-content">
+    <input class="edit-weight-input" type="digit" placeholder="体重 (kg)" value="{{editWeight}}" bindinput="onEditWeightInput" confirm-type="done" bindconfirm="onSaveEdit" />
+  </view>
+  <view class="edit-panel-actions">
+    <button class="btn-cancel" bindtap="closeEditPanel">取消</button>
+    <button class="btn-save" bindtap="onSaveEdit">保存</button>
+  </view>
+</view>
 
 <!-- Toast -->
 <view class="toast {{toastShow ? 'show' : ''}}">{{toastMsg}}</view>

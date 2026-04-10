@@ -1,0 +1,87 @@
+/* components/custom-tab-bar/custom-tab-bar.wxss */
+.custom-tab-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 98rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  z-index: 1000;
+  box-sizing: border-box;
+  padding-bottom: env(safe-area-inset-bottom);
+  /* 确保完全覆盖底部区域 */
+  box-shadow: 0 -2rpx 8rpx rgba(0, 0, 0, 0.1);
+  /* 使用主题CSS变量 */
+  background-color: var(--color-tab-bar-bg, #0f0f13);
+  border-top: 1px solid var(--color-border, #2c2c3c);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.tab-bar-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  height: 100%;
+  transition: all 0.2s ease;
+  padding-top: 12rpx;
+  padding-bottom: calc(12rpx + env(safe-area-inset-bottom));
+}
+
+.tab-bar-item.active {
+  transform: translateY(-2rpx);
+}
+
+.tab-icon {
+  width: 48rpx;
+  height: 48rpx;
+  margin-bottom: 4rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tab-icon .icon {
+  width: 100%;
+  height: 100%;
+  transition: all 0.3s ease;
+}
+
+/* 确保图标在深色背景下可见 */
+.tab-icon .icon {
+  filter: brightness(1.8) contrast(1.3);
+  opacity: 1;
+}
+
+/* 选中状态更明显 */
+.tab-bar-item.active .tab-icon .icon {
+  transform: scale(1.1);
+  filter: brightness(2.2) contrast(1.5);
+}
+
+.tab-text {
+  font-size: 20rpx;
+  font-weight: 400;
+  transition: color 0.3s ease;
+  color: var(--color-tab-icon, #8888a0);
+}
+
+.tab-bar-item.active .tab-text {
+  color: var(--color-tab-icon-active, #6c5ce7);
+}
+
+/* 点击反馈效果 */
+.tab-bar-item:active {
+  opacity: 0.8;
+}
+
+.tab-bar-item:active .tab-icon .icon {
+  transform: scale(0.95);
+}
+
+.tab-bar-item.active:active .tab-icon .icon {
+  transform: scale(1.05);
+}

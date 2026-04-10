@@ -1,5 +1,6 @@
 /* pages/diet/diet.wxss */
 @import "/styles/simple-theme.wxss";
+@import "/styles/theme.wxss";
 
 /* 安全区域适配 */
 /* 页面背景由主题CSS控制 */
@@ -309,6 +310,15 @@
   border-radius: 8rpx;
 }
 .delete-btn:active { color: #e17055; }
+
+/* 编辑图标 */
+.edit-icon {
+  font-size: 28rpx;
+  color: #8888a0;
+  padding: 4rpx 10rpx;
+  border-radius: 8rpx;
+}
+.edit-icon:active { color: #6c5ce7; }
 
 /* Food Tags */
 .food-tags {

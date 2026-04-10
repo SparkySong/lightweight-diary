@@ -1,5 +1,6 @@
 /* pages/index/index.wxss */
 @import "/styles/simple-theme.wxss";
+@import "/styles/theme.wxss";
 
 /* 安全区域适配 */
 /* 页面背景由主题CSS控制 */
@@ -438,6 +439,13 @@
   padding: 16rpx 28rpx;
 }
 .btn-goal::after { border: none; }
+.btn-cancel-small {
+  padding: 16rpx 24rpx;
+  background: #2a2a3a;
+  border-radius: 16rpx;
+  color: #8888a0;
+  font-size: 24rpx;
+}
 
 /* Goal */
 .goal-input-wrap { margin-bottom: 8rpx; }
@@ -471,6 +479,31 @@
   border-radius: 5rpx;
   background: linear-gradient(90deg, #6c5ce7, #00b894);
   transition: width 0.5s ease;
+}
+
+/* 目标卡片点击编辑 */
+.goal-card {
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.goal-card:active {
+  transform: scale(0.98);
+}
+.goal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.goal-edit-hint {
+  font-size: 22rpx;
+  color: #6c5ce7;
+  opacity: 0.7;
+}
+.goal-empty {
+  text-align: center;
+  padding: 30rpx 0;
+  color: #8888a0;
+  font-size: 28rpx;
 }
 
 /* Quick Actions */
@@ -588,6 +621,118 @@
   border-radius: 10rpx;
 }
 .delete-btn:active { color: #e17055; }
+
+/* 编辑图标 */
+.edit-icon {
+  font-size: 28rpx;
+  color: #8888a0;
+  padding: 8rpx 12rpx;
+  border-radius: 10rpx;
+}
+.edit-icon:active { color: #6c5ce7; }
+
+/* 编辑体重弹窗 */
+.edit-panel-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+.edit-panel-mask.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.edit-panel {
+  position: fixed;
+  bottom: -600rpx;
+  left: 30rpx;
+  right: 30rpx;
+  background: #1a1a24;
+  border-radius: 24rpx;
+  padding: 32rpx 28rpx;
+  border: 1rpx solid #6c5ce7;
+  z-index: 1000;
+  transition: bottom 0.3s ease;
+  margin-bottom: calc(env(safe-area-inset-bottom) + 140rpx);
+}
+.edit-panel.show {
+  bottom: 0;
+}
+
+.edit-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24rpx;
+}
+.edit-panel-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #e8e8ef;
+}
+.edit-panel-date {
+  font-size: 26rpx;
+  color: #8888a0;
+}
+.edit-panel-content {
+  margin-bottom: 24rpx;
+  width: 100%;
+  box-sizing: border-box;
+}
+.edit-weight-input {
+  width: 100%;
+  height: 88rpx;
+  line-height: 88rpx;
+  background: #0f0f13;
+  border: 1rpx solid #2a2a3a;
+  border-radius: 20rpx;
+  padding: 0 20rpx;
+  color: #e8e8ef;
+  font-size: 40rpx;
+  font-weight: 700;
+  text-align: center;
+  box-sizing: border-box;
+}
+.edit-weight-input::placeholder {
+  color: #8888a0;
+  font-weight: 400;
+  font-size: 28rpx;
+}
+.edit-panel-actions {
+  display: flex;
+  gap: 16rpx;
+  width: 100%;
+  box-sizing: border-box;
+}
+.btn-cancel {
+  flex: 1;
+  background: #2a2a3a;
+  border: none;
+  border-radius: 18rpx;
+  color: #8888a0;
+  font-size: 28rpx;
+  font-weight: 600;
+  padding: 20rpx 0;
+}
+.btn-cancel::after { border: none; }
+.btn-save {
+  flex: 2;
+  background: linear-gradient(135deg, #6c5ce7, #5a4bd1);
+  border: none;
+  border-radius: 18rpx;
+  color: white;
+  font-size: 28rpx;
+  font-weight: 600;
+  padding: 20rpx 0;
+}
+.btn-save::after { border: none; }
 
 /* 编辑身高遮罩层 */
 .height-edit-mask {

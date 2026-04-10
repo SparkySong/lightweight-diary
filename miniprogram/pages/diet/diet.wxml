@@ -26,11 +26,11 @@
     <button class="btn-add" bindtap="toggleAddPanel">➕ 记录饮食</button>
   </view>
 
-  <!-- Add Panel -->
+  <!-- Add/Edit Panel -->
   <view class="card add-panel" wx:if="{{showAddPanel}}">
     <view class="panel-header">
-      <text class="card-title">📝 添加饮食记录</text>
-      <text class="close-btn" bindtap="toggleAddPanel">✕</text>
+      <text class="card-title">{{isEditing ? '✏️ 编辑饮食' : '📝 添加饮食记录'}}</text>
+      <text class="close-btn" bindtap="{{isEditing ? 'cancelEdit' : 'toggleAddPanel'}}">✕</text>
     </view>
 
     <!-- Date -->
@@ -86,12 +86,13 @@
       <text class="day-total">{{day.totalCal}} kcal</text>
     </view>
 
-    <view class="card meal-card" wx:for="{{day.records}}" wx:key="_id" wx:for-item="meal">
+    <view class="card meal-card" wx:for="{{day.records}}" wx:key="_id" wx:for-item="meal" data-meal="{{meal}}" bindtap="onEditDiet">
       <view class="meal-header">
         <text class="meal-type-label">{{meal.mealLabel}}</text>
         <view class="meal-actions">
           <text class="meal-cal">{{meal.totalCal}} kcal</text>
-          <view class="delete-btn" data-id="{{meal._id}}" bindtap="onDeleteDiet">✕</view>
+          <view class="edit-icon" catchtap="onEditDiet" data-meal="{{meal}}">✏️</view>
+          <view class="delete-btn" data-id="{{meal._id}}" catchtap="onDeleteDiet">✕</view>
         </view>
       </view>
       <view class="food-tags">

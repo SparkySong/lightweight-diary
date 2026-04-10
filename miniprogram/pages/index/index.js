@@ -51,7 +51,12 @@ Page({
     // 云端状态
     cloudReady: false,
     cloudError: false,
-    errorMsg: ''
+    errorMsg: '',
+    // 编辑记录相关
+    showEditPanel: false,
+    editRecordId: '',
+    editDate: '',
+    editWeight: ''
   },
 
   onLoad() {
@@ -555,6 +560,16 @@ Page({
 
   onGoalInput(e) { this.setData({ inputGoal: e.detail.value }); },
 
+  // 点击目标体重卡片编辑
+  onEditGoal(e) {
+    // 阻止事件冒泡
+    e && e.stopPropagation && e.stopPropagation();
+    this.setData({ 
+      showGoalInput: true, 
+      inputGoal: this.data.goalWeight ? String(this.data.goalWeight) : '' 
+    });
+  },
+
   async onSetGoal() {
     const val = parseFloat(this.data.inputGoal);
     if (!val || val < 20 || val > 300) { this.showToast('请输入有效目标体重'); return; }
@@ -564,6 +579,23 @@ Page({
       this.setData({ goalWeight: val, showGoalInput: false, inputGoal: '' });
       this.updateGoalProgress(val);
     } catch (e) { this.showToast('设定失败'); }
+  },
+
+  // 取消目标编辑
+  onCancelGoal() {
+    this.setData({ showGoalInput: false, inputGoal: '' });
+  },
+
+  // 点击页面取消目标输入
+  onCancelGoalInput(e) {
+    if (this.data.showGoalInput) {
+      this.setData({ showGoalInput: false, inputGoal: '' });
+    }
+  },
+
+  // 阻止事件冒泡
+  stopPropagation(e) {
+    e && e.stopPropagation && e.stopPropagation();
   },
 
   async onDelete(e) {
@@ -680,6 +712,9 @@ Page({
     // 设置下拉刷新背景色
     this.setPullDownRefreshBg(newTheme);
     
+    // 更新tabBar主题
+    app.applyThemeToTabBar();
+    
     // 显示提示
     this.showToast(newTheme === 'dark' ? '切换到深色模式 🌙' : '切换到浅色模式 ☀️');
   },
@@ -691,6 +726,55 @@ Page({
     });
   },
   
+  // --- 编辑体重功能 ---
+  onEditRecord(e) {
+    const record = e.currentTarget.dataset.record;
+    this.setData({
+      editRecordId: record._id,
+      editDate: record.date,
+      editWeight: String(record.weight),
+      showEditPanel: true
+    });
+  },
+
+  onEditWeightInput(e) {
+    this.setData({ editWeight: e.detail.value });
+  },
+
+  closeEditPanel() {
+    this.setData({
+      showEditPanel: false,
+      editRecordId: '',
+      editDate: '',
+      editWeight: ''
+    });
+  },
+
+  async onSaveEdit() {
+    const { editRecordId, editWeight } = this.data;
+    const weight = parseFloat(editWeight);
+    if (!editRecordId || !weight || weight < 20 || weight > 300) {
+      this.showToast('请输入有效体重');
+      return;
+    }
+
+    wx.showLoading({ title: '保存中...' });
+    try {
+      const res = await wx.cloud.callFunction({
+        name: 'addRecord',
+        data: { date: this.data.editDate, weight }
+      });
+      if (res.result.success) {
+        this.showToast('体重已更新 ✏️');
+        this.closeEditPanel();
+        this.loadAll();
+      }
+    } catch (e) {
+      this.showToast('保存失败');
+    }
+    wx.hideLoading();
+  },
+
   // 下拉刷新相关方法
   onPullDownRefresh() {
     console.log('下拉刷新开始');

@@ -21,14 +21,14 @@
       {
         "pagePath": "pages/index/index",
         "text": "打卡",
-        "iconPath": "images/tab-weight.jpg",
-        "selectedIconPath": "images/tab-weight-active.jpg"
+        "iconPath": "images/tab-weight.png",
+        "selectedIconPath": "images/tab-weight-active.png"
       },
       {
         "pagePath": "pages/diet/diet",
         "text": "饮食",
-        "iconPath": "images/tab-diet.jpg",
-        "selectedIconPath": "images/tab-diet-active.jpg"
+        "iconPath": "images/tab-diet.png",
+        "selectedIconPath": "images/tab-diet-active.png"
       }
     ]
   },

@@ -57,17 +57,31 @@ App({
     
     // 存储当前tabBar配置供页面使用
     this.globalData.tabBarConfig = tabBarConfig;
+    this.globalData.theme = theme;
     
-    // 延迟设置tabBar样式，确保页面已加载
-    setTimeout(() => {
-      try {
-        if (wx.setTabBarStyle) {
-          wx.setTabBarStyle(tabBarConfig);
+    // 更新自定义tabBar主题
+    this.updateCustomTabBarTheme(theme);
+  },
+  
+  // 更新自定义tabBar组件的主题
+  updateCustomTabBarTheme(theme) {
+    try {
+      // 获取当前页面栈
+      const pages = getCurrentPages();
+      if (pages.length > 0) {
+        const currentPage = pages[pages.length - 1];
+        
+        // 如果有自定义tabBar组件，则更新其主题
+        if (currentPage.selectComponent) {
+          const customTabBar = currentPage.selectComponent('.custom-tab-bar');
+          if (customTabBar && customTabBar.updateTheme) {
+            customTabBar.updateTheme(theme);
+          }
         }
-      } catch (error) {
-        console.error('设置tabBar样式失败:', error);
       }
-    }, 100);
+    } catch (error) {
+      console.log('更新自定义tabBar主题失败:', error);
+    }
   },
   
   // 获取tabBar配置（供页面使用）
