@@ -175,10 +175,12 @@
 .food-list {
   margin-bottom: 16rpx;
 }
+.food-item-row {
+  margin-bottom: 10rpx;
+}
 .food-item {
   display: flex;
   gap: 10rpx;
-  margin-bottom: 10rpx;
   align-items: center;
 }
 .food-name {
@@ -191,6 +193,52 @@
   font-size: 26rpx;
 }
 .food-name::placeholder { color: #8888a0; font-size: 24rpx; }
+
+/* 食物搜索建议面板 */
+.food-search-panel {
+  background: #1a1a24;
+  border: 1rpx solid #fdcb6e40;
+  border-radius: 16rpx;
+  padding: 16rpx;
+  margin-top: 8rpx;
+  z-index: 100;
+}
+.search-hint {
+  font-size: 22rpx;
+  color: #8888a0;
+  margin-bottom: 12rpx;
+  text-align: center;
+}
+.search-results {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+.search-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14rpx 16rpx;
+  background: #0f0f13;
+  border-radius: 12rpx;
+  border: 1rpx solid #2a2a3a;
+}
+.search-item:active {
+  background: #fdcb6e20;
+  border-color: #fdcb6e;
+}
+.search-item-name {
+  font-size: 26rpx;
+  color: #e8e8ef;
+  flex: 1;
+}
+.search-item-cal {
+  font-size: 24rpx;
+  color: #fdcb6e;
+  font-weight: 600;
+  margin-left: 16rpx;
+}
+
 .food-cal {
   flex: 1;
   background: #0f0f13;
@@ -215,6 +263,28 @@
   border: 1rpx dashed #2a2a3a;
   border-radius: 14rpx;
   margin-top: 8rpx;
+}
+
+/* 热量预览 */
+.cal-preview {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10rpx;
+  padding: 16rpx;
+  background: #fdcb6e15;
+  border: 1rpx solid #fdcb6e40;
+  border-radius: 14rpx;
+  margin-bottom: 20rpx;
+}
+.cal-preview-label {
+  font-size: 24rpx;
+  color: #8888a0;
+}
+.cal-preview-value {
+  font-size: 28rpx;
+  color: #fdcb6e;
+  font-weight: 700;
 }
 
 /* Quick Add */
@@ -389,3 +459,136 @@
   box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.4);
 }
 .toast.show { transform: translateX(-50%) translateY(0); }
+
+/* ========== 浅色主题样式 ========== */
+.theme-light .card {
+  background: #ffffff;
+  border-color: #dee2e6;
+}
+.theme-light .add-panel {
+  border-color: #fab00540;
+}
+.theme-light .date-picker {
+  background: #ffffff;
+  border-color: #dee2e6;
+  color: #212529;
+}
+.theme-light .meal-type {
+  background: #ffffff;
+  border-color: #dee2e6;
+  color: #868e96;
+}
+.theme-light .meal-type.selected {
+  background: #fab00520;
+  border-color: #fab005;
+  color: #fab005;
+}
+.theme-light .food-name {
+  background: #ffffff;
+  border-color: #dee2e6;
+  color: #212529;
+}
+.theme-light .food-name::placeholder {
+  color: #adb5bd;
+}
+.theme-light .food-cal {
+  background: #ffffff;
+  border-color: #dee2e6;
+  color: #212529;
+}
+.theme-light .food-cal::placeholder {
+  color: #adb5bd;
+}
+.theme-light .add-food-btn {
+  color: #4c6ef5;
+  border-color: #dee2e6;
+}
+.theme-light .food-search-panel {
+  background: #ffffff;
+  border-color: #fab00540;
+}
+.theme-light .search-hint {
+  color: #868e96;
+}
+.theme-light .search-results .search-item {
+  background: #f8f9fa;
+  border-color: #dee2e6;
+}
+.theme-light .search-results .search-item:active {
+  background: #fab00515;
+  border-color: #fab005;
+}
+.theme-light .search-item-name {
+  color: #212529;
+}
+.theme-light .search-item-cal {
+  color: #fab005;
+}
+.theme-light .cal-preview {
+  background: #fab00515;
+  border-color: #fab00540;
+}
+.theme-light .cal-preview-label {
+  color: #868e96;
+}
+.theme-light .cal-preview-value {
+  color: #fab005;
+}
+.theme-light .food-tag {
+  background: #f8f9fa;
+  border-color: #dee2e6;
+  color: #212529;
+}
+.theme-light .food-tag-cal {
+  color: #868e96;
+}
+.theme-light .empty-text {
+  color: #212529;
+}
+.theme-light .empty-hint {
+  color: #868e96;
+}
+.theme-light .title {
+  background: linear-gradient(135deg, #fab005, #e67700);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.theme-light .subtitle {
+  color: #868e96;
+}
+.theme-light .day-date {
+  color: #212529;
+}
+.theme-light .day-total {
+  color: #fab005;
+}
+.theme-light .meal-type-label {
+  color: #212529;
+}
+.theme-light .meal-cal {
+  color: #fab005;
+}
+.theme-light .remove-food {
+  color: #fa5252;
+}
+.theme-light .quick-item {
+  background: #f8f9fa;
+  border-color: #dee2e6;
+  color: #212529;
+}
+.theme-light .quick-item:active {
+  background: #fab00520;
+  border-color: #fab005;
+}
+.theme-light .close-btn {
+  color: #868e96;
+}
+.theme-light .footer {
+  color: #adb5bd;
+}
+.theme-light .toast {
+  background: #ffffff;
+  border-color: #40c057;
+  color: #40c057;
+  box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.1);
+}

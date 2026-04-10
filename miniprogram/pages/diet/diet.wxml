@@ -47,12 +47,32 @@
 
     <!-- Food Items -->
     <view class="food-list">
-      <view class="food-item" wx:for="{{foods}}" wx:key="index">
-        <input class="food-name" placeholder="食物名称" value="{{item.name}}" data-idx="{{index}}" bindinput="onFoodNameInput" />
-        <input class="food-cal" type="digit" placeholder="卡路里" value="{{item.calories}}" data-idx="{{index}}" bindinput="onFoodCalInput" />
-        <view class="remove-food" data-idx="{{index}}" bindtap="removeFoodItem">−</view>
-      </view>
+      <block wx:for="{{foods}}" wx:key="index" wx:for-index="foodIdx">
+        <view class="food-item-row">
+          <view class="food-item">
+            <input class="food-name" placeholder="食物名称" value="{{item.name}}" data-idx="{{foodIdx}}" bindinput="onFoodNameInput" bindfocus="onFoodNameInput" />
+            <input class="food-cal" type="digit" placeholder="卡路里" value="{{item.calories}}" data-idx="{{foodIdx}}" bindinput="onFoodCalInput" />
+            <view class="remove-food" data-idx="{{foodIdx}}" bindtap="removeFoodItem">−</view>
+          </view>
+          <!-- 食物搜索建议 - 单独显示，不影响布局 -->
+          <view class="food-search-panel" wx:if="{{showSearchPanel && searchActiveIndex === foodIdx && searchResults.length > 0}}">
+            <view class="search-hint">👆 选择以下食物自动填充卡路里：</view>
+            <view class="search-results">
+              <view class="search-item" wx:for="{{searchResults}}" wx:key="name" wx:for-item="result" data-item="{{result}}" data-idx="{{foodIdx}}" bindtap="selectFood">
+                <text class="search-item-name">{{result.name}}</text>
+                <text class="search-item-cal">{{result.serving}} kcal</text>
+              </view>
+            </view>
+          </view>
+        </view>
+      </block>
       <view class="add-food-btn" bindtap="addFoodItem">+ 添加更多食物</view>
+    </view>
+    
+    <!-- 总热量预览 -->
+    <view class="cal-preview" wx:if="{{showAddPanel}}">
+      <text class="cal-preview-label">本餐预计热量：</text>
+      <text class="cal-preview-value">{{totalCalPreview}} kcal</text>
     </view>
 
     <!-- Quick Add -->

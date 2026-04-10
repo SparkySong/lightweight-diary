@@ -1,11 +1,7 @@
 <!--pages/index/index.wxml-->
 <page class="{{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}}" bindtap="onPageTap" catchtap="onCancelGoalInput">
-<!-- 页面元信息，用于动态设置背景色和下拉刷新样式 -->
-<page-meta 
-  background-text-style="{{currentTheme === 'light' ? 'light' : 'dark'}}" 
-  background-color="{{currentTheme === 'light' ? '#f8f9fa' : '#0f0f13'}}" 
-  background-color-top="{{currentTheme === 'light' ? '#f8f9fa' : '#0f0f13'}}"
-  background-color-bottom="{{currentTheme === 'light' ? '#f8f9fa' : '#0f0f13'}}" />
+<!-- 页面元信息，在 JS 中动态设置背景色 -->
+<page-meta background-text-style="dark" background-color="#f8f9fa" background-color-top="#f8f9fa" background-color-bottom="#f8f9fa" />
 
 <!-- 自定义导航栏区域（完全隐藏原生状态栏，用背景色覆盖） -->
 <view class="custom-nav-area"></view>
@@ -14,7 +10,7 @@
   <!-- Header -->
   <view class="header">
     <view class="header-title-row">
-      <text class="title">减肥打卡</text>
+      <text class="title">打卡记录</text>
       <view class="header-actions">
         <!-- 主题切换按钮 -->
         <view class="theme-toggle" bindtap="onToggleThemeMenu">
@@ -96,7 +92,7 @@
         <text class="height-edit" bindtap="onEditHeight">修改</text>
       </view>
       <view wx:else class="height-input-wrap" catchtap="stopPropagation">
-        <input id="height-input" class="height-input" type="digit" placeholder="身高 (cm)" value="{{inputHeight}}" bindinput="onHeightInput" confirm-type="done" bindconfirm="onSetHeight" />
+        <input id="height-input" class="height-input" type="digit" placeholder="身高 (cm)" value="{{inputHeight}}" bindinput="onHeightInput" />
         <button id="height-btn" class="btn-sm" bindtap="onSetHeight">保存</button>
       </view>
     </view>
