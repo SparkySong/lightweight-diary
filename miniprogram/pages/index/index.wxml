@@ -160,9 +160,11 @@
       <text class="action-icon">{{reminderEnabled ? '🔔' : '🔕'}}</text>
       <text class="action-label">{{reminderEnabled ? '提醒已开启' : '开启提醒'}}</text>
       <text class="action-desc" wx:if="{{reminderEnabled}}">每天 {{remindTime}}</text>
-      <picker mode="time" value="{{remindTime}}" bindchange="onRemindTimeChange" wx:if="{{reminderEnabled}}">
-        <text class="action-link">修改时间</text>
-      </picker>
+      <view class="time-picker-wrap" wx:if="{{reminderEnabled}}" catchtap="onTimePickerTap">
+        <picker mode="time" value="{{remindTime}}" bindchange="onRemindTimeChange">
+          <text class="action-link">修改时间</text>
+        </picker>
+      </view>
     </view>
   </view>
 

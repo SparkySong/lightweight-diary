@@ -47,7 +47,11 @@ Page({
     themeColors: null,
     showThemeMenu: false,
     // 下拉刷新
-    refreshing: false
+    refreshing: false,
+    // 云端状态
+    cloudReady: false,
+    cloudError: false,
+    errorMsg: ''
   },
 
   onLoad() {
@@ -73,13 +77,69 @@ Page({
   async loadAll() {
     wx.showLoading({ title: '加载中...' });
     try {
-      await Promise.all([
+      // 重置状态
+      this.setData({ cloudReady: false, cloudError: false, errorMsg: '' });
+      
+      // 使用 allSettled 代替 all，确保一个失败不会影响其他
+      const results = await Promise.allSettled([
         this.loadRecords(),
         this.loadGoal(),
         this.loadProfile()
       ]);
+      
+      // 检查是否有成功的结果
+      const successCount = results.filter(result => result.status === 'fulfilled').length;
+      const totalCount = results.length;
+      
+      if (successCount === totalCount) {
+        // 所有云函数调用都成功
+        this.setData({ cloudReady: true, cloudError: false });
+      } else if (successCount > 0) {
+        // 部分成功
+        this.setData({ 
+          cloudReady: true, 
+          cloudError: true,
+          errorMsg: `部分数据加载失败 (${totalCount - successCount}/${totalCount})`
+        });
+      } else {
+        // 全部失败
+        this.setData({ 
+          cloudReady: false, 
+          cloudError: true,
+          errorMsg: '云服务连接失败，请检查云函数部署状态'
+        });
+        console.warn('所有云函数调用都失败了');
+        
+        // 尝试使用本地存储
+        const localRecords = wx.getStorageSync('localRecords') || [];
+        const localGoal = wx.getStorageSync('localGoal');
+        const localProfile = wx.getStorageSync('localProfile') || { height: null, reminder: { enabled: false, remindTime: '08:00' }};
+        
+        if (localRecords.length > 0) {
+          this.setData({ records: localRecords });
+          this.updateStats(localRecords);
+          this.calcStreak(localRecords);
+          this.drawChart(localRecords);
+        }
+        if (localGoal) {
+          this.setData({ goalWeight: localGoal, showGoalInput: false });
+          this.updateGoalProgress(localGoal);
+        }
+        this.setData({
+          height: localProfile.height,
+          showHeightInput: !localProfile.height,
+          reminderEnabled: localProfile.reminder.enabled,
+          remindTime: localProfile.reminder.remindTime
+        });
+        this.calcBMI();
+      }
     } catch (e) {
-      console.error(e);
+      console.error('loadAll 错误:', e);
+      this.setData({ 
+        cloudReady: false, 
+        cloudError: true,
+        errorMsg: '加载数据时发生错误'
+      });
     }
     wx.hideLoading();
   },
@@ -261,6 +321,12 @@ Page({
     }
   },
 
+  // 点击时间选择器
+  onTimePickerTap() {
+    // 这个方法只是用来阻止事件冒泡到父元素的 onToggleReminder
+    // e 参数不需要使用
+  },
+  
   onRemindTimeChange(e) {
     this.setData({ remindTime: e.detail.value });
     if (this.data.reminderEnabled) {

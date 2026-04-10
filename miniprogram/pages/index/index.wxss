@@ -25,6 +25,60 @@
   z-index: 9999;
 }
 
+/* 云端状态提示 */
+.cloud-status {
+  position: fixed;
+  top: calc(env(safe-area-inset-top) + 44px);
+  left: 0;
+  right: 0;
+  z-index: 9998;
+  background-color: var(--error-bg, rgba(225, 112, 85, 0.1));
+  border-bottom: 1px solid var(--error-border, rgba(225, 112, 85, 0.3));
+  padding: 10rpx 30rpx;
+  transition: opacity 0.3s;
+}
+
+.cloud-status-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0;
+}
+
+.cloud-status-icon {
+  font-size: 14px;
+  margin-right: 10rpx;
+}
+
+.cloud-status-text {
+  flex: 1;
+  font-size: 12px;
+  color: var(--error-text, #e17055);
+  line-height: 1.4;
+}
+
+.cloud-retry-btn {
+  margin-left: 20rpx;
+  padding: 6rpx 20rpx;
+  font-size: 11px;
+  background-color: rgba(225, 112, 85, 0.15);
+  border: 1px solid rgba(225, 112, 85, 0.4);
+  color: #e17055;
+  border-radius: 4px;
+  line-height: 1.2;
+}
+
+/* 主题适配 */
+.theme-light .cloud-status {
+  background-color: rgba(225, 112, 85, 0.08);
+  border-bottom: 1px solid rgba(225, 112, 85, 0.2);
+}
+
+.theme-light .cloud-retry-btn {
+  background-color: rgba(225, 112, 85, 0.1);
+  border: 1px solid rgba(225, 112, 85, 0.3);
+}
+
 /* Header */
 .header {
   position: relative;
@@ -454,6 +508,26 @@
   color: #6c5ce7;
   margin-top: 8rpx;
   display: block;
+}
+
+.time-picker-wrap {
+  /* 只需要用于捕获事件，不需要额外样式 */
+  pointer-events: auto !important;
+}
+
+/* 修改时间链接的点击反馈 */
+.time-picker-wrap .action-link {
+  display: inline-block;
+  background: rgba(108, 92, 231, 0.1);
+  padding: 6rpx 16rpx;
+  border-radius: 8rpx;
+  border: 1rpx solid rgba(108, 92, 231, 0.3);
+  transition: all 0.2s;
+}
+
+.time-picker-wrap .action-link:active {
+  background: rgba(108, 92, 231, 0.2);
+  transform: scale(0.95);
 }
 
 /* History */
