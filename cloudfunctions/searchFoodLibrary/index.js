@@ -16,28 +16,22 @@ exports.main = async (event, context) => {
   }
   
   try {
-    // 先检查集合是否存在，不存在则返回空
-    try {
-      await db.collection('food_library').limit(1).get();
-    } catch (checkErr) {
-      console.log('集合不存在，无需搜索');
-      return { success: true, foods: [] };
-    }
-    
-    // 模糊搜索云端食物库
+    // 模糊搜索云端食物库（合并所有条件到一个 where）
     const res = await db.collection('food_library')
       .where(
-        _.or([
-          { openid: OPENID },
-          { openid: _.exists(false) } // 兼容旧数据
+        _.and([
+          _.or([
+            { openid: OPENID },
+            { openid: _.exists(false) } // 兼容旧数据
+          ]),
+          {
+            name: db.RegExp({
+              regexp: keyword.trim(),
+              options: 'i' // 不区分大小写
+            })
+          }
         ])
       )
-      .where({
-        name: db.RegExp({
-          regexp: keyword.trim(),
-          options: 'i' // 不区分大小写
-        })
-      })
       .limit(10)
       .get();
     

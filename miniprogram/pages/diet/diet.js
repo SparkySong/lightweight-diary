@@ -434,12 +434,16 @@ Page({
       // 云端失败不影响本地搜索
     }
     
-    // 3. 合并结果去重
+    // 3. 合并结果去重（云端数据优先，覆盖本地同名食物）
     const allResults = [...localResults];
-    cloudResults.forEach(food => {
-      const exists = allResults.some(f => f.name.toLowerCase() === food.name.toLowerCase());
-      if (!exists) {
-        allResults.push(food);
+    cloudResults.forEach(cloudFood => {
+      const localIndex = allResults.findIndex(f => f.name.toLowerCase() === cloudFood.name.toLowerCase());
+      if (localIndex >= 0) {
+        // 本地有同名食物，用云端数据替换（云端是最新保存的）
+        allResults[localIndex] = cloudFood;
+      } else {
+        // 本地没有，添加云端食物
+        allResults.push(cloudFood);
       }
     });
     
@@ -623,9 +627,9 @@ Page({
     const idx = e.currentTarget.dataset.idx;
     const foods = [...this.data.foods];
     
-    // 填充食物名称和卡路里
+    // 填充食物名称和卡路里（使用 calories 字段）
     foods[idx].name = item.name;
-    foods[idx].calories = item.serving;
+    foods[idx].calories = item.calories || item.serving;
     
     this.setData({
       foods,
@@ -697,12 +701,9 @@ Page({
     if (validFoods.length === 0) { this.showToast('请至少输入一项食物'); return; }
 
     const totalCal = validFoods.reduce((sum, f) => sum + (parseInt(f.calories) || 0), 0);
-
-    // 找出不在本地数据库的新食物
-    const newFoods = validFoods.filter(f => !isFoodInDatabase(f.name));
+    
     console.log('=== 提交食物 ===');
     console.log('validFoods:', validFoods);
-    console.log('newFoods (不在数据库中的):', newFoods);
     
     wx.showLoading({ title: '保存中...' });
     try {
@@ -721,36 +722,35 @@ Page({
         }
       });
       
-      // 如果有新食物，自动保存到云端食物库
-      if (newFoods.length > 0) {
-        try {
-          console.log('正在保存新食物到云端:', newFoods);
-          const libraryRes = await wx.cloud.callFunction({
-            name: 'addToFoodLibrary',
-            data: { foods: newFoods }
-          });
-          console.log('云端返回:', libraryRes);
-          
-          // 更新本地数据库，合并新食物
-          newFoods.forEach(food => {
-            if (!isFoodInDatabase(food.name)) {
-              foodDatabase.push({
-                name: food.name.trim(),
-                calories: parseInt(food.calories) || 0,
-                unit: food.unit || '',
-                serving: food.calories || 0
-              });
+      // 每次保存都将食物同步到云端食物库（云函数会自动判断是新增还是更新）
+      try {
+        console.log('正在同步食物到云端:', validFoods);
+        const libraryRes = await wx.cloud.callFunction({
+          name: 'addToFoodLibrary',
+          data: { foods: validFoods }
+        });
+        console.log('云端食物库返回:', libraryRes);
+        
+        // 如果返回了更新信息，更新本地数据库
+        if (libraryRes.result && libraryRes.result.results) {
+          libraryRes.result.results.forEach(result => {
+            if (result.updated || result.added) {
+              // 更新本地数据库
+              const localIndex = foodDatabase.findIndex(f => f.name.toLowerCase() === result.name.toLowerCase());
+              if (localIndex >= 0) {
+                foodDatabase[localIndex].calories = result.newCalories;
+                foodDatabase[localIndex].serving = result.newCalories;
+              }
             }
           });
-          console.log('本地数据库已更新，当前长度:', foodDatabase.length);
-        } catch (e) {
-          console.error('保存新食物到云端失败', e);
         }
+      } catch (e) {
+        console.error('同步食物到云端失败', e);
       }
       
       if (res.result.success) {
         const msg = isEditing ? '记录已更新 ✏️' : '记录成功 🍽️';
-        this.showToast(newFoods.length > 0 ? `${msg} 新食物已入库 📚` : msg);
+        this.showToast(msg);
         this.setData({
           foods: [{ name: '', calories: '' }],
           showAddPanel: false,
