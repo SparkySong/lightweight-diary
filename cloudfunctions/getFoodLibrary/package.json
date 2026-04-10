@@ -1,0 +1,9 @@
+{
+  "name": "getFoodLibrary",
+  "version": "1.0.0",
+  "description": "获取用户自定义食物库",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

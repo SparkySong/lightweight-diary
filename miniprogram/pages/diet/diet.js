@@ -298,15 +298,10 @@ const foodDatabase = [
   { name: '鸡蛋灌饼', calories: 280, unit: '个', serving: '280' },
 ];
 
-// 搜索食物（模糊匹配）
-function searchFoods(keyword) {
-  if (!keyword || keyword.trim().length < 1) {
-    return [];
-  }
-  const lowerKeyword = keyword.toLowerCase().trim();
-  return foodDatabase.filter(food => 
-    food.name.toLowerCase().includes(lowerKeyword)
-  ).slice(0, 6); // 最多返回6个结果
+// 检查食物是否存在于本地数据库
+function isFoodInDatabase(foodName) {
+  const lowerName = foodName.toLowerCase().trim();
+  return foodDatabase.some(food => food.name.toLowerCase() === lowerName);
 }
 
 Page({
@@ -340,20 +335,116 @@ Page({
     displayedDays: [],     // 当前显示的数据
     hasMore: true,         // 是否有更多数据
     isLoadingMore: false,  // 是否正在加载更多
-    pageSize: PAGE_SIZE    // 每页加载数量
+    pageSize: PAGE_SIZE,   // 每页加载数量
+    // 云端自定义食物库
+    customFoods: []        // 存储云端自定义食物
   },
 
   onLoad() {
     this.setTodayDate();
     this.initTheme();
+    // 加载云端自定义食物
+    this.loadCustomFoods();
   },
 
   onShow() {
     this.loadRecords();
+    // 加载云端自定义食物（确保每次进入页面都同步最新数据）
+    this.loadCustomFoods();
     // 重新检查主题状态，确保页面显示正确的主题
     this.initTheme();
     // 更新tabBar主题
     app.applyThemeToTabBar();
+  },
+  
+  // 加载云端自定义食物库
+  async loadCustomFoods() {
+    try {
+      const res = await wx.cloud.callFunction({
+        name: 'getFoodLibrary',
+        data: {}
+      });
+      
+      console.log('=== 云端食物库数据 ===');
+      console.log('原始返回:', res);
+      
+      if (res.result && res.result.foods && res.result.foods.length > 0) {
+        // 保存到 data 中，搜索时使用
+        this.setData({ customFoods: res.result.foods });
+        
+        let addedCount = 0;
+        // 合并到本地数据库
+        res.result.foods.forEach(food => {
+          const exists = foodDatabase.some(f => f.name.toLowerCase() === food.name.toLowerCase());
+          if (!exists) {
+            foodDatabase.push({
+              name: food.name,
+              calories: food.calories,
+              unit: food.unit || '',
+              serving: food.calories
+            });
+            addedCount++;
+          }
+        });
+        console.log(`=== 合并了 ${addedCount} 个新食物到本地 ===`);
+        console.log('当前 foodDatabase 长度:', foodDatabase.length);
+      } else {
+        this.setData({ customFoods: [] });
+        console.log('云端食物库为空');
+      }
+    } catch (e) {
+      console.error('加载自定义食物库失败', e);
+    }
+  },
+  
+  // 搜索食物（本地 + 云端实时）
+  async searchFoods(keyword) {
+    if (!keyword || keyword.trim().length < 1) {
+      return [];
+    }
+    const lowerKeyword = keyword.toLowerCase().trim();
+    
+    // 1. 搜索本地数据库
+    const localResults = foodDatabase.filter(food => 
+      food.name.toLowerCase().includes(lowerKeyword)
+    );
+    console.log('本地搜索结果:', localResults);
+    
+    // 2. 搜索云端自定义食物库（直接调用云函数）
+    let cloudResults = [];
+    try {
+      const res = await wx.cloud.callFunction({
+        name: 'searchFoodLibrary',
+        data: { keyword: keyword.trim() }
+      });
+      
+      console.log('云端搜索返回:', res);
+      
+      if (res.result && res.result.foods && res.result.foods.length > 0) {
+        cloudResults = res.result.foods.map(food => ({
+          name: food.name,
+          calories: food.calories,
+          unit: food.unit || '',
+          serving: food.calories
+        }));
+        console.log('云端匹配的食物:', cloudResults);
+      }
+    } catch (e) {
+      console.error('云端搜索失败:', e);
+      // 云端失败不影响本地搜索
+    }
+    
+    // 3. 合并结果去重
+    const allResults = [...localResults];
+    cloudResults.forEach(food => {
+      const exists = allResults.some(f => f.name.toLowerCase() === food.name.toLowerCase());
+      if (!exists) {
+        allResults.push(food);
+      }
+    });
+    
+    console.log('最终合并结果:', allResults);
+    return allResults.slice(0, 6);
   },
 
   setTodayDate() {
@@ -509,14 +600,17 @@ Page({
     const name = e.detail.value;
     foods[idx].name = name;
     
-    // 搜索匹配的食物
-    const results = searchFoods(name);
-    
     this.setData({ 
       foods,
-      searchResults: results,
-      searchActiveIndex: idx,
-      showSearchPanel: results.length > 0
+      searchActiveIndex: idx
+    });
+    
+    // 搜索匹配的食物（支持本地 + 云端）
+    this.searchFoods(name).then(results => {
+      this.setData({
+        searchResults: results,
+        showSearchPanel: results.length > 0
+      });
     });
     
     // 更新总热量
@@ -604,6 +698,12 @@ Page({
 
     const totalCal = validFoods.reduce((sum, f) => sum + (parseInt(f.calories) || 0), 0);
 
+    // 找出不在本地数据库的新食物
+    const newFoods = validFoods.filter(f => !isFoodInDatabase(f.name));
+    console.log('=== 提交食物 ===');
+    console.log('validFoods:', validFoods);
+    console.log('newFoods (不在数据库中的):', newFoods);
+    
     wx.showLoading({ title: '保存中...' });
     try {
       // 如果是编辑模式，先删除原记录
@@ -620,8 +720,37 @@ Page({
           calories: totalCal
         }
       });
+      
+      // 如果有新食物，自动保存到云端食物库
+      if (newFoods.length > 0) {
+        try {
+          console.log('正在保存新食物到云端:', newFoods);
+          const libraryRes = await wx.cloud.callFunction({
+            name: 'addToFoodLibrary',
+            data: { foods: newFoods }
+          });
+          console.log('云端返回:', libraryRes);
+          
+          // 更新本地数据库，合并新食物
+          newFoods.forEach(food => {
+            if (!isFoodInDatabase(food.name)) {
+              foodDatabase.push({
+                name: food.name.trim(),
+                calories: parseInt(food.calories) || 0,
+                unit: food.unit || '',
+                serving: food.calories || 0
+              });
+            }
+          });
+          console.log('本地数据库已更新，当前长度:', foodDatabase.length);
+        } catch (e) {
+          console.error('保存新食物到云端失败', e);
+        }
+      }
+      
       if (res.result.success) {
-        this.showToast(isEditing ? '记录已更新 ✏️' : '记录成功 🍽️');
+        const msg = isEditing ? '记录已更新 ✏️' : '记录成功 🍽️';
+        this.showToast(newFoods.length > 0 ? `${msg} 新食物已入库 📚` : msg);
         this.setData({
           foods: [{ name: '', calories: '' }],
           showAddPanel: false,
