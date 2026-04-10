@@ -1,0 +1,10 @@
+{
+  "navigationStyle": "custom",
+  "navigationBarTitleText": "",
+  "disableScroll": false,
+  "enablePullDownRefresh": true,
+  "backgroundColor": "#0f0f13",
+  "backgroundTextStyle": "dark",
+  "backgroundColorTop": "#0f0f13",
+  "backgroundColorBottom": "#0f0f13"
+}

@@ -1,0 +1,143 @@
+/* 主题样式变量定义 */
+
+/* 深色主题（默认） */
+:root {
+  /* 基础颜色 */
+  --color-bg-primary: #0f0f13;
+  --color-bg-secondary: #1a1a24;
+  --color-bg-tertiary: #242432;
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #8888a0;
+  --color-text-tertiary: #6c5ce7;
+  --color-accent-primary: #6c5ce7;
+  --color-accent-secondary: #a29bfe;
+  --color-border: #2c2c3c;
+  
+  /* 组件相关 */
+  --color-stat-card-bg: #1a1a24;
+  --color-chart-bg: #1a1a24;
+  --color-input-bg: #242432;
+  --color-input-border: #2c2c3c;
+  --color-button-primary: #6c5ce7;
+  --color-button-secondary: #1a1a24;
+  
+  /* 状态颜色 */
+  --color-success: #00b894;
+  --color-warning: #fdcb6e;
+  --color-danger: #e17055;
+  --color-info: #a29bfe;
+  
+  /* BMI 颜色 */
+  --color-bmi-bg: #8888a0;
+  --color-bmi-underweight: #636e72;
+  --color-bmi-healthy: #00b894;
+  --color-bmi-overweight: #fdcb6e;
+  --color-bmi-obese: #e17055;
+  
+  /* 导航栏 */
+  --color-nav-bg: #0f0f13;
+  --color-tab-bar-bg: #0f0f13;
+  --color-tab-icon: #8888a0;
+  --color-tab-icon-active: #6c5ce7;
+}
+
+/* 浅色主题 */
+[data-theme="light"] {
+  /* 基础颜色 */
+  --color-bg-primary: #f8f9fa;
+  --color-bg-secondary: #ffffff;
+  --color-bg-tertiary: #f1f3f5;
+  --color-text-primary: #212529;
+  --color-text-secondary: #868e96;
+  --color-text-tertiary: #4c6ef5;
+  --color-accent-primary: #4c6ef5;
+  --color-accent-secondary: #748ffc;
+  --color-border: #dee2e6;
+  
+  /* 组件相关 */
+  --color-stat-card-bg: #ffffff;
+  --color-chart-bg: #ffffff;
+  --color-input-bg: #ffffff;
+  --color-input-border: #dee2e6;
+  --color-button-primary: #4c6ef5;
+  --color-button-secondary: #ffffff;
+  
+  /* 状态颜色 */
+  --color-success: #40c057;
+  --color-warning: #fab005;
+  --color-danger: #fa5252;
+  --color-info: #748ffc;
+  
+  /* BMI 颜色 */
+  --color-bmi-bg: #adb5bd;
+  --color-bmi-underweight: #868e96;
+  --color-bmi-healthy: #40c057;
+  --color-bmi-overweight: #fab005;
+  --color-bmi-obese: #fa5252;
+  
+  /* 导航栏 */
+  --color-nav-bg: #ffffff;
+  --color-tab-bar-bg: #ffffff;
+  --color-tab-icon: #868e96;
+  --color-tab-icon-active: #4c6ef5;
+}
+
+/* 应用主题样式到组件 */
+.stat-card {
+  background-color: var(--color-stat-card-bg);
+  border-color: var(--color-border);
+}
+
+.card {
+  background-color: var(--color-stat-card-bg);
+  border-color: var(--color-border);
+}
+
+.btn-primary {
+  background-color: var(--color-button-primary);
+  color: white;
+}
+
+.btn-secondary {
+  background-color: var(--color-button-secondary);
+  border-color: var(--color-border);
+  color: var(--color-text-primary);
+}
+
+.stat-label, .card-title {
+  color: var(--color-text-secondary);
+}
+
+.stat-value {
+  color: var(--color-text-primary);
+}
+
+.title {
+  color: var(--color-text-primary);
+}
+
+.subtitle {
+  color: var(--color-text-secondary);
+}
+
+/* 页面背景 */
+page {
+  background-color: var(--color-bg-primary);
+}
+
+/* 容器背景 */
+.container {
+  background-color: var(--color-bg-primary);
+}
+
+/* 自定义导航栏 */
+.custom-nav-area {
+  background-color: var(--color-nav-bg);
+}
+
+/* 输入框 */
+input, .input, .btn {
+  background-color: var(--color-input-bg);
+  border-color: var(--color-input-border);
+  color: var(--color-text-primary);
+}

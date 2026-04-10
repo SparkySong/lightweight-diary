@@ -1,0 +1,204 @@
+<!--pages/index/index.wxml-->
+<page class="{{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}}" bindtap="onPageTap">
+<!-- 页面元信息，用于动态设置背景色和下拉刷新样式 -->
+<page-meta 
+  background-text-style="{{currentTheme === 'light' ? 'light' : 'dark'}}" 
+  background-color="{{currentTheme === 'light' ? '#f8f9fa' : '#0f0f13'}}" 
+  background-color-top="{{currentTheme === 'light' ? '#f8f9fa' : '#0f0f13'}}"
+  background-color-bottom="{{currentTheme === 'light' ? '#f8f9fa' : '#0f0f13'}}" />
+
+<!-- 自定义导航栏区域（完全隐藏原生状态栏，用背景色覆盖） -->
+<view class="custom-nav-area"></view>
+
+<view class="container {{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}}">
+  <!-- Header -->
+  <view class="header">
+    <view class="header-title-row">
+      <text class="title">减肥打卡</text>
+      <view class="header-actions">
+        <!-- 主题切换按钮 -->
+        <view class="theme-toggle" bindtap="onToggleThemeMenu">
+          <text class="theme-icon" wx:if="{{currentTheme === 'dark'}}">🌙</text>
+          <text class="theme-icon" wx:else>☀️</text>
+        </view>
+      </view>
+    </view>
+    <text class="subtitle" wx:if="{{streak > 0}}">🔥 已连续打卡 {{streak}} 天！</text>
+    <text class="subtitle" wx:else>坚持记录，遇见更好的自己</text>
+    
+    <!-- 主题选择菜单 -->
+    <view class="theme-menu" wx:if="{{showThemeMenu}}">
+      <view class="theme-menu-item {{currentTheme === 'dark' ? 'active' : ''}}" 
+            bindtap="onSwitchTheme" data-theme="dark">
+        <text class="theme-menu-icon">🌙</text>
+        <text class="theme-menu-text">深色模式</text>
+      </view>
+      <view class="theme-menu-item {{currentTheme === 'light' ? 'active' : ''}}" 
+            bindtap="onSwitchTheme" data-theme="light">
+        <text class="theme-menu-icon">☀️</text>
+        <text class="theme-menu-text">浅色模式</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- Stats Cards -->
+  <view class="stats">
+    <view class="stat-card">
+      <text class="stat-label">当前体重</text>
+      <text class="stat-value">{{currentWeight}}</text>
+      <text class="stat-unit" wx:if="{{currentWeight !== '--'}}">kg</text>
+      <text class="stat-change {{lastChangeClass}}">{{lastChange}}</text>
+    </view>
+    <view class="stat-card">
+      <text class="stat-label">目标体重</text>
+      <text class="stat-value">{{goalWeight || '--'}}</text>
+      <text class="stat-unit" wx:if="{{goalWeight}}">kg</text>
+      <text class="stat-change neutral" wx:if="{{!goalWeight}}">未设置</text>
+      <text class="stat-change {{goalReached ? 'down' : 'neutral'}}" wx:else>{{goalRemaining}}</text>
+    </view>
+    <view class="stat-card">
+      <text class="stat-label">已减</text>
+      <text class="stat-value" style="color:{{totalLostColor}}">{{totalLost}}</text>
+      <text class="stat-unit" wx:if="{{totalLost !== '--'}}">kg</text>
+      <text class="stat-change neutral">{{daysCount}} 天</text>
+    </view>
+  </view>
+
+  <!-- BMI Card -->
+  <view class="card bmi-card">
+    <view class="card-header">
+      <text class="card-title">📊 BMI 指数</text>
+      <text class="bmi-badge" style="background:{{bmiBgColor}};color:{{bmiColor}}">{{bmiCategory}}</text>
+    </view>
+    <view class="bmi-content">
+      <view class="bmi-value-wrap">
+        <text class="bmi-number" style="color:{{bmiColor}}">{{bmiValue}}</text>
+        <text class="bmi-range">正常范围 18.5-24</text>
+      </view>
+      <view class="bmi-bar">
+        <view class="bmi-segment underweight"></view>
+        <view class="bmi-segment normal"></view>
+        <view class="bmi-segment overweight"></view>
+        <view class="bmi-segment obese"></view>
+        <view class="bmi-indicator" wx:if="{{bmiValue !== '--'}}" style="left: {{bmiIndicatorLeft}}%;"></view>
+      </view>
+      <view class="bmi-labels">
+        <text>偏瘦</text>
+        <text>正常</text>
+        <text>偏胖</text>
+        <text>肥胖</text>
+      </view>
+    </view>
+    <!-- Height Setting -->
+    <view class="height-section">
+      <view wx:if="{{height && !showHeightInput}}" class="height-display">
+        <text class="height-val">身高: {{height}} cm</text>
+        <text class="height-edit" bindtap="onEditHeight">修改</text>
+      </view>
+      <view wx:else class="height-input-wrap" catchtap="stopPropagation">
+        <input id="height-input" class="height-input" type="digit" placeholder="身高 (cm)" value="{{inputHeight}}" bindinput="onHeightInput" confirm-type="done" bindconfirm="onSetHeight" />
+        <button id="height-btn" class="btn-sm" bindtap="onSetHeight">保存</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- Chart -->
+  <view class="card">
+    <view class="card-header">
+      <text class="card-title">📈 体重趋势</text>
+      <view class="range-btns">
+        <view class="range-btn {{chartRange === 7 ? 'active' : ''}}" data-range="7" bindtap="onRangeChange">7天</view>
+        <view class="range-btn {{chartRange === 30 ? 'active' : ''}}" data-range="30" bindtap="onRangeChange">30天</view>
+        <view class="range-btn {{chartRange === 'all' ? 'active' : ''}}" data-range="all" bindtap="onRangeChange">全部</view>
+      </view>
+    </view>
+    <canvas canvas-id="chart" id="chart" class="chart-canvas" />
+  </view>
+
+  <!-- Checkin -->
+  <view class="card">
+    <view class="card-title-wrap">
+      <text class="card-title">📝 今日打卡</text>
+    </view>
+    <view class="input-row">
+      <picker mode="date" value="{{inputDate}}" bindchange="onDateChange">
+        <view class="picker-btn">{{inputDate || '选择日期'}}</view>
+      </picker>
+      <input class="weight-input" type="digit" placeholder="体重 (kg)" value="{{inputWeight}}" bindinput="onWeightInput" confirm-type="done" bindconfirm="onCheckin" />
+    </view>
+    <button class="btn-primary" bindtap="onCheckin">✅ 打卡记录</button>
+  </view>
+
+  <!-- Goal -->
+  <view class="card">
+    <text class="card-title">🎯 目标体重</text>
+    <view class="goal-input-wrap" wx:if="{{showGoalInput}}">
+      <view class="input-row">
+        <input class="weight-input goal-input" type="digit" placeholder="目标体重 kg" value="{{inputGoal}}" bindinput="onGoalInput" confirm-type="done" bindconfirm="onSetGoal" />
+        <button class="btn-goal" bindtap="onSetGoal">设定</button>
+      </view>
+    </view>
+    <view wx:if="{{goalWeight && !showGoalInput}}">
+      <view class="goal-display">
+        <text class="goal-val">{{goalWeight}} kg</text>
+        <text class="goal-remaining {{goalReached ? 'down' : ''}}">{{goalRemaining}}</text>
+      </view>
+      <view class="progress-bar">
+        <view class="progress-fill" style="width: {{goalProgressWidth}}%;"></view>
+      </view>
+    </view>
+  </view>
+
+  <!-- Quick Actions -->
+  <view class="quick-actions">
+    <view class="action-card" bindtap="goToDiet">
+      <text class="action-icon">🥗</text>
+      <text class="action-label">饮食记录</text>
+      <text class="action-desc">记录每日饮食</text>
+    </view>
+    <view class="action-card" bindtap="onToggleReminder">
+      <text class="action-icon">{{reminderEnabled ? '🔔' : '🔕'}}</text>
+      <text class="action-label">{{reminderEnabled ? '提醒已开启' : '开启提醒'}}</text>
+      <text class="action-desc" wx:if="{{reminderEnabled}}">每天 {{remindTime}}</text>
+      <picker mode="time" value="{{remindTime}}" bindchange="onRemindTimeChange" wx:if="{{reminderEnabled}}">
+        <text class="action-link">修改时间</text>
+      </picker>
+    </view>
+  </view>
+
+  <!-- History -->
+  <view class="card history-card">
+    <text class="card-title">📋 打卡记录</text>
+    <view class="empty-state" wx:if="{{records.length === 0}}">
+      <text class="empty-emoji">📭</text>
+      <text class="empty-text">还没有记录，开始你的第一次打卡吧！</text>
+    </view>
+    <view class="record-list" wx:else>
+      <view class="record-item" wx:for="{{records}}" wx:key="_id" wx:for-item="record">
+        <view class="record-left">
+          <text class="record-date">{{record.dateStr}}</text>
+          <text class="record-weight">{{record.weight}} kg</text>
+        </view>
+        <view class="record-right">
+          <text class="record-diff {{record.diffClass}}" wx:if="{{record.diff !== undefined && record.diff !== null}}">
+            <block wx:if="{{record.diff < 0}}">↓{{(-record.diff)}}</block>
+            <block wx:elif="{{record.diff > 0}}">↑{{record.diff}}</block>
+            <block wx:else>→</block>
+          </text>
+          <view class="delete-btn" data-id="{{record._id}}" data-date="{{record.date}}" bindtap="onDelete">✕</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="footer">
+    <text>💪 每天进步一点点</text>
+  </view>
+</view>
+
+<!-- 编辑身高时的遮罩层 -->
+<view class="height-edit-mask {{showHeightInput ? 'show' : ''}}" bindtap="onMaskTap"></view>
+
+<!-- Toast -->
+<view class="toast {{toastShow ? 'show' : ''}}">{{toastMsg}}</view>
+</page>

@@ -1,0 +1,113 @@
+<!--pages/diet/diet.wxml-->
+<page class="{{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}}">
+<!-- 页面元信息，用于动态设置背景色和下拉刷新样式 -->
+<page-meta 
+  background-text-style="{{currentTheme === 'light' ? 'light' : 'dark'}}" 
+  background-color="{{currentTheme === 'light' ? '#f8f9fa' : '#0f0f13'}}" 
+  background-color-top="{{currentTheme === 'light' ? '#f8f9fa' : '#0f0f13'}}"
+  background-color-bottom="{{currentTheme === 'light' ? '#f8f9fa' : '#0f0f13'}}" />
+
+<!-- 自定义导航栏区域（完全隐藏原生状态栏，用背景色覆盖） -->
+<view class="custom-nav-area"></view>
+
+<view class="container {{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}}">
+  <!-- Header -->
+  <view class="header">
+    <view class="header-title-row">
+      <text class="title">饮食记录</text>
+      <view class="header-actions">
+      </view>
+    </view>
+    <text class="subtitle">管住嘴，迈开腿 🏃</text>
+  </view>
+
+  <!-- Add Button / Panel -->
+  <view class="add-section" wx:if="{{!showAddPanel}}">
+    <button class="btn-add" bindtap="toggleAddPanel">➕ 记录饮食</button>
+  </view>
+
+  <!-- Add Panel -->
+  <view class="card add-panel" wx:if="{{showAddPanel}}">
+    <view class="panel-header">
+      <text class="card-title">📝 添加饮食记录</text>
+      <text class="close-btn" bindtap="toggleAddPanel">✕</text>
+    </view>
+
+    <!-- Date -->
+    <picker mode="date" value="{{inputDate}}" bindchange="onDateChange">
+      <view class="date-picker">{{inputDate || '选择日期'}}</view>
+    </picker>
+
+    <!-- Meal Type -->
+    <view class="meal-types">
+      <view class="meal-type {{item.selected ? 'selected' : ''}}" wx:for="{{mealTypes}}" wx:key="key" data-key="{{item.key}}" bindtap="selectMealType">
+        <text>{{item.label}}</text>
+      </view>
+    </view>
+
+    <!-- Food Items -->
+    <view class="food-list">
+      <view class="food-item" wx:for="{{foods}}" wx:key="index">
+        <input class="food-name" placeholder="食物名称" value="{{item.name}}" data-idx="{{index}}" bindinput="onFoodNameInput" />
+        <input class="food-cal" type="digit" placeholder="卡路里" value="{{item.calories}}" data-idx="{{index}}" bindinput="onFoodCalInput" />
+        <view class="remove-food" data-idx="{{index}}" bindtap="removeFoodItem">−</view>
+      </view>
+      <view class="add-food-btn" bindtap="addFoodItem">+ 添加更多食物</view>
+    </view>
+
+    <!-- Quick Add -->
+    <view class="quick-add">
+      <text class="quick-label">快捷添加：</text>
+      <view class="quick-items">
+        <view class="quick-item" data-item="{{ {name:'米饭一碗', calories:'230'} }}" bindtap="quickAdd">🍚 米饭</view>
+        <view class="quick-item" data-item="{{ {name:'鸡胸肉100g', calories:'133'} }}" bindtap="quickAdd">🍗 鸡胸肉</view>
+        <view class="quick-item" data-item="{{ {name:'苹果一个', calories:'95'} }}" bindtap="quickAdd">🍎 苹果</view>
+        <view class="quick-item" data-item="{{ {name:'牛奶一杯', calories:'150'} }}" bindtap="quickAdd">🥛 牛奶</view>
+        <view class="quick-item" data-item="{{ {name:'水煮蛋一个', calories:'78'} }}" bindtap="quickAdd">🥚 鸡蛋</view>
+        <view class="quick-item" data-item="{{ {name:'全麦面包一片', calories:'70'} }}" bindtap="quickAdd">🍞 面包</view>
+        <view class="quick-item" data-item="{{ {name:'沙拉一份', calories:'120'} }}" bindtap="quickAdd">🥗 沙拉</view>
+        <view class="quick-item" data-item="{{ {name:'香蕉一根', calories:'105'} }}" bindtap="quickAdd">🍌 香蕉</view>
+      </view>
+    </view>
+
+    <button class="btn-submit" bindtap="onSubmit">✅ 保存记录</button>
+  </view>
+
+  <!-- Records by Day -->
+  <view wx:if="{{days.length === 0 && !showAddPanel}}" class="empty-state">
+    <text class="empty-emoji">🍽️</text>
+    <text class="empty-text">还没有饮食记录</text>
+    <text class="empty-hint">点击上方按钮开始记录</text>
+  </view>
+
+  <view class="day-group" wx:for="{{days}}" wx:key="date" wx:for-item="day">
+    <view class="day-header">
+      <text class="day-date">{{day.date}}</text>
+      <text class="day-total">{{day.totalCal}} kcal</text>
+    </view>
+
+    <view class="card meal-card" wx:for="{{day.records}}" wx:key="_id" wx:for-item="meal">
+      <view class="meal-header">
+        <text class="meal-type-label">{{meal.mealLabel}}</text>
+        <view class="meal-actions">
+          <text class="meal-cal">{{meal.totalCal}} kcal</text>
+          <view class="delete-btn" data-id="{{meal._id}}" bindtap="onDeleteDiet">✕</view>
+        </view>
+      </view>
+      <view class="food-tags">
+        <view class="food-tag" wx:for="{{meal.foods}}" wx:index="idx2" wx:for-item="food" wx:for-index2="fi">
+          <text>{{food.name}}</text>
+          <text class="food-tag-cal" wx:if="{{food.calories}}">{{food.calories}}cal</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="footer">
+    <text>🥗 饮食控制是减肥成功的关键</text>
+  </view>
+</view>
+
+<!-- Toast -->
+<view class="toast {{toastShow ? 'show' : ''}}">{{toastMsg}}</view>
+</page>

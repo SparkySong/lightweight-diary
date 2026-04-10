@@ -1,0 +1,381 @@
+/* pages/diet/diet.wxss */
+@import "/styles/simple-theme.wxss";
+
+/* 安全区域适配 */
+/* 页面背景由主题CSS控制 */
+/* page的background-color已通过page.theme-light/page.theme-dark设置 */
+
+.container {
+  padding: 30rpx;
+  padding-bottom: 100rpx;
+  /* 使用安全区域避免与系统状态栏重叠，同时考虑胶囊按钮高度 */
+  padding-top: calc(env(safe-area-inset-top) + 44px);
+  min-height: 100vh;
+}
+
+/* 自定义导航栏区域 - 跟随主题颜色 */
+/* 增加额外高度，避免被iOS胶囊按钮遮挡 */
+.custom-nav-area {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: calc(env(safe-area-inset-top) + 44px);
+  background-color: var(--nav-bg, #0f0f13);
+  z-index: 9999;
+}
+
+/* Header */
+.header {
+  position: relative;
+  padding: 30rpx 0 30rpx;
+  /* 减少上边距，因为我们已经通过container的padding-top提供了足够的安全距离 */
+  margin-top: 0;
+}
+
+.header-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12rpx;
+}
+
+.header-actions {
+  display: flex;
+  gap: 20rpx;
+}
+
+.refresh-btn {
+  width: 60rpx;
+  height: 60rpx;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(10px);
+  border: 1rpx solid rgba(255, 255, 255, 0.2);
+  transition: transform 0.2s;
+}
+
+.refresh-btn:active {
+  transform: scale(0.95);
+}
+
+.refresh-icon {
+  font-size: 32rpx;
+}
+
+.refresh-btn.refreshing .refresh-icon {
+  animation: rotate 1s linear infinite;
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.title {
+  font-size: 44rpx;
+  font-weight: 700;
+  background: linear-gradient(135deg, #fdcb6e, #e17055);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: block;
+  text-align: left;
+  margin-bottom: 8rpx;
+}
+.subtitle {
+  font-size: 24rpx;
+  color: #8888a0;
+}
+
+/* Add Section */
+.add-section {
+  margin-bottom: 24rpx;
+}
+.btn-add {
+  width: 100%;
+  background: linear-gradient(135deg, #fdcb6e, #e17055);
+  border: none;
+  border-radius: 20rpx;
+  color: white;
+  font-size: 30rpx;
+  font-weight: 600;
+  padding: 22rpx 0;
+}
+.btn-add::after { border: none; }
+
+/* Card */
+.card {
+  background: #1a1a24;
+  border-radius: 24rpx;
+  padding: 28rpx 24rpx;
+  border: 1rpx solid #2a2a3a;
+  margin-bottom: 20rpx;
+}
+.card-title {
+  font-size: 28rpx;
+  font-weight: 600;
+}
+
+/* Add Panel */
+.add-panel {
+  border-color: #fdcb6e40;
+}
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+.close-btn {
+  font-size: 32rpx;
+  color: #8888a0;
+  padding: 8rpx;
+}
+
+/* Date Picker */
+.date-picker {
+  background: #0f0f13;
+  border: 1rpx solid #2a2a3a;
+  border-radius: 16rpx;
+  padding: 16rpx 20rpx;
+  color: #e8e8ef;
+  font-size: 26rpx;
+  text-align: center;
+  margin-bottom: 20rpx;
+}
+
+/* Meal Types */
+.meal-types {
+  display: flex;
+  gap: 10rpx;
+  margin-bottom: 20rpx;
+}
+.meal-type {
+  flex: 1;
+  background: #0f0f13;
+  border: 1rpx solid #2a2a3a;
+  border-radius: 14rpx;
+  padding: 14rpx 8rpx;
+  text-align: center;
+  font-size: 24rpx;
+  color: #8888a0;
+}
+.meal-type.selected {
+  background: #fdcb6e20;
+  border-color: #fdcb6e;
+  color: #fdcb6e;
+  font-weight: 600;
+}
+
+/* Food List */
+.food-list {
+  margin-bottom: 16rpx;
+}
+.food-item {
+  display: flex;
+  gap: 10rpx;
+  margin-bottom: 10rpx;
+  align-items: center;
+}
+.food-name {
+  flex: 2;
+  background: #0f0f13;
+  border: 1rpx solid #2a2a3a;
+  border-radius: 14rpx;
+  padding: 14rpx 16rpx;
+  color: #e8e8ef;
+  font-size: 26rpx;
+}
+.food-name::placeholder { color: #8888a0; font-size: 24rpx; }
+.food-cal {
+  flex: 1;
+  background: #0f0f13;
+  border: 1rpx solid #2a2a3a;
+  border-radius: 14rpx;
+  padding: 14rpx 16rpx;
+  color: #e8e8ef;
+  font-size: 26rpx;
+  text-align: center;
+}
+.food-cal::placeholder { color: #8888a0; font-size: 24rpx; }
+.remove-food {
+  font-size: 36rpx;
+  color: #e17055;
+  padding: 4rpx 12rpx;
+}
+.add-food-btn {
+  text-align: center;
+  color: #6c5ce7;
+  font-size: 24rpx;
+  padding: 12rpx;
+  border: 1rpx dashed #2a2a3a;
+  border-radius: 14rpx;
+  margin-top: 8rpx;
+}
+
+/* Quick Add */
+.quick-add {
+  margin-bottom: 20rpx;
+}
+.quick-label {
+  font-size: 22rpx;
+  color: #8888a0;
+  display: block;
+  margin-bottom: 10rpx;
+}
+.quick-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10rpx;
+}
+.quick-item {
+  background: #0f0f13;
+  border: 1rpx solid #2a2a3a;
+  border-radius: 14rpx;
+  padding: 10rpx 16rpx;
+  font-size: 22rpx;
+  color: #e8e8ef;
+}
+.quick-item:active {
+  background: #fdcb6e20;
+  border-color: #fdcb6e;
+}
+
+/* Submit */
+.btn-submit {
+  width: 100%;
+  background: linear-gradient(135deg, #fdcb6e, #e17055);
+  border: none;
+  border-radius: 18rpx;
+  color: white;
+  font-size: 28rpx;
+  font-weight: 600;
+  padding: 18rpx 0;
+}
+.btn-submit::after { border: none; }
+
+/* Day Group */
+.day-group {
+  margin-bottom: 24rpx;
+}
+.day-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8rpx 4rpx 12rpx;
+}
+.day-date {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #e8e8ef;
+}
+.day-total {
+  font-size: 24rpx;
+  color: #fdcb6e;
+  font-weight: 600;
+}
+
+/* Meal Card */
+.meal-card {
+  padding: 20rpx 24rpx;
+  margin-bottom: 12rpx;
+}
+.meal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12rpx;
+}
+.meal-type-label {
+  font-size: 26rpx;
+  font-weight: 600;
+}
+.meal-actions {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+.meal-cal {
+  font-size: 22rpx;
+  color: #fdcb6e;
+}
+.delete-btn {
+  font-size: 28rpx;
+  color: #8888a0;
+  padding: 4rpx 10rpx;
+  border-radius: 8rpx;
+}
+.delete-btn:active { color: #e17055; }
+
+/* Food Tags */
+.food-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10rpx;
+}
+.food-tag {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+  background: #0f0f13;
+  border: 1rpx solid #2a2a3a;
+  border-radius: 12rpx;
+  padding: 8rpx 14rpx;
+  font-size: 22rpx;
+  color: #e8e8ef;
+}
+.food-tag-cal {
+  font-size: 18rpx;
+  color: #8888a0;
+}
+
+/* Empty */
+.empty-state {
+  text-align: center;
+  padding: 80rpx 20rpx;
+}
+.empty-emoji {
+  font-size: 72rpx;
+  display: block;
+  margin-bottom: 16rpx;
+}
+.empty-text {
+  font-size: 28rpx;
+  color: #e8e8ef;
+  display: block;
+  margin-bottom: 8rpx;
+}
+.empty-hint {
+  font-size: 24rpx;
+  color: #8888a0;
+}
+
+/* Footer */
+.footer {
+  text-align: center;
+  padding: 40rpx 0 20rpx;
+  font-size: 24rpx;
+  color: #555570;
+}
+
+/* Toast */
+.toast {
+  position: fixed;
+  top: calc(env(safe-area-inset-top) + 100rpx); /* 调整位置，避免被胶囊按钮遮挡 */
+  left: 50%;
+  transform: translateX(-50%) translateY(-200rpx);
+  background: #1a1a24;
+  border: 1rpx solid #00b894;
+  color: #00b894;
+  padding: 20rpx 40rpx;
+  border-radius: 20rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+  z-index: 100;
+  transition: transform 0.3s ease;
+  box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.4);
+}
+.toast.show { transform: translateX(-50%) translateY(0); }

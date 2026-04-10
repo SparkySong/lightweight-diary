@@ -1,0 +1,242 @@
+/* 简易主题切换CSS */
+
+/* 全局CSS变量定义，确保下拉刷新底色正确 */
+:root {
+  --page-bg-dark: #0f0f13;
+  --page-bg-light: #f8f9fa;
+  --nav-bg-dark: #0f0f13;
+  --nav-bg-light: #ffffff;
+  --content-bg-dark: #0f0f13;
+  --content-bg-light: #f8f9fa;
+}
+
+/* 深色主题（默认） */
+page.theme-dark {
+  background-color: var(--page-bg-dark, #0f0f13);
+  transition: background-color 0.5s ease;
+}
+
+/* 确保深色主题的下拉区域也是深色 */
+page.theme-dark .page__background {
+  background-color: #0f0f13;
+}
+
+page.theme-dark .wx-pull-to-refresh__area {
+  background-color: #0f0f13;
+}
+
+page.theme-dark .page__bd {
+  background-color: #0f0f13;
+}
+
+/* 浅色主题 */
+page.theme-light {
+  background-color: var(--page-bg-light, #f8f9fa);
+  transition: background-color 0.5s ease;
+}
+
+/* 确保浅色主题的下拉区域也是浅色 */
+page.theme-light .page__background {
+  background-color: #f8f9fa;
+}
+
+page.theme-light .wx-pull-to-refresh__area {
+  background-color: #f8f9fa;
+}
+
+page.theme-light .page__bd {
+  background-color: #f8f9fa;
+}
+
+.container.theme-dark {
+  background-color: var(--content-bg-dark, #0f0f13);
+  min-height: 100vh; /* 确保容器高度足够 */
+}
+
+.container.theme-light {
+  background-color: var(--content-bg-light, #f8f9fa);
+  min-height: 100vh; /* 确保容器高度足够 */
+}
+
+.container.theme-dark .stat-card,
+.container.theme-dark .card {
+  background-color: #1a1a24;
+  border-color: #2a2a3a;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.container.theme-dark .stat-label,
+.container.theme-dark .card-title {
+  color: #8888a0;
+}
+
+.container.theme-dark .stat-value {
+  color: #ffffff;
+}
+
+.container.theme-dark .title {
+  color: #ffffff;
+}
+
+.container.theme-dark .subtitle {
+  color: #8888a0;
+}
+
+/* 顶部安全区域 - 深色主题毛玻璃效果 */
+.container.theme-dark .custom-nav-area,
+page.theme-dark .custom-nav-area {
+  background: linear-gradient(180deg, rgba(15, 15, 19, 0.96) 0%, rgba(15, 15, 19, 0.85) 100%);
+  backdrop-filter: saturate(180%) blur(15rpx);
+  -webkit-backdrop-filter: saturate(180%) blur(15rpx);
+  transition: background 0.5s ease;
+  background-color: var(--nav-bg-dark, rgba(15, 15, 19, 0.96));
+}
+
+.container.theme-dark .header .header-actions .theme-toggle,
+.container.theme-dark .header .header-actions .refresh-btn {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.28);
+  backdrop-filter: blur(20rpx);
+  transition: all 0.3s ease;
+}
+
+
+
+.container.theme-light .stat-card,
+.container.theme-light .card {
+  background-color: #ffffff;
+  border-color: #dee2e6;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.container.theme-light .stat-label,
+.container.theme-light .card-title {
+  color: #868e96;
+}
+
+.container.theme-light .stat-value {
+  color: #212529;
+}
+
+.container.theme-light .title {
+  color: #212529;
+}
+
+.container.theme-light .subtitle {
+  color: #868e96;
+}
+
+/* 顶部安全区域 - 浅色主题毛玻璃效果 */
+.container.theme-light .custom-nav-area,
+page.theme-light .custom-nav-area {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.9) 100%);
+  backdrop-filter: saturate(180%) blur(15rpx);
+  -webkit-backdrop-filter: saturate(180%) blur(15rpx);
+  transition: background 0.5s ease;
+  background-color: var(--nav-bg-light, rgba(255, 255, 255, 0.98));
+}
+
+.container.theme-light .header .header-actions .theme-toggle,
+.container.theme-light .header .header-actions .refresh-btn {
+  background: rgba(0, 0, 0, 0.08);
+  border-color: rgba(0, 0, 0, 0.18);
+  backdrop-filter: blur(20rpx);
+  transition: all 0.3s ease;
+}
+
+/* 主题菜单样式 */
+.container.theme-dark .theme-menu {
+  background: #1a1a24;
+  border-color: #2a2a3a;
+}
+
+.container.theme-light .theme-menu {
+  background: #ffffff;
+  border-color: #dee2e6;
+}
+
+.container.theme-dark .theme-menu-item {
+  border-bottom-color: #2a2a3a;
+}
+
+.container.theme-light .theme-menu-item {
+  border-bottom-color: #dee2e6;
+}
+
+.container.theme-dark .theme-menu-text {
+  color: #ffffff;
+}
+
+.container.theme-light .theme-menu-text {
+  color: #212529;
+}
+
+/* 按钮样式 */
+.container.theme-dark .btn-primary {
+  background: #6c5ce7;
+  color: white;
+}
+
+.container.theme-light .btn-primary {
+  background: #4c6ef5;
+  color: white;
+}
+
+.container.theme-dark .btn-secondary {
+  background: #1a1a24;
+  color: #ffffff;
+  border-color: #2a2a3a;
+}
+
+.container.theme-light .btn-secondary {
+  background: #ffffff;
+  color: #212529;
+  border-color: #dee2e6;
+}
+
+/* BMI相关 */
+.container.theme-dark .bmi-bar-bg {
+  background: #8888a0;
+}
+
+.container.theme-light .bmi-bar-bg {
+  background: #adb5bd;
+}
+
+.container.theme-dark .bmi-text,
+.container.theme-dark .bmi-category {
+  color: #ffffff;
+}
+
+.container.theme-light .bmi-text,
+.container.theme-light .bmi-category {
+  color: #212529;
+}
+
+/* 输入框 */
+.container.theme-dark input,
+.container.theme-dark .input,
+.container.theme-dark .height-input,
+.container.theme-dark .weight-input {
+  background: #242432;
+  border-color: #2c2c3c;
+  color: #ffffff;
+}
+
+.container.theme-light input,
+.container.theme-light .input,
+.container.theme-light .height-input,
+.container.theme-light .weight-input {
+  background: #ffffff;
+  border-color: #dee2e6;
+  color: #212529;
+}
+
+/* 状态颜色 */
+.container.theme-dark .down { color: #00b894; }
+.container.theme-dark .up { color: #e17055; }
+.container.theme-dark .neutral { color: #8888a0; }
+
+.container.theme-light .down { color: #40c057; }
+.container.theme-light .up { color: #fa5252; }
+.container.theme-light .neutral { color: #868e96; }

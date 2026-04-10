@@ -1,0 +1,13 @@
+/* app.wxss */
+page {
+  /* 背景色由主题CSS file控制 */
+  color: #e8e8ef;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  font-size: 28rpx;
+  min-height: 100vh;
+}
+
+/* 浅色主题下的字体颜色调整 */
+page.theme-light {
+  color: #212529;
+}

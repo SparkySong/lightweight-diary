@@ -1,0 +1,37 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/diet/diet"
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#0f0f13",
+    "navigationBarTitleText": "",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#0f0f13",
+    "navigationStyle": "custom",
+    "enablePullDownRefresh": true,
+    "backgroundTextStyle": "dark"
+  },
+  "tabBar": {
+    "color": "#8888a0",
+    "selectedColor": "#6c5ce7",
+    "backgroundColor": "#0f0f13",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "打卡",
+        "iconPath": "images/tab-weight.jpg",
+        "selectedIconPath": "images/tab-weight-active.jpg"
+      },
+      {
+        "pagePath": "pages/diet/diet",
+        "text": "饮食",
+        "iconPath": "images/tab-diet.jpg",
+        "selectedIconPath": "images/tab-diet-active.jpg"
+      }
+    ]
+  },
+  "cloud": true,
+  "sitemapLocation": "sitemap.json"
+}
