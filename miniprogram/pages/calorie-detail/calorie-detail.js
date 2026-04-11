@@ -213,8 +213,9 @@ Page({
     const targetCal = Math.min(this.data.customTarget || 1500, 5000);
     const remainingCal = targetCal - totalCal;
     
-    // 热量缺口计算（假设日标消耗为目标+500）
-    const deficit = totalCal - (targetCal + 500);
+    // 热量缺口计算：摄入 - 目标消耗
+    // 负数表示热量不足（有利于减脂），正数表示摄入超标
+    const deficit = totalCal - targetCal;
     
     // 确定状态
     let statusClass, statusIcon, statusText;
