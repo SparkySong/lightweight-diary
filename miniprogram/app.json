@@ -4,6 +4,7 @@
     "pages/diet/diet",
     "pages/calorie-detail/calorie-detail"
   ],
+  "darkmode": true,
   "window": {
     "navigationBarBackgroundColor": "#0f0f13",
     "navigationBarTitleText": "",

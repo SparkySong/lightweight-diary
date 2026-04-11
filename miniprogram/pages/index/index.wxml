@@ -14,7 +14,8 @@
       <view class="header-actions">
         <!-- 主题切换按钮 -->
         <view class="theme-toggle" bindtap="onToggleThemeMenu">
-          <text class="theme-icon" wx:if="{{currentTheme === 'dark'}}">🌙</text>
+          <text class="theme-icon" wx:if="{{currentThemeSetting === 'system'}}">📱</text>
+          <text class="theme-icon" wx:elif="{{currentTheme === 'dark'}}">🌙</text>
           <text class="theme-icon" wx:else>☀️</text>
         </view>
       </view>
@@ -24,12 +25,17 @@
     
     <!-- 主题选择菜单 -->
     <view class="theme-menu" wx:if="{{showThemeMenu}}">
-      <view class="theme-menu-item {{currentTheme === 'dark' ? 'active' : ''}}" 
+      <view class="theme-menu-item {{currentThemeSetting === 'system' ? 'active' : ''}}" 
+            bindtap="onSwitchTheme" data-theme="system">
+        <text class="theme-menu-icon">📱</text>
+        <text class="theme-menu-text">跟随系统</text>
+      </view>
+      <view class="theme-menu-item {{currentThemeSetting === 'dark' ? 'active' : ''}}" 
             bindtap="onSwitchTheme" data-theme="dark">
         <text class="theme-menu-icon">🌙</text>
         <text class="theme-menu-text">深色模式</text>
       </view>
-      <view class="theme-menu-item {{currentTheme === 'light' ? 'active' : ''}}" 
+      <view class="theme-menu-item {{currentThemeSetting === 'light' ? 'active' : ''}}" 
             bindtap="onSwitchTheme" data-theme="light">
         <text class="theme-menu-icon">☀️</text>
         <text class="theme-menu-text">浅色模式</text>

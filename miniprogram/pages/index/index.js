@@ -47,6 +47,7 @@ Page({
     remindTime: '08:00',
     // 主题相关
     currentTheme: 'dark',
+    currentThemeSetting: 'dark', // 用户设置的主题（可能为 system）
     themeColors: null,
     showThemeMenu: false,
     // 下拉刷新
@@ -81,6 +82,12 @@ Page({
 
   onShow() {
     this.loadAll();
+    // 页面显示时检测主题变化（特别针对跟随系统模式）
+    const themeSetting = app.getThemeSetting();
+    if (themeSetting === 'system') {
+      // 跟随系统模式时，每次页面显示都检测系统主题
+      this.onThemeChange();
+    }
     // 页面显示时确保tabBar应用正确主题
     setTimeout(() => {
       app.applyThemeToTabBar();
@@ -729,13 +736,27 @@ Page({
   
   // 主题相关方法
   initTheme() {
-    const theme = app.getTheme();
+    const themeSetting = app.getThemeSetting();
+    const effectiveTheme = app.getEffectiveTheme();
     this.setData({ 
-      currentTheme: theme
+      currentTheme: effectiveTheme,
+      currentThemeSetting: themeSetting
     });
     
     // 动态设置下拉刷新背景色
-    this.setPullDownRefreshBg(theme);
+    this.setPullDownRefreshBg(effectiveTheme);
+  },
+  
+  // 页面主题变化回调（跟随系统主题时调用）
+  onThemeChange() {
+    const themeSetting = app.getThemeSetting();
+    const effectiveTheme = app.getEffectiveTheme();
+    this.setData({
+      currentTheme: effectiveTheme,
+      currentThemeSetting: themeSetting
+    });
+    this.setPullDownRefreshBg(effectiveTheme);
+    app.applyThemeToTabBar();
   },
   
   // 设置下拉刷新背景色
@@ -776,23 +797,67 @@ Page({
   },
   
   // 切换主题
-  onSwitchTheme() {
-    // 切换全局主题
-    const newTheme = app.switchTheme();
+  onSwitchTheme(e) {
+    const theme = e.currentTarget.dataset.theme;
+    
+    // 如果选择跟随系统但无法检测到系统主题，提示用户选择
+    if (theme === 'system') {
+      // 检测系统主题
+      const detectedTheme = app.getSystemTheme();
+      const savedTheme = wx.getStorageSync('lastSystemTheme');
+      
+      // 如果没有保存过主题（首次使用跟随系统），让用户确认
+      if (!savedTheme) {
+        wx.showModal({
+          title: '选择当前系统主题',
+          content: '您的微信版本暂不支持自动检测主题，请确认您的微信当前是深色还是浅色模式？',
+          confirmText: '🌙 深色',
+          cancelText: '☀️ 浅色',
+          success: (res) => {
+            const systemTheme = res.confirm ? 'dark' : 'light';
+            this.applyThemeWithSystem(theme, systemTheme);
+          }
+        });
+        return;
+      }
+    }
+    
+    this.applyThemeWithSystem(theme, theme === 'system' ? app.getSystemTheme() : theme);
+  },
+  
+  // 应用主题
+  applyThemeWithSystem(themeSetting, effectiveTheme) {
+    // 保存主题设置
+    wx.setStorageSync('appTheme', themeSetting);
+    app.globalData.theme = themeSetting;
+    
+    // 如果是跟随系统，保存检测到的系统主题
+    if (themeSetting === 'system') {
+      app.setSystemTheme(effectiveTheme);
+    }
     
     this.setData({
-      currentTheme: newTheme,
+      currentTheme: effectiveTheme,
+      currentThemeSetting: themeSetting,
       showThemeMenu: false
     });
     
     // 设置下拉刷新背景色
-    this.setPullDownRefreshBg(newTheme);
+    this.setPullDownRefreshBg(effectiveTheme);
     
     // 更新tabBar主题
     app.applyThemeToTabBar();
     
     // 显示提示
-    this.showToast(newTheme === 'dark' ? '切换到深色模式 🌙' : '切换到浅色模式 ☀️');
+    let toastMsg = '';
+    if (themeSetting === 'system') {
+      toastMsg = '已切换到跟随系统 📱';
+    } else if (themeSetting === 'dark') {
+      toastMsg = '切换到深色模式 🌙';
+    } else {
+      toastMsg = '切换到浅色模式 ☀️';
+    }
+    this.showToast(toastMsg);
   },
   
   // 显示/隐藏主题菜单

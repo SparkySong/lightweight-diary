@@ -351,8 +351,12 @@ Page({
     this.loadRecords();
     // 加载云端自定义食物（确保每次进入页面都同步最新数据）
     this.loadCustomFoods();
-    // 重新检查主题状态，确保页面显示正确的主题
-    this.initTheme();
+    // 页面显示时检测主题变化（特别针对跟随系统模式）
+    const themeSetting = app.getThemeSetting();
+    if (themeSetting === 'system') {
+      // 跟随系统模式时，每次页面显示都检测系统主题
+      this.onThemeChange();
+    }
     // 更新tabBar主题
     app.applyThemeToTabBar();
   },
@@ -850,13 +854,23 @@ Page({
   
   // 主题相关方法
   initTheme() {
-    const theme = app.getTheme();
+    const theme = app.getEffectiveTheme();
     this.setData({ 
       currentTheme: theme
     });
     
     // 动态设置下拉刷新背景色
     this.setPullDownRefreshBg(theme);
+  },
+  
+  // 页面主题变化回调（跟随系统主题时调用）
+  onThemeChange() {
+    const theme = app.getEffectiveTheme();
+    this.setData({
+      currentTheme: theme
+    });
+    this.setPullDownRefreshBg(theme);
+    app.applyThemeToTabBar();
   },
   
   // 设置下拉刷新背景色

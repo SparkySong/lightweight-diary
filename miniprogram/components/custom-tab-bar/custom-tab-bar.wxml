@@ -9,7 +9,7 @@
   >
     <view class="tab-icon">
       <image 
-        src="{{theme === 'dark' ? (selected === index ? item.selectedIconPath : item.iconPath) : (selected === index ? item.iconPath : item.selectedIconPath)}}" 
+        src="{{selected === index ? item.selectedIconPath : item.iconPath}}" 
         mode="aspectFit" 
         class="icon"
       />

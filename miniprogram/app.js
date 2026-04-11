@@ -13,6 +13,9 @@ App({
     // 初始化主题（默认深色模式）
     this.initTheme();
     
+    // 监听系统主题变化
+    this.watchSystemTheme();
+    
     // 应用主题到tabBar
     this.applyThemeToTabBar();
   },
@@ -42,7 +45,118 @@ App({
   
   // 获取当前主题
   getTheme() {
+    const themeSetting = wx.getStorageSync('appTheme');
+    // 如果用户选择跟随系统，则返回系统主题
+    if (themeSetting === 'system') {
+      return this.getSystemTheme();
+    }
+    return themeSetting || 'dark';
+  },
+  
+  // 获取微信客户端主题
+  getSystemTheme() {
+    try {
+      // 尝试所有可能的 API 获取主题
+      const apis = [
+        { name: 'wx.getAppBaseInfo', fn: wx.getAppBaseInfo },
+        { name: 'wx.getDeviceInfo', fn: wx.getDeviceInfo },
+        { name: 'wx.getSystemSetting', fn: wx.getSystemSetting },
+        { name: 'wx.getSystemInfoSync', fn: wx.getSystemInfoSync }
+      ];
+      
+      for (const api of apis) {
+        if (typeof api.fn === 'function') {
+          try {
+            const info = api.fn();
+            if (info && info.theme) {
+              wx.setStorageSync('lastSystemTheme', info.theme);
+              return info.theme;
+            }
+          } catch (e) {
+            // 继续尝试下一个 API
+          }
+        }
+      }
+      
+      // 如果所有 API 都无法获取主题，使用上次保存的主题
+      const lastSystemTheme = wx.getStorageSync('lastSystemTheme');
+      if (lastSystemTheme) {
+        return lastSystemTheme;
+      }
+      
+      // 首次使用且无法检测，默认深色（与小程序默认主题一致）
+      return 'dark';
+    } catch (e) {
+      return 'dark';
+    }
+  },
+  
+  // 设置系统主题（供用户手动选择）
+  setSystemTheme(theme) {
+    if (theme === 'dark' || theme === 'light') {
+      wx.setStorageSync('lastSystemTheme', theme);
+    }
+  },
+  
+  // 监听微信客户端主题变化
+  watchSystemTheme() {
+    try {
+      // 基础库 2.21+ 支持 wx.onThemeChange
+      if (typeof wx.onThemeChange === 'function') {
+        wx.onThemeChange((res) => {
+          console.log('微信主题变化通知:', res.theme);
+          // 保存检测到的系统主题
+          if (res.theme === 'dark' || res.theme === 'light') {
+            wx.setStorageSync('lastSystemTheme', res.theme);
+          }
+          
+          const themeSetting = wx.getStorageSync('appTheme');
+          // 仅当用户选择跟随系统时才响应
+          if (themeSetting === 'system') {
+            // 更新 globalData 中的主题
+            this.globalData.theme = res.theme;
+            // 应用主题到tabBar
+            this.applyThemeToTabBar();
+            // 通知页面主题变化
+            this.notifyThemeChange();
+          }
+        });
+        console.log('已注册微信主题变化监听');
+      } else {
+        console.log('当前版本不支持 wx.onThemeChange，将使用 onShow 检测');
+      }
+      
+      // 首次启动时保存检测到的系统主题
+      const currentTheme = this.getSystemTheme();
+      wx.setStorageSync('lastSystemTheme', currentTheme);
+      console.log('首次保存系统主题:', currentTheme);
+    } catch (err) {
+      console.error('监听微信主题变化失败:', err);
+    }
+  },
+  
+  // 通知所有页面主题变化
+  notifyThemeChange() {
+    const pages = getCurrentPages();
+    pages.forEach(page => {
+      if (page.onThemeChange) {
+        page.onThemeChange();
+      }
+    });
+  },
+  
+  // 获取主题设置（区分手动设置和跟随系统）
+  getThemeSetting() {
     return wx.getStorageSync('appTheme') || 'dark';
+  },
+  
+  // 获取显示用主题（实际生效的主题）
+  getEffectiveTheme() {
+    const themeSetting = this.getThemeSetting();
+    if (themeSetting === 'system') {
+      return this.getSystemTheme();
+    }
+    return themeSetting;
   },
   
   // 应用主题到tabBar
