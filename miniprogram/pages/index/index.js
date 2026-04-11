@@ -65,7 +65,12 @@ Page({
     displayedRecords: [],     // 当前显示的记录
     hasMoreRecords: true,     // 是否有更多记录
     isLoadingMore: false,     // 是否正在加载更多
-    pageSize: PAGE_SIZE       // 每页加载数量
+    pageSize: PAGE_SIZE,      // 每页加载数量
+    // 体重弹框相关
+    weightPopupShow: false,
+    weightPopupType: 'current', // 'current' 或 'target'
+    weightInputValue: '',
+    weightPopupError: ''
   },
 
   onLoad() {
@@ -226,9 +231,21 @@ Page({
 
   async loadGoal() {
     try {
-      const res = await wx.cloud.callFunction({ name: 'getGoal' });
-      const goal = res.result.goal;
+      // 先从本地存储获取目标体重
+      const weightData = wx.getStorageSync('weightData') || {};
+      let goal = weightData.targetWeight || null;
+      
+      // 如果本地没有，尝试从云端获取
+      if (!goal) {
+        const res = await wx.cloud.callFunction({ name: 'getGoal' });
+        goal = res.result.goal;
+      }
+      
       if (goal) {
+        // 确保保留一位小数并同步到本地存储
+        goal = parseFloat(parseFloat(goal).toFixed(1));
+        weightData.targetWeight = goal;
+        wx.setStorageSync('weightData', weightData);
         this.setData({ goalWeight: goal, showGoalInput: false });
         this.updateGoalProgress(goal);
       } else {
@@ -630,7 +647,7 @@ Page({
   },
 
   async onSetGoal() {
-    const val = parseFloat(this.data.inputGoal);
+    const val = parseFloat(parseFloat(this.data.inputGoal).toFixed(1));
     if (!val || val < 20 || val > 300) { this.showToast('请输入有效目标体重'); return; }
     try {
       await wx.cloud.callFunction({ name: 'setGoal', data: { goal: val } });
@@ -849,5 +866,92 @@ Page({
         this.setData({ refreshing: false });
       }, 500);
     });
+  },
+
+  // 打开体重弹框
+  openWeightPopup(e) {
+    const type = e.currentTarget.dataset.type;
+    const currentWeight = this.data.currentWeight;
+    const goalWeight = this.data.goalWeight;
+    
+    let inputValue = '';
+    if (type === 'current') {
+      inputValue = currentWeight !== '--' ? currentWeight : '';
+    } else {
+      inputValue = goalWeight ? String(goalWeight) : '';
+    }
+    
+    this.setData({
+      weightPopupShow: true,
+      weightPopupType: type,
+      weightInputValue: inputValue,
+      weightPopupError: ''
+    });
+  },
+
+  // 关闭体重弹框
+  closeWeightPopup() {
+    this.setData({
+      weightPopupShow: false,
+      weightInputValue: '',
+      weightPopupError: ''
+    });
+  },
+
+  // 体重输入
+  onWeightPopupInput(e) {
+    this.setData({ weightInputValue: e.detail.value });
+  },
+
+  // 保存体重
+  async saveWeightPopup() {
+    const value = parseFloat(this.data.weightInputValue);
+    
+    if (!value || value < 20 || value > 300) {
+      this.setData({ weightPopupError: '请输入20-300之间的有效体重' });
+      return;
+    }
+    
+    this.setData({ weightPopupError: '' });
+    
+    wx.showLoading({ title: '保存中...' });
+    
+    try {
+      if (this.data.weightPopupType === 'current') {
+        // 保存当前体重 - 添加今日打卡记录
+        const today = this.data.inputDate;
+        const res = await wx.cloud.callFunction({
+          name: 'addRecord',
+          data: { date: today, weight: value }
+        });
+        
+        if (res.result && res.result.success) {
+          this.showToast('体重已记录 📝');
+          this.closeWeightPopup();
+          this.loadAll();
+        } else {
+          this.showToast('保存失败');
+        }
+      } else {
+        // 保存目标体重到本地存储（保留一位小数）
+        const weightData = wx.getStorageSync('weightData') || {};
+        weightData.targetWeight = parseFloat(value.toFixed(1));
+        wx.setStorageSync('weightData', weightData);
+        
+        this.showToast('目标体重已设置 🎯');
+        this.closeWeightPopup();
+        
+        // 更新目标体重显示
+        this.setData({ goalWeight: weightData.targetWeight });
+        
+        // 重新计算目标相关信息
+        this.updateGoalProgress(weightData.targetWeight);
+      }
+    } catch (e) {
+      console.error('保存体重失败', e);
+      this.showToast('保存失败');
+    }
+    
+    wx.hideLoading();
   }
 });

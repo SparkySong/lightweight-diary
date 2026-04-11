@@ -59,21 +59,25 @@ Page({
   },
 
   onShow() {
-    this.loadRecords();
-    // 重新绘制图表
-    setTimeout(() => {
-      this.drawPieChart();
-      this.drawLineChart();
-      this.drawBarChart();
-    }, 300);
+    this.loadUserData().then(() => {
+      this.loadRecords();
+      // 重新绘制图表
+      setTimeout(() => {
+        this.drawPieChart();
+        this.drawLineChart();
+        this.drawBarChart();
+      }, 300);
+    });
   },
 
   onReady() {
     // 延迟绘制，等待数据加载
     setTimeout(() => {
-      this.drawPieChart();
-      this.drawLineChart();
-      this.drawBarChart();
+      this.loadUserData().then(() => {
+        this.drawPieChart();
+        this.drawLineChart();
+        this.drawBarChart();
+      });
     }, 500);
   },
 
@@ -104,34 +108,24 @@ Page({
 
   async loadUserData() {
     try {
-      // 获取用户设置的目标热量
-      const userData = wx.getStorageSync('userSettings') || {};
-      const customTarget = userData.dailyCalorieTarget || 0;
+      // 只从云端获取用户设置的目标热量
+      const res = await wx.cloud.callFunction({ name: 'getUserSettings', data: {} });
+      const customTarget = res.result.settings?.dailyCalorieTarget || 0;
       
-      // 获取BMR和目标
-      const weightData = wx.getStorageSync('weightData') || {};
-      const targetWeight = weightData.targetWeight || 65;
-      const height = userData.height || 170;
-      const age = userData.age || 25;
-      const gender = userData.gender || 'male';
-      
-      // 计算基础代谢率(BMR) - 简化Mifflin-St Jeor公式
-      let bmr;
-      if (gender === 'male') {
-        bmr = 10 * targetWeight + 6.25 * height - 5 * age + 5;
-      } else {
-        bmr = 10 * targetWeight + 6.25 * height - 5 * age - 161;
-      }
-      
-      // 计算日标消耗 = BMR * 活动系数 * 减脂缺口
-      const dailyConsume = Math.round(bmr * 1.4 - 500); // 假设轻量活动，减500卡
+      // 默认热量目标（如果云端没有设置）
+      const defaultTarget = 1500;
       
       this.setData({
-        customTarget: customTarget || dailyConsume,
+        customTarget: customTarget || defaultTarget,
         showTargetInput: false
       });
     } catch (e) {
       console.error('加载用户数据失败', e);
+      // 云端失败时使用默认值
+      this.setData({
+        customTarget: 1500,
+        showTargetInput: false
+      });
     }
   },
 
@@ -646,23 +640,31 @@ Page({
   },
 
   // 保存目标
-  saveTarget() {
+  async saveTarget() {
     const target = parseInt(this.data.customTarget);
     if (!target || target < 500 || target > 5000) {
       this.showToast('请输入500-5000之间的数值');
       return;
     }
     
-    // 保存到本地存储
-    const userSettings = wx.getStorageSync('userSettings') || {};
-    userSettings.dailyCalorieTarget = target;
-    wx.setStorageSync('userSettings', userSettings);
+    wx.showLoading({ title: '保存中...' });
     
-    // 使用自定义 toast（已优化层级）
-    this.showToast('目标已设定 🎯');
-    
-    this.setData({ showTargetInput: false });
-    this.loadRecords();
+    try {
+      // 只保存到云端
+      await wx.cloud.callFunction({
+        name: 'saveUserSettings',
+        data: { dailyCalorieTarget: target }
+      });
+      
+      this.showToast('目标已设定 🎯');
+      this.setData({ showTargetInput: false });
+      this.loadRecords();
+    } catch (e) {
+      console.error('云端保存失败', e);
+      this.showToast('保存失败，请重试');
+    } finally {
+      wx.hideLoading();
+    }
   },
 
   // 单位切换

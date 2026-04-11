@@ -39,16 +39,15 @@
 
   <!-- Stats Cards -->
   <view class="stats">
-    <view class="stat-card">
+    <view class="stat-card" bindtap="openWeightPopup" data-type="current">
       <text class="stat-label">当前体重</text>
       <text class="stat-value">{{currentWeight}}</text>
       <text class="stat-unit" wx:if="{{currentWeight !== '--'}}">kg</text>
       <text class="stat-change {{lastChangeClass}}">{{lastChange}}</text>
     </view>
-    <view class="stat-card">
+    <view class="stat-card" bindtap="openWeightPopup" data-type="target">
       <text class="stat-label">目标体重</text>
-      <text class="stat-value">{{goalWeight || '--'}}</text>
-      <text class="stat-unit" wx:if="{{goalWeight}}">kg</text>
+      <text class="stat-value">{{goalWeight || '--'}}<text class="stat-unit" wx:if="{{goalWeight}}">kg</text></text>
       <text class="stat-change neutral" wx:if="{{!goalWeight}}">未设置</text>
       <text class="stat-change {{goalReached ? 'down' : 'neutral'}}" wx:else>{{goalRemaining}}</text>
     </view>
@@ -240,3 +239,26 @@
 <!-- Toast -->
 <view class="toast {{toastShow ? 'show' : ''}}">{{toastMsg}}</view>
 </page>
+
+<!-- 体重编辑弹框 - 放在page外面 -->
+<view class="weight-popup-overlay {{weightPopupShow ? 'show' : ''}}" bindtap="closeWeightPopup"></view>
+<view class="weight-popup {{weightPopupShow ? 'show' : ''}}">
+  <view class="weight-popup-header">
+    <text class="weight-popup-title">{{weightPopupType === 'current' ? '📝 ' + (currentWeight !== '--' ? '编辑当前体重' : '记录当前体重') : '🎯 ' + (goalWeight ? '编辑目标体重' : '设置目标体重')}}</text>
+    <text class="weight-popup-close" bindtap="closeWeightPopup">✕</text>
+  </view>
+  <view class="weight-popup-body">
+    <view class="weight-popup-input-group">
+      <text class="weight-popup-label">{{weightPopupType === 'current' ? '当前体重' : '目标体重'}}</text>
+      <view class="weight-popup-input-row">
+        <input class="weight-popup-input" type="digit" value="{{weightInputValue}}" bindinput="onWeightPopupInput" placeholder="请输入体重" />
+        <text class="weight-popup-unit">kg</text>
+      </view>
+    </view>
+    <view class="weight-popup-error" wx:if="{{weightPopupError}}">{{weightPopupError}}</view>
+  </view>
+  <view class="weight-popup-footer">
+    <button class="weight-popup-btn-cancel" bindtap="closeWeightPopup">取消</button>
+    <button class="weight-popup-btn-confirm" bindtap="saveWeightPopup">确认</button>
+  </view>
+</view>
