@@ -80,7 +80,7 @@
           <text class="menu-text">偏好设置</text>
         </view>
         <view class="menu-item-right">
-          <text class="menu-desc">{{weightUnit === 'kg' ? '千克' : '斤'}} · {{calorieUnit}}</text>
+          <text class="menu-desc">{{weightUnit === 'kg' ? '千克' : '斤'}} </text>
           <text class="menu-arrow">›</text>
         </view>
       </view>

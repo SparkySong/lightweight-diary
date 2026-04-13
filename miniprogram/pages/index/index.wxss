@@ -403,7 +403,7 @@
   flex: 1;
   background: #0f0f13;
   border: 1rpx solid #2a2a3a;
-  border-radius: 20rpx;
+  border-radius: 12rpx;
   padding: 18rpx 20rpx;
   color: #e8e8ef;
   font-size: 32rpx;
@@ -436,15 +436,21 @@
   color: white;
   font-size: 26rpx;
   font-weight: 600;
-  padding: 16rpx 28rpx;
+  width: 160rpx;
+  padding: 8rpx 28rpx;
 }
 .btn-goal::after { border: none; }
 .btn-cancel-small {
-  padding: 16rpx 24rpx;
   background: #2a2a3a;
   border-radius: 16rpx;
   color: #8888a0;
-  font-size: 24rpx;
+  font-size: 26rpx;
+  font-weight: 600;
+  width: 100rpx;
+  text-align: center;
+  height: 47rpx;
+ line-height: 47rpx;
+  padding: 16rpx 28rpx;
 }
 
 /* Goal */
