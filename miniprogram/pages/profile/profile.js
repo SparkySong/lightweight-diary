@@ -56,15 +56,11 @@ Page({
     const nickname = wx.getStorageSync('nickname') || '轻体用户';
     const weightUnit = wx.getStorageSync('weightUnit') || 'kg';
     const calorieUnit = wx.getStorageSync('calorieUnit') || 'kcal';
-    const calorieGoal = wx.getStorageSync('calorieGoal') || 0;
     const weightData = wx.getStorageSync('weightData') || {};
     const goalWeight = weightData.targetWeight || null;
     const height = wx.getStorageSync('userHeight') || null;
-    let calorieGoalDisplay = '未设置';
-    if (calorieGoal > 0) {
-      calorieGoalDisplay = calorieGoal + ' kcal';
-    }
-    this.setData({ nickname, height, goalWeight, weightUnit, calorieUnit, calorieGoal, calorieGoalDisplay });
+    // 热量目标暂不设置，等云端返回后再更新
+    this.setData({ nickname, height, goalWeight, weightUnit, calorieUnit, calorieGoal: 0, calorieGoalDisplay: '未设置' });
     this.loadStats(goalWeight);
   },
 
@@ -105,12 +101,23 @@ Page({
     const nickname = wx.getStorageSync('nickname') || '轻体用户';
     const weightUnit = wx.getStorageSync('weightUnit') || 'kg';
     const calorieUnit = wx.getStorageSync('calorieUnit') || 'kcal';
-    const calorieGoal = wx.getStorageSync('calorieGoal') || 0;
 
     // 从本地存储加载体重数据
     const weightData = wx.getStorageSync('weightData') || {};
     const goalWeight = weightData.targetWeight || null;
     const height = wx.getStorageSync('userHeight') || null;
+
+    // 同步云端身高数据到本地
+    await this.syncAllFromCloud();
+
+    // 从云端获取热量目标
+    let calorieGoal = 0;
+    try {
+      const res = await wx.cloud.callFunction({ name: 'getUserSettings', data: {} });
+      calorieGoal = res.result.settings?.dailyCalorieTarget || 0;
+    } catch (e) {
+      console.warn('获取云端热量目标失败', e);
+    }
 
     // 更新热量目标显示
     let calorieGoalDisplay = '未设置';
@@ -122,16 +129,13 @@ Page({
       }
     }
 
-    // 同步云端身高数据到本地
-    await this.syncAllFromCloud();
-
     // 重新从本地获取（可能刚被云端数据更新）
     const syncedHeight = wx.getStorageSync('userHeight') || height;
 
     // 加载统计数据
     this.loadStats(goalWeight);
 
-this.setData({
+    this.setData({
       nickname,
       height: syncedHeight,
       goalWeight,
@@ -142,7 +146,7 @@ this.setData({
     });
   },
 
-// 从云端同步所有个人数据到本地
+  // 从云端同步个人数据到本地
   async syncAllFromCloud() {
     try {
       const res = await wx.cloud.callFunction({ name: 'getProfile' });
@@ -150,10 +154,6 @@ this.setData({
       // 同步身高
       if (result.height) {
         wx.setStorageSync('userHeight', result.height);
-      }
-      // 同步热量目标（云端 profile 可能存有）
-      if (result.calorieGoal && result.calorieGoal > 0) {
-        wx.setStorageSync('calorieGoal', result.calorieGoal);
       }
       // 同步目标体重
       if (result.goalWeight) {
@@ -357,14 +357,22 @@ loadStats(goalWeight) {
     this.setData({ editCalorieGoal: e.detail.value });
   },
 
-  onSaveCalorieGoal() {
+  async onSaveCalorieGoal() {
     const val = parseInt(this.data.editCalorieGoal);
     if (!val || val < 200 || val > 10000) {
       this.showToast('热量范围 200-10000kcal');
       return;
     }
-    wx.setStorageSync('calorieGoal', val);
-    this.showToast('热量目标已设置 🔥');
+    try {
+      await wx.cloud.callFunction({
+        name: 'saveUserSettings',
+        data: { dailyCalorieTarget: val }
+      });
+      this.showToast('热量目标已设置 🔥');
+    } catch (e) {
+      console.error('保存热量目标失败', e);
+      this.showToast('保存失败');
+    }
     this.closeAllPopups();
     this.loadUserData();
   },

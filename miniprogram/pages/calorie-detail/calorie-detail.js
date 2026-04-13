@@ -662,7 +662,6 @@ Page({
     wx.showLoading({ title: '保存中...' });
     
     try {
-      // 只保存到云端
       await wx.cloud.callFunction({
         name: 'saveUserSettings',
         data: { dailyCalorieTarget: target }
