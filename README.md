@@ -99,10 +99,6 @@ npm install
 - 云函数运行时长限制为 60 秒
 - 注意保护用户隐私数据
 
-## 许可证
-
-MIT License
-
 ## 贡献指南
 
 欢迎提交 Issue 和 Pull Request！
