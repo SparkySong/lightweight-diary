@@ -10,7 +10,7 @@ const lowCalRecipes = {
 
 Page({
   data: {
-    currentTheme: 'dark',
+    currentTheme: app.globalData.theme || 'dark',
     todayDate: '',
     unit: 'kcal',
     customTarget: '',
@@ -59,6 +59,8 @@ Page({
   },
 
   onShow() {
+    // 每次进入页面都重新初始化主题
+    this.initTheme();
     this.loadUserData().then(() => {
       this.loadRecords();
       // 重新绘制图表
@@ -89,7 +91,17 @@ Page({
 
   initTheme() {
     const theme = app.getTheme();
-    this.setData({ currentTheme: theme });
+    // 只有主题变化时才更新
+    if (this.data.currentTheme !== theme) {
+      this.setData({ currentTheme: theme });
+    }
+    
+    // 动态设置导航栏颜色
+    wx.setNavigationBarColor({
+      frontColor: theme === 'light' ? '#000000' : '#ffffff',
+      backgroundColor: theme === 'light' ? '#ffffff' : '#0f0f13',
+      animation: { duration: 200, timingFunc: 'easeIn' }
+    });
     
     if (theme === 'light') {
       wx.setBackgroundColor({
