@@ -136,9 +136,14 @@ App({
   },
   
   // 通知所有页面主题变化
-  notifyThemeChange() {
+  notifyThemeChange(theme) {
+    const effectiveTheme = theme || this.getEffectiveTheme();
     const pages = getCurrentPages();
     pages.forEach(page => {
+      // 直接更新页面的 currentTheme 数据，避免切换时闪烁
+      if (page.data && page.data.currentTheme !== undefined) {
+        page.setData({ currentTheme: effectiveTheme });
+      }
       if (page.onThemeChange) {
         page.onThemeChange();
       }

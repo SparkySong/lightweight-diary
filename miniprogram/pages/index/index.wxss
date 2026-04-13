@@ -990,50 +990,358 @@
   opacity: 0.9;
 }
 
-/* 浅色主题弹框 */
-.theme-light .weight-popup {
+/* 浅色主题弹框 - 弹窗直接在page内，带theme-light类 */
+.theme-light.weight-popup {
   background: #ffffff;
 }
 
-.theme-light .weight-popup-header {
+.theme-light.weight-popup .weight-popup-header {
   border-color: #dee2e6;
 }
 
-.theme-light .weight-popup-title {
+.theme-light.weight-popup .weight-popup-title {
   color: #212529;
 }
 
-.theme-light .weight-popup-close {
+.theme-light.weight-popup .weight-popup-close {
   color: #868e96;
 }
 
-.theme-light .weight-popup-close:active {
+.theme-light.weight-popup .weight-popup-close:active {
   color: #212529;
 }
 
-.theme-light .weight-popup-input {
+.theme-light.weight-popup .weight-popup-input {
   background: #f8f9fa;
   border-color: #dee2e6;
   color: #212529;
 }
 
-.theme-light .weight-popup-unit {
+.theme-light.weight-popup .weight-popup-unit {
   color: #868e96;
 }
 
-.theme-light .weight-popup-btn-cancel {
+.theme-light.weight-popup .weight-popup-btn-cancel {
   background: #e9ecef;
   color: #495057;
 }
 
-.theme-light .weight-popup-btn-cancel:active {
+.theme-light.weight-popup .weight-popup-btn-cancel:active {
   background: #dee2e6;
 }
 
-.theme-light .weight-popup-btn-confirm {
+.theme-light.weight-popup .weight-popup-btn-confirm {
   background: linear-gradient(135deg, #4c6ef5, #748ffc);
 }
 
-.theme-light .weight-popup-error {
+.theme-light.weight-popup .weight-popup-error {
   color: #e03131;
+}
+
+/* ========== 浅色主题全面覆盖 ========== */
+
+/* 主题菜单 */
+.theme-light .theme-menu {
+  background: #ffffff;
+  border-color: #dee2e6;
+  box-shadow: 0 10rpx 30rpx rgba(0, 0, 0, 0.1);
+}
+
+.theme-light .theme-menu-item {
+  border-bottom-color: #dee2e6;
+}
+
+.theme-light .theme-menu-item.active {
+  background: rgba(76, 110, 245, 0.1);
+}
+
+.theme-light .theme-menu-text {
+  color: #495057;
+}
+
+/* 主题切换按钮和刷新按钮 */
+.theme-light .theme-toggle,
+.theme-light .refresh-btn {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+/* 标题文字 */
+.theme-light .title {
+  background: linear-gradient(135deg, #4c6ef5, #40c057);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.theme-light .subtitle {
+  color: #868e96;
+}
+
+/* 统计卡片 */
+.theme-light .stat-card {
+  background: #ffffff;
+  border-color: #dee2e6;
+}
+
+.theme-light .stat-label {
+  color: #868e96;
+}
+
+.theme-light .stat-value {
+  color: #212529;
+}
+
+.theme-light .stat-unit {
+  color: #868e96;
+}
+
+.theme-light .stat-change.neutral {
+  color: #868e96;
+}
+
+/* 通用卡片样式 */
+.theme-light .card {
+  background: #ffffff;
+  border-color: #dee2e6;
+}
+
+/* BMI 卡片 */
+.theme-light .bmi-badge {
+  opacity: 1;
+}
+
+.theme-light .bmi-range {
+  color: #868e96;
+}
+
+/* 身高设置 */
+.theme-light .height-val {
+  color: #495057;
+}
+
+.theme-light .height-edit {
+  color: #4c6ef5;
+}
+
+.theme-light .height-input {
+  background: #f8f9fa;
+  border-color: #dee2e6;
+  color: #212529;
+}
+
+/* 快速操作卡片 */
+.theme-light .action-card {
+  background: #ffffff;
+  border-color: #dee2e6;
+}
+
+/* 目标卡片 */
+.theme-light .goal-edit-hint {
+  color: #4c6ef5;
+}
+
+.theme-light .goal-empty {
+  color: #868e96;
+}
+
+/* 图表卡片 - 图表内文字颜色 */
+.theme-light .chart-empty {
+  color: #868e96;
+}
+
+/* 记录列表 */
+.theme-light .record-item {
+  border-bottom-color: #dee2e6;
+}
+
+.theme-light .record-date {
+  color: #868e96;
+}
+
+.theme-light .record-weight {
+  color: #212529;
+}
+
+/* 加载更多 */
+.theme-light .load-more-text {
+  color: #868e96;
+}
+
+.theme-light .loading-spinner {
+  border-color: #dee2e6;
+  border-top-color: #4c6ef5;
+}
+
+/* 弹框遮罩 - 浅色模式下稍亮一些（弹窗直接在page内，带theme-light类） */
+.theme-light.weight-popup-overlay {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+/* 弹框内容 - 已有覆盖，这里补充遗漏的 */
+.theme-light.weight-popup .weight-popup-body {
+  /* 保持背景色由 .weight-popup 控制 */
+}
+
+/* 确认按钮 */
+.theme-light .btn-primary {
+  background: linear-gradient(135deg, #4c6ef5, #748ffc);
+}
+
+.theme-light .btn-sm {
+  background: linear-gradient(135deg, #4c6ef5, #748ffc);
+  color: #ffffff;
+}
+
+/* 弹框内输入框 placeholder */
+.theme-light input::-webkit-input-placeholder {
+  color: #adb5bd;
+}
+
+/* BMI 标签文字 */
+.theme-light .bmi-labels {
+  color: #868e96;
+}
+
+/* 身高设置区域 */
+.theme-light .height-section {
+  border-top-color: #dee2e6;
+}
+
+.theme-light .height-input-wrap {
+  /* input样式已在 .height-input 中定义 */
+}
+
+/* 图表相关文字颜色 */
+.theme-light .chart-title,
+.theme-light .chart-label {
+  color: #495057;
+}
+
+/* 目标进度条背景 */
+.theme-light .progress-bg {
+  background: #dee2e6;
+}
+
+/* 空状态文字 */
+.theme-light .empty-state {
+  color: #868e96;
+}
+
+/* 空状态样式 */
+.theme-light .empty-text {
+  color: #868e96;
+}
+
+/* 记录列表分隔线 */
+.theme-light .record-item {
+  border-top-color: #dee2e6;
+}
+
+/* 身高输入按钮 */
+.theme-light .height-btn {
+  background: linear-gradient(135deg, #4c6ef5, #748ffc);
+  color: #ffffff;
+}
+
+/* 胶囊按钮 */
+.theme-light .btn-capsule {
+  background: linear-gradient(135deg, #4c6ef5, #748ffc);
+  color: #ffffff;
+}
+
+/* 次要按钮 */
+.theme-light .btn-secondary {
+  background: #f8f9fa;
+  border-color: #dee2e6;
+  color: #495057;
+}
+
+/* 图表标题和标签 */
+.theme-light .chart-title,
+.theme-light .chart-label {
+  color: #495057;
+}
+
+/* 目标进度相关 */
+.theme-light .goal-progress {
+  background: #dee2e6;
+}
+
+/* 圆角容器背景 */
+.theme-light .rounded-bg {
+  background: #f8f9fa;
+}
+
+/* 数字显示 */
+.theme-light .number-display {
+  color: #212529;
+}
+
+/* 卡片标题文字颜色 */
+.theme-light .card-title {
+  color: #212529;
+}
+
+/* 目标卡片进度条 */
+.theme-light .goal-progress-bar {
+  background: #dee2e6;
+}
+
+.theme-light .goal-progress-fill {
+  /* 进度填充色保持渐变 */
+}
+
+/* 目标详情文字 */
+.theme-light .goal-detail {
+  color: #495057;
+}
+
+/* 快速操作文字 */
+.theme-light .action-label {
+  color: #212529;
+}
+
+/* 小标签文字 */
+.theme-light .hint-text {
+  color: #868e96;
+}
+
+/* ========== 编辑面板和遮罩浅色主题 ========== */
+/* 遮罩层浅色主题 */
+.theme-light.height-edit-mask,
+.theme-light.edit-panel-mask {
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+/* 编辑面板浅色主题 */
+.theme-light.edit-panel {
+  background: #ffffff;
+  border-color: #dee2e6;
+}
+
+.theme-light.edit-panel .edit-panel-title {
+  color: #212529;
+}
+
+.theme-light.edit-panel .edit-panel-date {
+  color: #868e96;
+}
+
+.theme-light.edit-panel .edit-weight-input {
+  background: #f8f9fa;
+  border-color: #dee2e6;
+  color: #212529;
+}
+
+.theme-light.edit-panel .edit-weight-input::placeholder {
+  color: #adb5bd;
+}
+
+.theme-light.edit-panel .btn-cancel {
+  background: #e9ecef;
+  color: #495057;
+}
+
+.theme-light.edit-panel .btn-save {
+  background: linear-gradient(135deg, #4c6ef5, #748ffc);
 }

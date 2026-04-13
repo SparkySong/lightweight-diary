@@ -848,6 +848,9 @@ Page({
     // 更新tabBar主题
     app.applyThemeToTabBar();
     
+    // 通知所有已加载页面同步更新主题（避免切换页面时闪烁）
+    app.notifyThemeChange(effectiveTheme);
+    
     // 显示提示
     let toastMsg = '';
     if (themeSetting === 'system') {

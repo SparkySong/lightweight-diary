@@ -224,11 +224,11 @@
 </view>
 
 <!-- 编辑身高时的遮罩层 -->
-<view class="height-edit-mask {{showHeightInput ? 'show' : ''}}" bindtap="onMaskTap"></view>
+<view class="height-edit-mask {{showHeightInput ? 'show' : ''}} {{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}}" bindtap="onMaskTap"></view>
 
 <!-- 编辑体重弹窗 -->
-<view class="edit-panel-mask {{showEditPanel ? 'show' : ''}}" bindtap="closeEditPanel"></view>
-<view class="edit-panel {{showEditPanel ? 'show' : ''}}">
+<view class="edit-panel-mask {{showEditPanel ? 'show' : ''}} {{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}}" bindtap="closeEditPanel"></view>
+<view class="edit-panel {{showEditPanel ? 'show' : ''}} {{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}}">
   <view class="edit-panel-header">
     <text class="edit-panel-title">✏️ 修改体重</text>
     <text class="edit-panel-date">{{editDate}}</text>
@@ -246,9 +246,9 @@
 <view class="toast {{toastShow ? 'show' : ''}}">{{toastMsg}}</view>
 </page>
 
-<!-- 体重编辑弹框 - 放在page外面 -->
-<view class="weight-popup-overlay {{weightPopupShow ? 'show' : ''}}" bindtap="closeWeightPopup"></view>
-<view class="weight-popup {{weightPopupShow ? 'show' : ''}}">
+<!-- 体重编辑弹框 - 放在page内（container外部）并添加主题类 -->
+<view class="weight-popup-overlay {{weightPopupShow ? 'show' : ''}} {{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}}" bindtap="closeWeightPopup"></view>
+<view class="weight-popup {{weightPopupShow ? 'show' : ''}} {{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}}">
   <view class="weight-popup-header">
     <text class="weight-popup-title">{{weightPopupType === 'current' ? '📝 ' + (currentWeight !== '--' ? '编辑当前体重' : '记录当前体重') : '🎯 ' + (goalWeight ? '编辑目标体重' : '设置目标体重')}}</text>
     <text class="weight-popup-close" bindtap="closeWeightPopup">✕</text>
