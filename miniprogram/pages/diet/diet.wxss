@@ -545,9 +545,39 @@
 .toast.show { transform: translateX(-50%) translateY(0); }
 
 /* ========== 浅色主题样式 ========== */
+
+/* 页面背景 - 覆盖 CSS 变量 */
+.theme-light {
+  --color-bg-primary: #f8f9fa;
+  --color-bg-secondary: #ffffff;
+  --color-bg-tertiary: #f1f3f5;
+  --color-text-primary: #212529;
+  --color-text-secondary: #868e96;
+  --color-border: #dee2e6;
+  --nav-bg: #ffffff;
+}
+
+/* 页面背景色 */
+.theme-light page,
+.theme-light .container {
+  background-color: #f8f9fa;
+}
+
+/* 自定义导航栏 */
+.theme-light .custom-nav-area {
+  background-color: #ffffff;
+}
+
+/* 通用卡片样式 */
 .theme-light .card {
   background: #ffffff;
   border-color: #dee2e6;
+}
+
+/* 刷新按钮 */
+.theme-light .refresh-btn {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.1);
 }
 .theme-light .add-panel {
   border-color: #fab00540;
@@ -704,4 +734,55 @@
 .theme-light .loading-spinner {
   border-color: #dee2e6;
   border-top-color: #fab005;
+}
+
+/* 浅色主题记录相关 */
+.theme-light .day-group {
+  /* 日期分组背景 */
+}
+
+.theme-light .meal-card {
+  background: #ffffff;
+  border-color: #dee2e6;
+}
+
+.theme-light .food-tag {
+  background: #f8f9fa;
+  border-color: #dee2e6;
+  color: #212529;
+}
+
+.theme-light .food-tag-cal {
+  color: #868e96;
+}
+
+/* 浅色主题按钮 */
+.theme-light .btn-add {
+  background: linear-gradient(135deg, #fab005, #e67700);
+}
+
+.theme-light .btn-submit {
+  background: linear-gradient(135deg, #fab005, #e67700);
+}
+
+/* 浅色主题删除/编辑按钮 */
+.theme-light .delete-btn {
+  color: #fa5252;
+}
+
+.theme-light .edit-icon {
+  color: #868e96;
+}
+
+.theme-light .edit-icon:active {
+  color: #4c6ef5;
+}
+
+/* 浅色主题输入框 placeholder */
+.theme-light .food-name::-webkit-input-placeholder {
+  color: #adb5bd;
+}
+
+.theme-light .food-cal::-webkit-input-placeholder {
+  color: #adb5bd;
 }

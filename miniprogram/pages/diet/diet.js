@@ -319,8 +319,8 @@ Page({
     showAddPanel: false,
     toastMsg: '',
     toastShow: false,
-    // 主题相关
-    currentTheme: 'dark',
+    // 主题相关 - 初始值从全局获取，避免首次渲染闪烁
+    currentTheme: app.globalData.theme || 'dark',
     // 编辑相关
     isEditing: false,
     editRecordId: '',
@@ -348,6 +348,9 @@ Page({
   },
 
   onShow() {
+    // 每次进入页面都重新初始化主题（确保 tabBar 切换后主题正确）
+    this.initTheme();
+    
     this.loadRecords();
     // 加载云端自定义食物（确保每次进入页面都同步最新数据）
     this.loadCustomFoods();
@@ -855,9 +858,12 @@ Page({
   // 主题相关方法
   initTheme() {
     const theme = app.getEffectiveTheme();
-    this.setData({ 
-      currentTheme: theme
-    });
+    // 只有主题变化时才更新，避免不必要的 setData 导致闪烁
+    if (this.data.currentTheme !== theme) {
+      this.setData({ 
+        currentTheme: theme
+      });
+    }
     
     // 动态设置下拉刷新背景色
     this.setPullDownRefreshBg(theme);

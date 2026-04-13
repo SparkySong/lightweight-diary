@@ -1,5 +1,5 @@
 <!-- components/custom-tab-bar/custom-tab-bar.wxml -->
-<view class="custom-tab-bar">
+<view class="custom-tab-bar theme-{{theme}}">
   <view 
     wx:for="{{list}}" 
     wx:key="text" 

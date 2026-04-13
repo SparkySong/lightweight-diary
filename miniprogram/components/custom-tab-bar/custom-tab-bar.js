@@ -44,8 +44,28 @@ Component({
     },
     
     updateTheme(theme) {
+      const currentTheme = theme || 'dark';
+      
+      // 浅色主题下：激活用普通图标，未激活用高亮图标（反过来）
+      // 深色主题下：激活用高亮图标，未激活用普通图标（正常）
+      const list = [
+        {
+          pagePath: "/pages/index/index",
+          text: "打卡",
+          iconPath: currentTheme === 'light' ? '../../images/tab-weight-active.png' : '../../images/tab-weight.png',
+          selectedIconPath: currentTheme === 'light' ? '../../images/tab-weight.png' : '../../images/tab-weight-active.png'
+        },
+        {
+          pagePath: "/pages/diet/diet",
+          text: "饮食",
+          iconPath: currentTheme === 'light' ? '../../images/tab-diet-active.png' : '../../images/tab-diet.png',
+          selectedIconPath: currentTheme === 'light' ? '../../images/tab-diet.png' : '../../images/tab-diet-active.png'
+        }
+      ];
+      
       this.setData({
-        theme: theme || 'dark'
+        theme: currentTheme,
+        list: list 
       });
     }
   },
@@ -68,11 +88,9 @@ Component({
         }
       }
       
-      // 设置初始主题
+      // 设置初始主题（同时更新图标路径）
       if (app.globalData.theme) {
-        this.setData({
-          theme: app.globalData.theme
-        });
+        this.updateTheme(app.globalData.theme);
       }
     }
   }

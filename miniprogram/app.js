@@ -173,7 +173,66 @@ App({
     this.globalData.tabBarConfig = tabBarConfig;
     this.globalData.theme = theme;
     
-    // 更新自定义tabBar主题
+    // 动态更新原生 tabBar 样式
+    try {
+      wx.setTabBarStyle({
+        color: tabBarConfig.color,
+        selectedColor: tabBarConfig.selectedColor,
+        backgroundColor: tabBarConfig.backgroundColor,
+        borderStyle: tabBarConfig.borderStyle,
+        fail: (err) => {
+          console.error('设置tabBar样式失败:', err);
+        }
+      });
+      
+      // 更新 tabBar 图标（浅色主题：激活用普通图标，未激活用高亮图标）
+      const pages = getCurrentPages();
+      if (pages.length > 0) {
+        const currentPage = pages[pages.length - 1];
+        const route = currentPage.route;
+        
+        // 根据主题决定图标路径
+        // 浅色主题：激活用普通图标，未激活用高亮图标
+        // 深色主题：激活用高亮图标，未激活用普通图标
+        const indexIconPath = theme === 'light' ? 'images/tab-weight-active.png' : 'images/tab-weight.png';
+        const indexSelectedIconPath = theme === 'light' ? 'images/tab-weight.png' : 'images/tab-weight-active.png';
+        const dietIconPath = theme === 'light' ? 'images/tab-diet-active.png' : 'images/tab-diet.png';
+        const dietSelectedIconPath = theme === 'light' ? 'images/tab-diet.png' : 'images/tab-diet-active.png';
+        
+        // 根据当前页面更新图标选中状态
+        if (route === 'pages/index/index') {
+          wx.setTabBarItem({
+            index: 0,
+            iconPath: indexIconPath,
+            selectedIconPath: indexSelectedIconPath,
+            text: '打卡'
+          });
+          wx.setTabBarItem({
+            index: 1,
+            iconPath: dietIconPath,
+            selectedIconPath: dietIconPath,
+            text: '饮食'
+          });
+        } else if (route === 'pages/diet/diet') {
+          wx.setTabBarItem({
+            index: 0,
+            iconPath: indexIconPath,
+            selectedIconPath: indexIconPath,
+            text: '打卡'
+          });
+          wx.setTabBarItem({
+            index: 1,
+            iconPath: dietIconPath,
+            selectedIconPath: dietSelectedIconPath,
+            text: '饮食'
+          });
+        }
+      }
+    } catch (err) {
+      console.error('更新tabBar失败:', err);
+    }
+    
+    // 更新自定义tabBar主题（如果有的话）
     this.updateCustomTabBarTheme(theme);
   },
   
