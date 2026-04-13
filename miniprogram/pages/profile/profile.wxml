@@ -157,7 +157,7 @@
     </view>
     <view class="popup-body">
       <view class="form-group">
-        <input class="form-input" type="nickname" value="{{editNickname}}" bindblur="onEditNicknameBlur" placeholder="点击获取微信昵称" focus="{{showNicknameEdit}}" adjust-position="false" cursor-spacing="100" />
+        <input class="form-input" type="nickname" value="{{editNickname}}" bindinput="onEditNicknameInput" placeholder="点击获取微信昵称" focus="{{showNicknameEdit}}" adjust-position="false" cursor-spacing="100" />
       </view>
     </view>
     <view class="popup-footer">

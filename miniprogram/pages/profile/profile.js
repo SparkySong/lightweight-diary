@@ -305,8 +305,8 @@ loadStats(goalWeight) {
     this.setData({ showNicknameEdit: false });
   },
 
-  // 昵称编辑输入
-  onEditNicknameBlur(e) {
+  // 昵称编辑输入（使用 bindinput 实时同步，解决 iOS 上 blur 事件可能晚于按钮点击的问题）
+  onEditNicknameInput(e) {
     this.setData({ editNickname: e.detail.value });
   },
 
