@@ -4,7 +4,8 @@
   background-text-style="{{currentTheme === 'light' ? 'light' : 'dark'}}" 
   background-color="{{currentTheme === 'light' ? '#f8f9fa' : '#0f0f13'}}" 
   background-color-top="{{currentTheme === 'light' ? '#f8f9fa' : '#0f0f13'}}"
-  background-color-bottom="{{currentTheme === 'light' ? '#f8f9fa' : '#0f0f13'}}" />
+  background-color-bottom="{{currentTheme === 'light' ? '#f8f9fa' : '#0f0f13'}}"
+  page-style="position: relative;" />
 
 <!-- 自定义导航栏区域 -->
 <view class="custom-nav-area"></view>
@@ -16,12 +17,15 @@
   </view>
 
   <!-- 个人信息卡片 -->
-  <view class="profile-card" bindtap="onProfileCardTap">
-    <view class="profile-avatar">
-      <text class="avatar-emoji">👤</text>
-    </view>
+  <view class="profile-card">
+    <button class="avatar-btn" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
+      <image class="profile-avatar" src="{{avatarUrl}}" mode="aspectFill" />
+    </button>
     <view class="profile-info">
-      <text class="profile-nickname">{{nickname}}</text>
+      <view class="nickname-row" bindtap="onNicknameTap">
+        <text class="profile-nickname">{{nickname}}</text>
+        <text class="nickname-edit-icon">✎</text>
+      </view>
       <view class="profile-stats">
         <view class="profile-stat-item">
           <text class="profile-stat-value">{{daysCount}}</text>
@@ -39,7 +43,6 @@
         </view>
       </view>
     </view>
-    <view class="profile-arrow">›</view>
   </view>
 
   <!-- 功能入口列表 -->
@@ -145,6 +148,25 @@
 
 <!-- ========== 弹窗区域（放在 container 外避免被遮挡） ========== -->
 
+<!-- 昵称编辑弹窗 -->
+<view class="popup-overlay" wx:if="{{showNicknameEdit}}" bindtap="onCloseNicknameEdit" catchtouchmove="preventTouchMove">
+  <view class="popup-panel nickname-popup" catchtap="stopPropagation">
+    <view class="popup-header">
+      <text class="popup-title">设置昵称</text>
+      <text class="popup-close" bindtap="onCloseNicknameEdit">✕</text>
+    </view>
+    <view class="popup-body">
+      <view class="form-group">
+        <input class="form-input" type="nickname" value="{{editNickname}}" bindblur="onEditNicknameBlur" placeholder="点击获取微信昵称" focus="{{showNicknameEdit}}" adjust-position="false" cursor-spacing="100" />
+      </view>
+    </view>
+    <view class="popup-footer">
+      <button class="popup-btn popup-btn-cancel" bindtap="onCloseNicknameEdit">取消</button>
+      <button class="popup-btn popup-btn-confirm" bindtap="onSaveNickname">保存</button>
+    </view>
+  </view>
+</view>
+
 <!-- 个人信息编辑弹窗 -->
 <view class="popup-overlay" wx:if="{{showProfileEdit}}" bindtap="onPopupOverlayTap" catchtouchmove="preventTouchMove">
   <view class="popup-panel" catchtap="stopPropagation">
@@ -155,15 +177,15 @@
     <view class="popup-body">
       <view class="form-group">
         <text class="form-label">昵称</text>
-        <input class="form-input" value="{{editNickname}}" bindinput="onNicknameInput" placeholder="请输入昵称" maxlength="20" />
+        <input class="form-input" value="{{editNickname}}" bindinput="onNicknameInput" placeholder="请输入昵称" maxlength="20" adjust-position="false" cursor-spacing="80" />
       </view>
       <view class="form-group">
         <text class="form-label">身高 (cm)</text>
-        <input class="form-input" type="digit" value="{{editHeight}}" bindinput="onHeightInput" placeholder="请输入身高" />
+        <input class="form-input" type="digit" value="{{editHeight}}" bindinput="onHeightInput" placeholder="请输入身高" adjust-position="false" cursor-spacing="80" />
       </view>
       <view class="form-group">
         <text class="form-label">目标体重 (kg)</text>
-        <input class="form-input" type="digit" value="{{editGoalWeight}}" bindinput="onGoalWeightInput" placeholder="请输入目标体重" />
+        <input class="form-input" type="digit" value="{{editGoalWeight}}" bindinput="onGoalWeightInput" placeholder="请输入目标体重" adjust-position="false" cursor-spacing="80" />
       </view>
     </view>
     <view class="popup-footer">
@@ -183,7 +205,7 @@
     <view class="popup-body">
       <view class="form-group">
         <text class="form-label">每日热量上限 (kcal)</text>
-        <input class="form-input" type="number" value="{{editCalorieGoal}}" bindinput="onCalorieGoalInput" placeholder="如 1800" />
+        <input class="form-input" type="number" value="{{editCalorieGoal}}" bindinput="onCalorieGoalInput" placeholder="如 1800" adjust-position="false" cursor-spacing="80" />
       </view>
       <view class="form-tips">
         <text class="form-tip">💡 一般建议：减脂 1200-1500kcal，维持 1500-2000kcal</text>

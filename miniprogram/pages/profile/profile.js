@@ -2,6 +2,9 @@
 const app = getApp();
 const VERSION = '1.0.0';
 
+// 默认头像 base64（灰色圆形占位图）
+const DEFAULT_AVATAR = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MCIgaGVpZ2h0PSI4MCIgdmlld0JveD0iMCAwIDgwIDgwIj48Y2lyY2xlIGN4PSI0MCIgY3k9IjQwIiByPSI0MCIgZmlsbD0iIzNhM2E0YSIvPjxjaXJjbGUgY3g9IjQwIiBjeT0iMzIiIHI9IjE2IiBmaWxsPSIjNmE2YTdhIi8+PGVsbGlwc2UgY3g9IjQwIiBjeT0iNjgiIHJ4PSIyNCIgcnk9IjE2IiBmaWxsPSIjNmE2YTdhIi8+PC9zdmc+';
+
 Page({
   data: {
     // 主题
@@ -10,6 +13,7 @@ Page({
     themeDesc: (function() { const t = wx.getStorageSync('appTheme') || 'dark'; if (t === 'system') return '跟随系统'; if (t === 'dark') return '深色模式'; return '浅色模式'; })(),
     // 用户信息
     nickname: '轻体用户',
+    avatarUrl: DEFAULT_AVATAR,
     height: null,
     goalWeight: null,
     daysCount: 0,
@@ -40,7 +44,10 @@ Page({
     editCalorieGoal: '',
     // Toast
     toastMsg: '',
-    toastShow: false
+    toastShow: false,
+    // 昵称编辑
+    showNicknameEdit: false,
+    editNickname: ''
   },
 
   onLoad() {
@@ -54,13 +61,14 @@ Page({
   // 同步初始化基础数据（立即可用）
   initBasicData() {
     const nickname = wx.getStorageSync('nickname') || '轻体用户';
+    const avatarUrl = wx.getStorageSync('avatarUrl') || DEFAULT_AVATAR;
     const weightUnit = wx.getStorageSync('weightUnit') || 'kg';
     const calorieUnit = wx.getStorageSync('calorieUnit') || 'kcal';
     const weightData = wx.getStorageSync('weightData') || {};
     const goalWeight = weightData.targetWeight || null;
     const height = wx.getStorageSync('userHeight') || null;
     // 热量目标暂不设置，等云端返回后再更新
-    this.setData({ nickname, height, goalWeight, weightUnit, calorieUnit, calorieGoal: 0, calorieGoalDisplay: '未设置' });
+    this.setData({ nickname, avatarUrl, height, goalWeight, weightUnit, calorieUnit, calorieGoal: 0, calorieGoalDisplay: '未设置' });
     this.loadStats(goalWeight);
   },
 
@@ -235,6 +243,64 @@ loadStats(goalWeight) {
       editHeight: this.data.height ? String(this.data.height) : '',
       editGoalWeight: this.data.goalWeight ? String(this.data.goalWeight) : ''
     });
+  },
+
+  // 选择头像
+  onChooseAvatar(e) {
+    const { avatarUrl } = e.detail;
+    wx.showLoading({ title: '上传中...' });
+    
+    const cloudPath = `avatars/${Date.now()}_${Math.random().toString(36).substr(2, 9)}.png`;
+    
+    wx.cloud.uploadFile({
+      cloudPath,
+      filePath: avatarUrl,
+      success: (res) => {
+        wx.setStorageSync('avatarUrl', res.fileID);
+        this.setData({ avatarUrl: res.fileID });
+      },
+      fail: () => {
+        wx.setStorageSync('avatarUrl', avatarUrl);
+        this.setData({ avatarUrl });
+      },
+      complete: () => {
+        wx.hideLoading();
+      }
+    });
+  },
+
+  // 昵称输入完成
+  onNicknameBlur(e) {
+    const nickname = e.detail.value.trim();
+    if (nickname && nickname !== this.data.nickname) {
+      wx.setStorageSync('nickname', nickname);
+      this.setData({ nickname });
+    }
+  },
+
+  // 点击昵称区域
+  onNicknameTap() {
+    this.setData({
+      showNicknameEdit: true,
+      editNickname: this.data.nickname
+    });
+  },
+
+  // 关闭昵称编辑
+  onCloseNicknameEdit() {
+    this.setData({ showNicknameEdit: false });
+  },
+
+  // 昵称编辑输入
+  onEditNicknameBlur(e) {
+    this.setData({ editNickname: e.detail.value });
+  },
+
+  // 保存昵称
+  onSaveNickname() {
+    const nickname = this.data.editNickname.trim() || '轻体用户';
+    wx.setStorageSync('nickname', nickname);
+    this.setData({ nickname, showNicknameEdit: false });
   },
 
   onMenuItemTap(e) {

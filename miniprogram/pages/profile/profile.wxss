@@ -7,6 +7,12 @@
   padding-bottom: 120rpx;
   padding-top: calc(env(safe-area-inset-top) + 44px);
   min-height: 100vh;
+  /* iOS 键盘弹起修复：固定定位防止页面整体上移 */
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+  /* 启用硬件加速，避免 iOS 滚动时出现闪烁 */
+  -webkit-overflow-scrolling: touch;
 }
 
 .custom-nav-area {
@@ -33,28 +39,98 @@
 .profile-card {
   display: flex;
   align-items: center;
-  background: #1a1a24;
-  border: 1rpx solid #2a2a3a;
+  background: var(--color-stat-card-bg, #1a1a24);
+  border: 1rpx solid var(--color-border, #2a2a3a);
   border-radius: 24rpx;
   padding: 36rpx 30rpx;
   margin-bottom: 30rpx;
   transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
+.avatar-btn {
+  width: 100rpx;
+  height: 100rpx;
+  padding: 0;
+  margin: 0;
+  margin-right: 24rpx;
+  border: none;
+  background: transparent;
+  border-radius: 50%;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.avatar-btn::after {
+  border: none;
+}
+
 .profile-avatar {
   width: 100rpx;
   height: 100rpx;
   border-radius: 50%;
-  background: rgba(108, 92, 231, 0.2);
+  background: var(--color-border, #3a3a4a);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 24rpx;
   flex-shrink: 0;
 }
 
-.avatar-emoji {
-  font-size: 48rpx;
+.profile-nickname {
+  font-size: 34rpx;
+  font-weight: 600;
+  color: #ffffff;
+  display: block;
+  margin-bottom: 16rpx;
+  background: transparent;
+  border: none;
+  padding: 0;
+  text-align: left;
+  outline: none;
+  -webkit-appearance: none;
+}
+
+.profile-nickname::after {
+  border: none;
+}
+
+.nickname-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.nickname-edit-icon {
+  font-size: 24rpx;
+  color: var(--color-text-secondary, #8888a0);
+  margin-left: 12rpx;
+}
+
+.avatar-edit-icon {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 36rpx;
+  height: 36rpx;
+  background: var(--color-accent-primary, #6c5ce7);
+  border-radius: 50%;
+  font-size: 20rpx;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nickname-btn {
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  text-align: left;
+  display: inline;
+}
+
+.nickname-btn::after {
+  border: none;
 }
 
 .profile-info {
@@ -68,6 +144,16 @@
   color: #ffffff;
   display: block;
   margin-bottom: 16rpx;
+  background: transparent;
+  border: none;
+  padding: 0;
+  text-align: left;
+  outline: none;
+  -webkit-appearance: none;
+}
+
+.profile-nickname::after {
+  border: none;
 }
 
 .profile-stats {
@@ -221,6 +307,10 @@
   padding: 40rpx 30rpx;
   padding-bottom: calc(env(safe-area-inset-bottom) + 40rpx);
   animation: slideUp 0.3s ease;
+}
+
+.nickname-popup {
+  padding-bottom: calc(env(safe-area-inset-bottom) + 120rpx);
 }
 
 /* 浅色主题弹窗 */
