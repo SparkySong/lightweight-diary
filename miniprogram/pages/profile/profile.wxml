@@ -55,7 +55,8 @@
           <text class="menu-text">个人信息</text>
         </view>
         <view class="menu-item-right">
-          <text class="menu-desc" wx:if="{{height}}">{{height}}cm · {{goalWeight}}{{weightUnit === 'kg' ? 'kg' : '斤'}}</text>
+          <text class="menu-desc" wx:if="{{currentWeight}}">{{height}}cm · {{currentWeight}}{{weightUnit === 'kg' ? 'kg' : '斤'}}</text>
+          <text class="menu-desc" wx:elif="{{height}}">{{height}}cm</text>
           <text class="menu-desc" wx:else>未设置</text>
           <text class="menu-arrow">›</text>
         </view>
@@ -184,7 +185,11 @@
         <input class="form-input" type="digit" value="{{editHeight}}" bindinput="onHeightInput" placeholder="请输入身高" adjust-position="false" cursor-spacing="80" />
       </view>
       <view class="form-group">
-        <text class="form-label">目标体重 (kg)</text>
+        <text class="form-label">当前体重 ({{weightUnit === 'jin' ? '斤' : 'kg'}})</text>
+        <input class="form-input" type="digit" value="{{editCurrentWeight}}" bindinput="onCurrentWeightInput" placeholder="请输入当前体重" adjust-position="false" cursor-spacing="80" />
+      </view>
+      <view class="form-group">
+        <text class="form-label">目标体重 ({{weightUnit === 'jin' ? '斤' : 'kg'}})</text>
         <input class="form-input" type="digit" value="{{editGoalWeight}}" bindinput="onGoalWeightInput" placeholder="请输入目标体重" adjust-position="false" cursor-spacing="80" />
       </view>
     </view>
