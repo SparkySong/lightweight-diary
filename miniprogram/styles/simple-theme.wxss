@@ -223,6 +223,18 @@ page.theme-light .custom-nav-area {
   color: #ffffff;
 }
 
+/* 深色模式 - 打卡输入框容器 */
+.container.theme-dark .weight-input-wrap {
+  background: #242432;
+  border-color: #2c2c3c;
+}
+.container.theme-dark .weight-placeholder {
+  color: #8888a0;
+}
+.container.theme-dark .weight-input {
+  color: #ffffff;
+}
+
 .container.theme-light input,
 .container.theme-light .input,
 .container.theme-light .height-input,
@@ -230,6 +242,34 @@ page.theme-light .custom-nav-area {
   background: #ffffff;
   border-color: #dee2e6;
   color: #212529;
+}
+
+/* 浅色模式 - 打卡输入框容器 */
+.container.theme-light .weight-input-wrap {
+  background: #ffffff;
+  border-color: #dee2e6;
+}
+.container.theme-light .weight-placeholder {
+  color: #868e96;
+}
+.container.theme-light .weight-input {
+  color: #212529;
+}
+
+/* 浅色模式下输入框 placeholder - iOS兼容性 */
+.container.theme-light input::placeholder,
+.container.theme-light .input::placeholder,
+.container.theme-light .height-input::placeholder,
+.container.theme-light .weight-input::placeholder {
+  color: #adb5bd;
+}
+
+/* 深色模式下输入框 placeholder */
+.container.theme-dark input::placeholder,
+.container.theme-dark .input::placeholder,
+.container.theme-dark .height-input::placeholder,
+.container.theme-dark .weight-input::placeholder {
+  color: #6c6c7c;
 }
 
 /* 状态颜色 */

@@ -399,11 +399,27 @@
   min-width: 200rpx;
   text-align: center;
 }
-.weight-input {
+.weight-input-wrap {
   flex: 1;
+  position: relative;
   background: #0f0f13;
   border: 1rpx solid #2a2a3a;
   border-radius: 12rpx;
+  min-height: 70rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.weight-placeholder {
+  color: #8888a0;
+  font-size: 26rpx;
+  position: absolute;
+  pointer-events: none;
+}
+.weight-input {
+  width: 100%;
+  background: transparent;
+  border: none;
   padding: 18rpx 20rpx;
   color: #e8e8ef;
   font-size: 32rpx;
@@ -411,9 +427,7 @@
   text-align: center;
 }
 .weight-input::placeholder {
-  color: #8888a0;
-  font-weight: 400;
-  font-size: 26rpx;
+  color: transparent;
 }
 
 /* Buttons */

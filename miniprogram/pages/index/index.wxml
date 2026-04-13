@@ -125,7 +125,10 @@
       <picker mode="date" value="{{inputDate}}" bindchange="onDateChange">
         <view class="picker-btn">{{inputDate || '选择日期'}}</view>
       </picker>
-      <input class="weight-input" type="digit" placeholder="体重 ({{weightUnitLabel}})" value="{{inputWeight}}" bindinput="onWeightInput" confirm-type="done" bindconfirm="onCheckin" />
+      <view class="weight-input-wrap">
+        <text class="weight-placeholder" wx:if="{{!inputWeight}}">体重 ({{weightUnitLabel}})</text>
+        <input class="weight-input" type="digit" value="{{inputWeight}}" bindinput="onWeightInput" confirm-type="done" bindconfirm="onCheckin" />
+      </view>
     </view>
     <button class="btn-primary" bindtap="onCheckin">✅ 打卡记录</button>
   </view>
