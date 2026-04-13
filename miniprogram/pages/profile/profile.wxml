@@ -1,0 +1,365 @@
+<!--pages/profile/profile.wxml-->
+<page class="{{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}}">
+<page-meta 
+  background-text-style="{{currentTheme === 'light' ? 'light' : 'dark'}}" 
+  background-color="{{currentTheme === 'light' ? '#f8f9fa' : '#0f0f13'}}" 
+  background-color-top="{{currentTheme === 'light' ? '#f8f9fa' : '#0f0f13'}}"
+  background-color-bottom="{{currentTheme === 'light' ? '#f8f9fa' : '#0f0f13'}}" />
+
+<!-- 自定义导航栏区域 -->
+<view class="custom-nav-area"></view>
+
+<view class="container {{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}}">
+  <!-- 页面标题 -->
+  <view class="header">
+    <text class="title">我的</text>
+  </view>
+
+  <!-- 个人信息卡片 -->
+  <view class="profile-card" bindtap="onProfileCardTap">
+    <view class="profile-avatar">
+      <text class="avatar-emoji">👤</text>
+    </view>
+    <view class="profile-info">
+      <text class="profile-nickname">{{nickname}}</text>
+      <view class="profile-stats">
+        <view class="profile-stat-item">
+          <text class="profile-stat-value">{{daysCount}}</text>
+          <text class="profile-stat-label">打卡天数</text>
+        </view>
+        <view class="profile-stat-divider"></view>
+        <view class="profile-stat-item">
+          <text class="profile-stat-value">{{totalLost}}</text>
+          <text class="profile-stat-label">已减(kg)</text>
+        </view>
+        <view class="profile-stat-divider"></view>
+        <view class="profile-stat-item">
+          <text class="profile-stat-value">{{goalRemaining}}</text>
+          <text class="profile-stat-label">距目标(kg)</text>
+        </view>
+      </view>
+    </view>
+    <view class="profile-arrow">›</view>
+  </view>
+
+  <!-- 功能入口列表 -->
+  <view class="menu-section">
+    <view class="menu-card">
+      <!-- 个人信息设置 -->
+      <view class="menu-item" bindtap="onMenuItemTap" data-action="profile">
+        <view class="menu-item-left">
+          <text class="menu-icon">👤</text>
+          <text class="menu-text">个人信息</text>
+        </view>
+        <view class="menu-item-right">
+          <text class="menu-desc" wx:if="{{height}}">{{height}}cm · {{goalWeight}}kg</text>
+          <text class="menu-desc" wx:else>未设置</text>
+          <text class="menu-arrow">›</text>
+        </view>
+      </view>
+
+      <!-- 每日热量目标 -->
+      <view class="menu-item" bindtap="onMenuItemTap" data-action="calorieGoal">
+        <view class="menu-item-left">
+          <text class="menu-icon">🔥</text>
+          <text class="menu-text">热量目标</text>
+        </view>
+        <view class="menu-item-right">
+          <text class="menu-desc">{{calorieGoalDisplay}}</text>
+          <text class="menu-arrow">›</text>
+        </view>
+      </view>
+
+      <!-- 单位与偏好设置 -->
+      <view class="menu-item" bindtap="onMenuItemTap" data-action="preferences">
+        <view class="menu-item-left">
+          <text class="menu-icon">⚙️</text>
+          <text class="menu-text">偏好设置</text>
+        </view>
+        <view class="menu-item-right">
+          <text class="menu-desc">{{weightUnit}} · {{calorieUnit}}</text>
+          <text class="menu-arrow">›</text>
+        </view>
+      </view>
+
+      <!-- 深色模式设置 -->
+      <view class="menu-item" bindtap="onMenuItemTap" data-action="theme">
+        <view class="menu-item-left">
+          <text class="menu-icon">🌙</text>
+          <text class="menu-text">主题设置</text>
+        </view>
+        <view class="menu-item-right">
+          <text class="menu-desc">{{themeDesc}}</text>
+          <text class="menu-arrow">›</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="menu-card">
+      <!-- 数据管理 -->
+      <view class="menu-item" bindtap="onMenuItemTap" data-action="dataManage">
+        <view class="menu-item-left">
+          <text class="menu-icon">📊</text>
+          <text class="menu-text">数据管理</text>
+        </view>
+        <view class="menu-item-right">
+          <text class="menu-arrow">›</text>
+        </view>
+      </view>
+
+      <!-- 帮助与反馈 -->
+      <view class="menu-item" bindtap="onMenuItemTap" data-action="help">
+        <view class="menu-item-left">
+          <text class="menu-icon">❓</text>
+          <text class="menu-text">帮助与反馈</text>
+        </view>
+        <view class="menu-item-right">
+          <text class="menu-arrow">›</text>
+        </view>
+      </view>
+
+      <!-- 关于 -->
+      <view class="menu-item" bindtap="onMenuItemTap" data-action="about">
+        <view class="menu-item-left">
+          <text class="menu-icon">ℹ️</text>
+          <text class="menu-text">关于我们</text>
+        </view>
+        <view class="menu-item-right">
+          <text class="menu-desc">v{{version}}</text>
+          <text class="menu-arrow">›</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部信息 -->
+  <view class="footer">
+    <text class="footer-version">轻体打卡 v{{version}}</text>
+    <view class="footer-links">
+      <text class="footer-link" bindtap="onLinkTap" data-url="agreement">用户协议</text>
+      <text class="footer-divider">|</text>
+      <text class="footer-link" bindtap="onLinkTap" data-url="privacy">隐私政策</text>
+    </view>
+  </view>
+</view>
+
+<!-- ========== 弹窗区域（放在 container 外避免被遮挡） ========== -->
+
+<!-- 个人信息编辑弹窗 -->
+<view class="popup-overlay" wx:if="{{showProfileEdit}}" bindtap="onPopupOverlayTap" catchtouchmove="preventTouchMove">
+  <view class="popup-panel" catchtap="stopPropagation">
+    <view class="popup-header">
+      <text class="popup-title">编辑个人信息</text>
+      <text class="popup-close" bindtap="onClosePopup">✕</text>
+    </view>
+    <view class="popup-body">
+      <view class="form-group">
+        <text class="form-label">昵称</text>
+        <input class="form-input" value="{{editNickname}}" bindinput="onNicknameInput" placeholder="请输入昵称" maxlength="20" />
+      </view>
+      <view class="form-group">
+        <text class="form-label">身高 (cm)</text>
+        <input class="form-input" type="digit" value="{{editHeight}}" bindinput="onHeightInput" placeholder="请输入身高" />
+      </view>
+      <view class="form-group">
+        <text class="form-label">目标体重 (kg)</text>
+        <input class="form-input" type="digit" value="{{editGoalWeight}}" bindinput="onGoalWeightInput" placeholder="请输入目标体重" />
+      </view>
+    </view>
+    <view class="popup-footer">
+      <button class="popup-btn popup-btn-cancel" bindtap="onClosePopup">取消</button>
+      <button class="popup-btn popup-btn-confirm" bindtap="onSaveProfile">保存</button>
+    </view>
+  </view>
+</view>
+
+<!-- 热量目标弹窗 -->
+<view class="popup-overlay" wx:if="{{showCalorieGoal}}" bindtap="onPopupOverlayTap" catchtouchmove="preventTouchMove">
+  <view class="popup-panel" catchtap="stopPropagation">
+    <view class="popup-header">
+      <text class="popup-title">设置每日热量目标</text>
+      <text class="popup-close" bindtap="onClosePopup">✕</text>
+    </view>
+    <view class="popup-body">
+      <view class="form-group">
+        <text class="form-label">每日热量上限 (kcal)</text>
+        <input class="form-input" type="number" value="{{editCalorieGoal}}" bindinput="onCalorieGoalInput" placeholder="如 1800" />
+      </view>
+      <view class="form-tips">
+        <text class="form-tip">💡 一般建议：减脂 1200-1500kcal，维持 1500-2000kcal</text>
+      </view>
+    </view>
+    <view class="popup-footer">
+      <button class="popup-btn popup-btn-cancel" bindtap="onClosePopup">取消</button>
+      <button class="popup-btn popup-btn-confirm" bindtap="onSaveCalorieGoal">保存</button>
+    </view>
+  </view>
+</view>
+
+<!-- 偏好设置弹窗 -->
+<view class="popup-overlay" wx:if="{{showPreferences}}" bindtap="onPopupOverlayTap" catchtouchmove="preventTouchMove">
+  <view class="popup-panel" catchtap="stopPropagation">
+    <view class="popup-header">
+      <text class="popup-title">偏好设置</text>
+      <text class="popup-close" bindtap="onClosePopup">✕</text>
+    </view>
+    <view class="popup-body">
+      <view class="setting-group">
+        <text class="setting-label">体重单位</text>
+        <view class="setting-options">
+          <view class="setting-option {{weightUnit === 'kg' ? 'active' : ''}}" bindtap="onWeightUnitChange" data-unit="kg">
+            <text>千克(kg)</text>
+          </view>
+          <view class="setting-option {{weightUnit === 'jin' ? 'active' : ''}}" bindtap="onWeightUnitChange" data-unit="jin">
+            <text>斤</text>
+          </view>
+        </view>
+      </view>
+      <view class="setting-group">
+        <text class="setting-label">热量单位</text>
+        <view class="setting-options">
+          <view class="setting-option {{calorieUnit === 'kcal' ? 'active' : ''}}" bindtap="onCalorieUnitChange" data-unit="kcal">
+            <text>千卡(kcal)</text>
+          </view>
+          <view class="setting-option {{calorieUnit === 'kj' ? 'active' : ''}}" bindtap="onCalorieUnitChange" data-unit="kj">
+            <text>千焦(kJ)</text>
+          </view>
+        </view>
+      </view>
+    </view>
+    <view class="popup-footer">
+      <button class="popup-btn popup-btn-confirm" bindtap="onClosePopup">完成</button>
+    </view>
+  </view>
+</view>
+
+<!-- 主题设置弹窗 -->
+<view class="popup-overlay" wx:if="{{showThemeSetting}}" bindtap="onPopupOverlayTap" catchtouchmove="preventTouchMove">
+  <view class="popup-panel" catchtap="stopPropagation">
+    <view class="popup-header">
+      <text class="popup-title">主题设置</text>
+      <text class="popup-close" bindtap="onClosePopup">✕</text>
+    </view>
+    <view class="popup-body">
+      <view class="theme-options">
+        <view class="theme-option {{themeSetting === 'system' ? 'active' : ''}}" bindtap="onSwitchTheme" data-theme="system">
+          <text class="theme-option-icon">📱</text>
+          <text class="theme-option-text">跟随系统</text>
+          <text class="theme-option-check" wx:if="{{themeSetting === 'system'}}">✓</text>
+        </view>
+        <view class="theme-option {{themeSetting === 'dark' ? 'active' : ''}}" bindtap="onSwitchTheme" data-theme="dark">
+          <text class="theme-option-icon">🌙</text>
+          <text class="theme-option-text">深色模式</text>
+          <text class="theme-option-check" wx:if="{{themeSetting === 'dark'}}">✓</text>
+        </view>
+        <view class="theme-option {{themeSetting === 'light' ? 'active' : ''}}" bindtap="onSwitchTheme" data-theme="light">
+          <text class="theme-option-icon">☀️</text>
+          <text class="theme-option-text">浅色模式</text>
+          <text class="theme-option-check" wx:if="{{themeSetting === 'light'}}">✓</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- 数据管理弹窗 -->
+<view class="popup-overlay" wx:if="{{showDataManage}}" bindtap="onPopupOverlayTap" catchtouchmove="preventTouchMove">
+  <view class="popup-panel" catchtap="stopPropagation">
+    <view class="popup-header">
+      <text class="popup-title">数据管理</text>
+      <text class="popup-close" bindtap="onClosePopup">✕</text>
+    </view>
+    <view class="popup-body">
+      <view class="data-manage-item" bindtap="onViewHistory">
+        <view class="data-manage-left">
+          <text class="data-manage-icon">📋</text>
+          <text class="data-manage-text">查看历史记录</text>
+        </view>
+        <text class="menu-arrow">›</text>
+      </view>
+      <view class="data-manage-item data-manage-danger" bindtap="onClearAllData">
+        <view class="data-manage-left">
+          <text class="data-manage-icon">🗑️</text>
+          <text class="data-manage-text">清空所有数据</text>
+        </view>
+        <text class="menu-arrow">›</text>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- 关于弹窗 -->
+<view class="popup-overlay" wx:if="{{showAbout}}" bindtap="onPopupOverlayTap" catchtouchmove="preventTouchMove">
+  <view class="popup-panel" catchtap="stopPropagation">
+    <view class="popup-header">
+      <text class="popup-title">关于我们</text>
+      <text class="popup-close" bindtap="onClosePopup">✕</text>
+    </view>
+    <view class="popup-body about-body">
+      <text class="about-logo">⚖️</text>
+      <text class="about-name">轻体打卡</text>
+      <text class="about-version">v{{version}}</text>
+      <text class="about-desc">一款简洁的体重管理与饮食记录工具，帮助你坚持记录、科学减脂，遇见更好的自己。</text>
+      <view class="about-features">
+        <text class="about-feature">✅ 体重打卡与趋势追踪</text>
+        <text class="about-feature">✅ 饮食记录与热量分析</text>
+        <text class="about-feature">✅ BMI 计算与目标管理</text>
+        <text class="about-feature">✅ 深色/浅色主题切换</text>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- 帮助弹窗 -->
+<view class="popup-overlay" wx:if="{{showHelp}}" bindtap="onPopupOverlayTap" catchtouchmove="preventTouchMove">
+  <view class="popup-panel" catchtap="stopPropagation">
+    <view class="popup-header">
+      <text class="popup-title">帮助与反馈</text>
+      <text class="popup-close" bindtap="onClosePopup">✕</text>
+    </view>
+    <view class="popup-body help-body">
+      <view class="help-item">
+        <text class="help-q">如何记录体重？</text>
+        <text class="help-a">在「打卡」页面，点击当前体重卡片或底部按钮，输入当日体重即可完成打卡。</text>
+      </view>
+      <view class="help-item">
+        <text class="help-q">如何记录饮食？</text>
+        <text class="help-a">在「饮食」页面，点击「记录饮食」按钮，选择餐次并输入食物名称和热量即可。</text>
+      </view>
+      <view class="help-item">
+        <text class="help-q">如何设置目标体重？</text>
+        <text class="help-a">在「打卡」页面点击目标体重卡片，或在「我的」→「个人信息」中设置。</text>
+      </view>
+      <view class="help-item">
+        <text class="help-q">数据会丢失吗？</text>
+        <text class="help-a">数据保存在云端，即使更换设备也能通过同一微信账号恢复。</text>
+      </view>
+      <view class="help-feedback">
+        <text class="help-feedback-text">如有其他问题，欢迎反馈！</text>
+        <button class="help-feedback-btn" open-type="contact">联系客服</button>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- 协议弹窗 -->
+<view class="popup-overlay" wx:if="{{showAgreement}}" bindtap="onPopupOverlayTap" catchtouchmove="preventTouchMove">
+  <view class="popup-panel popup-panel-large" catchtap="stopPropagation">
+    <view class="popup-header">
+      <text class="popup-title">{{agreementTitle}}</text>
+      <text class="popup-close" bindtap="onClosePopup">✕</text>
+    </view>
+    <view class="popup-body agreement-body">
+      <scroll-view scroll-y class="agreement-scroll">
+        <text class="agreement-text">{{agreementContent}}</text>
+      </scroll-view>
+    </view>
+  </view>
+</view>
+
+<!-- Toast -->
+<view class="toast {{toastShow ? 'toast-show' : ''}}" wx:if="{{toastMsg}}">
+  <text class="toast-text">{{toastMsg}}</text>
+</view>
+
+</page>

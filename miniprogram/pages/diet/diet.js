@@ -867,6 +867,9 @@ Page({
     
     // 动态设置下拉刷新背景色
     this.setPullDownRefreshBg(theme);
+    
+    // 同步刷新 tabBar 图标
+    app.applyThemeToTabBar();
   },
   
   // 页面主题变化回调（跟随系统主题时调用）

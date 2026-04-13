@@ -118,7 +118,7 @@ App({
             // 应用主题到tabBar
             this.applyThemeToTabBar();
             // 通知页面主题变化
-            this.notifyThemeChange();
+            this.notifyThemeChange(res.theme);
           }
         });
         console.log('已注册微信主题变化监听');
@@ -136,18 +136,24 @@ App({
   },
   
   // 通知所有页面主题变化
-  notifyThemeChange(theme) {
-    const effectiveTheme = theme || this.getEffectiveTheme();
+  notifyThemeChange(effectiveTheme) {
+    const themeSetting = this.getThemeSetting();
     const pages = getCurrentPages();
     pages.forEach(page => {
-      // 直接更新页面的 currentTheme 数据，避免切换时闪烁
+      // 直接更新页面的 currentTheme 和 themeSetting 数据
       if (page.data && page.data.currentTheme !== undefined) {
-        page.setData({ currentTheme: effectiveTheme });
+        const updateData = { currentTheme: effectiveTheme };
+        // 同步更新 themeSetting（profile 使用）
+        if (page.data.themeSetting !== undefined) {
+          updateData.themeSetting = themeSetting;
+        }
+        page.setData(updateData);
       }
       if (page.onThemeChange) {
         page.onThemeChange();
       }
     });
+    // tabBar 已在 applyThemeWithSystem 中同步调用，此处不重复
   },
   
   // 获取主题设置（区分手动设置和跟随系统）
@@ -203,6 +209,8 @@ App({
         const indexSelectedIconPath = theme === 'light' ? 'images/tab-weight.png' : 'images/tab-weight-active.png';
         const dietIconPath = theme === 'light' ? 'images/tab-diet-active.png' : 'images/tab-diet.png';
         const dietSelectedIconPath = theme === 'light' ? 'images/tab-diet.png' : 'images/tab-diet-active.png';
+        const profileIconPath = theme === 'light' ? 'images/profile-active.png' : 'images/profile.png';
+        const profileSelectedIconPath = theme === 'light' ? 'images/profile.png' : 'images/profile-active.png';
         
         // 根据当前页面更新图标选中状态
         if (route === 'pages/index/index') {
@@ -218,6 +226,12 @@ App({
             selectedIconPath: dietIconPath,
             text: '饮食'
           });
+          wx.setTabBarItem({
+            index: 2,
+            iconPath: profileIconPath,
+            selectedIconPath: profileIconPath,
+            text: '我的'
+          });
         } else if (route === 'pages/diet/diet') {
           wx.setTabBarItem({
             index: 0,
@@ -230,6 +244,31 @@ App({
             iconPath: dietIconPath,
             selectedIconPath: dietSelectedIconPath,
             text: '饮食'
+          });
+          wx.setTabBarItem({
+            index: 2,
+            iconPath: profileIconPath,
+            selectedIconPath: profileIconPath,
+            text: '我的'
+          });
+        } else if (route === 'pages/profile/profile') {
+          wx.setTabBarItem({
+            index: 0,
+            iconPath: indexIconPath,
+            selectedIconPath: indexIconPath,
+            text: '打卡'
+          });
+          wx.setTabBarItem({
+            index: 1,
+            iconPath: dietIconPath,
+            selectedIconPath: dietIconPath,
+            text: '饮食'
+          });
+          wx.setTabBarItem({
+            index: 2,
+            iconPath: profileIconPath,
+            selectedIconPath: profileSelectedIconPath,
+            text: '我的'
           });
         }
       }

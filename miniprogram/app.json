@@ -2,6 +2,7 @@
   "pages": [
     "pages/index/index",
     "pages/diet/diet",
+    "pages/profile/profile",
     "pages/calorie-detail/calorie-detail"
   ],
   "darkmode": true,
@@ -31,6 +32,12 @@
         "text": "饮食",
         "iconPath": "images/tab-diet.png",
         "selectedIconPath": "images/tab-diet-active.png"
+      },
+      {
+        "pagePath": "pages/profile/profile",
+        "text": "我的",
+        "iconPath": "images/profile.png",
+        "selectedIconPath": "images/profile-active.png"
       }
     ]
   },

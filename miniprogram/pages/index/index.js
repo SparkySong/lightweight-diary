@@ -82,16 +82,8 @@ Page({
 
   onShow() {
     this.loadAll();
-    // 页面显示时检测主题变化（特别针对跟随系统模式）
-    const themeSetting = app.getThemeSetting();
-    if (themeSetting === 'system') {
-      // 跟随系统模式时，每次页面显示都检测系统主题
-      this.onThemeChange();
-    }
-    // 页面显示时确保tabBar应用正确主题
-    setTimeout(() => {
-      app.applyThemeToTabBar();
-    }, 100);
+    // 每次显示都重新初始化主题（确保从其他页面切换回来时主题同步）
+    this.initTheme();
   },
 
   setTodayDate() {
@@ -745,6 +737,8 @@ Page({
     
     // 动态设置下拉刷新背景色
     this.setPullDownRefreshBg(effectiveTheme);
+    
+    app.applyThemeToTabBar();
   },
   
   // 页面主题变化回调（跟随系统主题时调用）

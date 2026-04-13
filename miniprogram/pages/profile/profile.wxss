@@ -1,0 +1,770 @@
+/* pages/profile/profile.wxss */
+@import "/styles/simple-theme.wxss";
+@import "/styles/theme.wxss";
+
+.container {
+  padding: 30rpx;
+  padding-bottom: 120rpx;
+  padding-top: calc(env(safe-area-inset-top) + 44px);
+  min-height: 100vh;
+}
+
+.custom-nav-area {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: calc(env(safe-area-inset-top) + 44px);
+  background-color: var(--nav-bg, #0f0f13);
+  z-index: 9999;
+}
+
+/* Header */
+.header {
+  padding: 20rpx 0 30rpx;
+}
+
+.title {
+  font-size: 44rpx;
+  font-weight: 700;
+}
+
+/* 个人信息卡片 */
+.profile-card {
+  display: flex;
+  align-items: center;
+  background: #1a1a24;
+  border: 1rpx solid #2a2a3a;
+  border-radius: 24rpx;
+  padding: 36rpx 30rpx;
+  margin-bottom: 30rpx;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.profile-avatar {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 50%;
+  background: rgba(108, 92, 231, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 24rpx;
+  flex-shrink: 0;
+}
+
+.avatar-emoji {
+  font-size: 48rpx;
+}
+
+.profile-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.profile-nickname {
+  font-size: 34rpx;
+  font-weight: 600;
+  color: #ffffff;
+  display: block;
+  margin-bottom: 16rpx;
+}
+
+.profile-stats {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.profile-stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+}
+
+.profile-stat-value {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.profile-stat-label {
+  font-size: 20rpx;
+  color: #8888a0;
+  margin-top: 4rpx;
+}
+
+.profile-stat-divider {
+  width: 1rpx;
+  height: 48rpx;
+  background: #2a2a3a;
+}
+
+.profile-arrow {
+  font-size: 36rpx;
+  color: #8888a0;
+  margin-left: 16rpx;
+  flex-shrink: 0;
+}
+
+/* 功能入口列表 */
+.menu-section {
+  margin-bottom: 30rpx;
+}
+
+.menu-card {
+  background: #1a1a24;
+  border: 1rpx solid #2a2a3a;
+  border-radius: 24rpx;
+  overflow: hidden;
+  margin-bottom: 24rpx;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 30rpx;
+  border-bottom: 1rpx solid #2a2a3a;
+  transition: background-color 0.2s;
+}
+
+.menu-item:last-child {
+  border-bottom: none;
+}
+
+.menu-item:active {
+  background: rgba(108, 92, 231, 0.08);
+}
+
+.menu-item-left {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+}
+
+.menu-icon {
+  font-size: 36rpx;
+}
+
+.menu-text {
+  font-size: 30rpx;
+  color: #ffffff;
+}
+
+.menu-item-right {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.menu-desc {
+  font-size: 24rpx;
+  color: #8888a0;
+}
+
+.menu-arrow {
+  font-size: 32rpx;
+  color: #8888a0;
+}
+
+/* 底部信息 */
+.footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40rpx 0 20rpx;
+  gap: 16rpx;
+}
+
+.footer-version {
+  font-size: 24rpx;
+  color: #6c6c80;
+}
+
+.footer-links {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.footer-link {
+  font-size: 22rpx;
+  color: #6c5ce7;
+}
+
+.footer-divider {
+  font-size: 22rpx;
+  color: #6c6c80;
+}
+
+/* ========== 弹窗通用样式 ========== */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 10000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.popup-panel {
+  width: 100%;
+  background: #1a1a24;
+  border-radius: 32rpx 32rpx 0 0;
+  padding: 40rpx 30rpx;
+  padding-bottom: calc(env(safe-area-inset-bottom) + 40rpx);
+  animation: slideUp 0.3s ease;
+}
+
+/* 浅色主题弹窗 */
+page.theme-light .popup-panel {
+  background: #ffffff;
+}
+
+page.theme-light .popup-overlay {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+page.theme-light .popup-title {
+  color: #212529;
+}
+
+page.theme-light .popup-close {
+  color: #868e96;
+}
+
+page.theme-light .popup-btn-cancel {
+  background: #f1f3f5;
+  color: #212529;
+}
+
+page.theme-light .popup-btn-confirm {
+  background: #4c6ef5;
+  color: #ffffff;
+}
+
+page.theme-light .form-input {
+  background: #f8f9fa;
+  border-color: #dee2e6;
+  color: #212529;
+}
+
+page.theme-light .form-tip {
+  color: #868e96;
+}
+
+page.theme-light .form-label {
+  color: #868e96;
+}
+
+page.theme-light .setting-label {
+  color: #868e96;
+}
+
+page.theme-light .setting-option {
+  background: #f8f9fa;
+  border-color: #dee2e6;
+  color: #212529;
+}
+
+page.theme-light .setting-option.active {
+  background: rgba(76, 110, 245, 0.1);
+  border-color: #4c6ef5;
+  color: #4c6ef5;
+}
+
+page.theme-light .theme-option {
+  background: #f8f9fa;
+  border-color: #dee2e6;
+}
+
+page.theme-light .theme-option.active {
+  background: rgba(76, 110, 245, 0.1);
+  border-color: #4c6ef5;
+}
+
+page.theme-light .theme-option-text {
+  color: #212529;
+}
+
+page.theme-light .theme-option-check {
+  color: #4c6ef5;
+}
+
+page.theme-light .data-manage-item {
+  border-bottom-color: #f1f3f5;
+}
+
+page.theme-light .data-manage-text {
+  color: #212529;
+}
+
+page.theme-light .data-manage-danger .data-manage-text {
+  color: #fa5252;
+}
+
+page.theme-light .about-name {
+  color: #212529;
+}
+
+page.theme-light .about-version {
+  color: #868e96;
+}
+
+page.theme-light .about-desc {
+  color: #868e96;
+}
+
+page.theme-light .about-feature {
+  color: #212529;
+}
+
+page.theme-light .help-q {
+  color: #212529;
+}
+
+page.theme-light .help-a {
+  color: #868e96;
+}
+
+page.theme-light .help-feedback {
+  border-top-color: #f1f3f5;
+}
+
+page.theme-light .help-feedback-text {
+  color: #868e96;
+}
+
+page.theme-light .help-feedback-btn {
+  background: #4c6ef5;
+}
+
+page.theme-light .agreement-text {
+  color: #868e96;
+}
+
+.popup-panel-large {
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.popup-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 30rpx;
+}
+
+.popup-title {
+  font-size: 34rpx;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.popup-close {
+  font-size: 36rpx;
+  color: #8888a0;
+  padding: 10rpx;
+}
+
+.popup-body {
+  margin-bottom: 30rpx;
+}
+
+.popup-footer {
+  display: flex;
+  gap: 20rpx;
+}
+
+.popup-btn {
+  flex: 1;
+  height: 88rpx;
+  line-height: 88rpx;
+  text-align: center;
+  border-radius: 16rpx;
+  font-size: 30rpx;
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+.popup-btn::after {
+  border: none;
+}
+
+.popup-btn-cancel {
+  background: #242432;
+  color: #ffffff;
+}
+
+.popup-btn-confirm {
+  background: #6c5ce7;
+  color: #ffffff;
+}
+
+/* 表单 */
+.form-group {
+  margin-bottom: 24rpx;
+}
+
+.form-label {
+  font-size: 26rpx;
+  color: #8888a0;
+  margin-bottom: 12rpx;
+  display: block;
+}
+
+.form-input {
+  width: 100%;
+  height: 88rpx;
+  background: #242432;
+  border: 1rpx solid #2c2c3c;
+  border-radius: 16rpx;
+  padding: 0 24rpx;
+  font-size: 30rpx;
+  color: #ffffff;
+  box-sizing: border-box;
+}
+
+.form-tips {
+  margin-top: 16rpx;
+}
+
+.form-tip {
+  font-size: 22rpx;
+  color: #8888a0;
+}
+
+/* 设置选项 */
+.setting-group {
+  margin-bottom: 36rpx;
+}
+
+.setting-label {
+  font-size: 28rpx;
+  color: #8888a0;
+  margin-bottom: 16rpx;
+  display: block;
+}
+
+.setting-options {
+  display: flex;
+  gap: 16rpx;
+}
+
+.setting-option {
+  flex: 1;
+  height: 80rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #242432;
+  border: 2rpx solid #2c2c3c;
+  border-radius: 16rpx;
+  font-size: 28rpx;
+  color: #ffffff;
+  transition: all 0.2s;
+}
+
+.setting-option.active {
+  background: rgba(108, 92, 231, 0.15);
+  border-color: #6c5ce7;
+  color: #6c5ce7;
+}
+
+/* 主题选项 */
+.theme-options {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.theme-option {
+  display: flex;
+  align-items: center;
+  padding: 24rpx 28rpx;
+  background: #242432;
+  border: 2rpx solid #2c2c3c;
+  border-radius: 16rpx;
+  transition: all 0.2s;
+}
+
+.theme-option.active {
+  background: rgba(108, 92, 231, 0.15);
+  border-color: #6c5ce7;
+}
+
+.theme-option-icon {
+  font-size: 36rpx;
+  margin-right: 20rpx;
+}
+
+.theme-option-text {
+  flex: 1;
+  font-size: 30rpx;
+  color: #ffffff;
+}
+
+.theme-option-check {
+  font-size: 30rpx;
+  color: #6c5ce7;
+  font-weight: 600;
+}
+
+/* 数据管理 */
+.data-manage-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28rpx 0;
+  border-bottom: 1rpx solid #2a2a3a;
+}
+
+.data-manage-item:last-child {
+  border-bottom: none;
+}
+
+.data-manage-left {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+}
+
+.data-manage-icon {
+  font-size: 36rpx;
+}
+
+.data-manage-text {
+  font-size: 30rpx;
+  color: #ffffff;
+}
+
+.data-manage-danger .data-manage-text {
+  color: #e17055;
+}
+
+/* 关于 */
+.about-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 20rpx 0;
+}
+
+.about-logo {
+  font-size: 80rpx;
+  margin-bottom: 16rpx;
+}
+
+.about-name {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 8rpx;
+}
+
+.about-version {
+  font-size: 26rpx;
+  color: #8888a0;
+  margin-bottom: 24rpx;
+}
+
+.about-desc {
+  font-size: 26rpx;
+  color: #8888a0;
+  line-height: 1.6;
+  margin-bottom: 30rpx;
+  padding: 0 20rpx;
+}
+
+.about-features {
+  display: flex;
+  flex-direction: column;
+  gap: 14rpx;
+  width: 100%;
+  align-items: flex-start;
+  padding-left: 40rpx;
+}
+
+.about-feature {
+  font-size: 26rpx;
+  color: #ffffff;
+}
+
+/* 帮助 */
+.help-body {
+  padding: 0;
+}
+
+.help-item {
+  margin-bottom: 24rpx;
+}
+
+.help-q {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #ffffff;
+  display: block;
+  margin-bottom: 8rpx;
+}
+
+.help-a {
+  font-size: 24rpx;
+  color: #8888a0;
+  line-height: 1.5;
+  display: block;
+}
+
+.help-feedback {
+  margin-top: 30rpx;
+  padding-top: 24rpx;
+  border-top: 1rpx solid #2a2a3a;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.help-feedback-text {
+  font-size: 24rpx;
+  color: #8888a0;
+}
+
+.help-feedback-btn {
+  width: 300rpx;
+  height: 72rpx;
+  line-height: 72rpx;
+  background: #6c5ce7;
+  color: #ffffff;
+  font-size: 26rpx;
+  border-radius: 36rpx;
+  text-align: center;
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+.help-feedback-btn::after {
+  border: none;
+}
+
+/* 协议 */
+.agreement-body {
+  padding: 0;
+  max-height: 55vh;
+  overflow: hidden;
+}
+
+.agreement-scroll {
+  max-height: 55vh;
+}
+
+.agreement-text {
+  font-size: 24rpx;
+  color: #8888a0;
+  line-height: 1.8;
+  white-space: pre-wrap;
+}
+
+/* Toast */
+.toast {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.75);
+  color: #ffffff;
+  padding: 20rpx 40rpx;
+  border-radius: 16rpx;
+  font-size: 28rpx;
+  z-index: 99999;
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+
+.toast-show {
+  opacity: 1;
+}
+
+.toast-text {
+  color: #ffffff;
+}
+
+/* ========== 浅色主题 ========== */
+.container.theme-light .profile-card {
+  background: #ffffff;
+  border-color: #dee2e6;
+}
+
+.container.theme-light .profile-nickname {
+  color: #212529;
+}
+
+.container.theme-light .profile-stat-value {
+  color: #212529;
+}
+
+.container.theme-light .profile-stat-label {
+  color: #868e96;
+}
+
+.container.theme-light .profile-stat-divider {
+  background: #dee2e6;
+}
+
+.container.theme-light .profile-arrow {
+  color: #868e96;
+}
+
+.container.theme-light .menu-card {
+  background: #ffffff;
+  border-color: #dee2e6;
+}
+
+.container.theme-light .menu-item {
+  border-bottom-color: #f1f3f5;
+}
+
+.container.theme-light .menu-item:active {
+  background: rgba(76, 110, 245, 0.06);
+}
+
+.container.theme-light .menu-text {
+  color: #212529;
+}
+
+.container.theme-light .menu-desc {
+  color: #868e96;
+}
+
+.container.theme-light .menu-arrow {
+  color: #868e96;
+}
+
+.container.theme-light .footer-version {
+  color: #adb5bd;
+}
+
+.container.theme-light .footer-link {
+  color: #4c6ef5;
+}
+
+.container.theme-light .footer-divider {
+  color: #adb5bd;
+}
+
