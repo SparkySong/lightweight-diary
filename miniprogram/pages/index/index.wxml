@@ -48,19 +48,19 @@
     <view class="stat-card" bindtap="openWeightPopup" data-type="current">
       <text class="stat-label">当前体重</text>
       <text class="stat-value">{{currentWeight}}</text>
-      <text class="stat-unit" wx:if="{{currentWeight !== '--'}}">kg</text>
+      <text class="stat-unit" wx:if="{{currentWeight !== '--'}}">{{weightUnitLabel}}</text>
       <text class="stat-change {{lastChangeClass}}">{{lastChange}}</text>
     </view>
     <view class="stat-card" bindtap="openWeightPopup" data-type="target">
       <text class="stat-label">目标体重</text>
-      <text class="stat-value">{{goalWeight || '--'}}<text class="stat-unit" wx:if="{{goalWeight}}">kg</text></text>
+      <text class="stat-value">{{goalWeight || '--'}}<text class="stat-unit" wx:if="{{goalWeight}}">{{weightUnitLabel}}</text></text>
       <text class="stat-change neutral" wx:if="{{!goalWeight}}">未设置</text>
       <text class="stat-change {{goalReached ? 'down' : 'neutral'}}" wx:else>{{goalRemaining}}</text>
     </view>
     <view class="stat-card">
       <text class="stat-label">已减</text>
       <text class="stat-value" style="color:{{totalLostColor}}">{{totalLost}}</text>
-      <text class="stat-unit" wx:if="{{totalLost !== '--'}}">kg</text>
+      <text class="stat-unit" wx:if="{{totalLost !== '--'}}">{{weightUnitLabel}}</text>
       <text class="stat-change neutral">{{daysCount}} 天</text>
     </view>
   </view>
@@ -125,7 +125,7 @@
       <picker mode="date" value="{{inputDate}}" bindchange="onDateChange">
         <view class="picker-btn">{{inputDate || '选择日期'}}</view>
       </picker>
-      <input class="weight-input" type="digit" placeholder="体重 (kg)" value="{{inputWeight}}" bindinput="onWeightInput" confirm-type="done" bindconfirm="onCheckin" />
+      <input class="weight-input" type="digit" placeholder="体重 ({{weightUnitLabel}})" value="{{inputWeight}}" bindinput="onWeightInput" confirm-type="done" bindconfirm="onCheckin" />
     </view>
     <button class="btn-primary" bindtap="onCheckin">✅ 打卡记录</button>
   </view>
@@ -138,14 +138,17 @@
     </view>
     <view class="goal-input-wrap" wx:if="{{showGoalInput}}" catchtap="stopPropagation">
       <view class="input-row">
-        <input class="weight-input goal-input" type="digit" placeholder="目标体重 kg" value="{{inputGoal}}" bindinput="onGoalInput" confirm-type="done" bindconfirm="onSetGoal" />
+        <view class="goal-input-with-unit">
+          <input class="weight-input goal-input" type="digit" placeholder="目标体重" value="{{inputGoal}}" bindinput="onGoalInput" confirm-type="done" bindconfirm="onSetGoal" />
+          <text class="goal-input-unit">{{weightUnitLabel}}</text>
+        </view>
         <button class="btn-goal" bindtap="onSetGoal">设定</button>
         <view class="btn-cancel-small" bindtap="onCancelGoal">取消</view>
       </view>
     </view>
     <view wx:if="{{goalWeight && !showGoalInput}}">
       <view class="goal-display">
-        <text class="goal-val">{{goalWeight}} kg</text>
+        <text class="goal-val">{{goalWeight}} {{weightUnitLabel}}</text>
         <text class="goal-remaining {{goalReached ? 'down' : ''}}">{{goalRemaining}}</text>
       </view>
       <view class="progress-bar">
@@ -195,7 +198,7 @@
         <view class="record-item" wx:for="{{records}}" wx:key="_id" wx:for-item="record" data-record="{{record}}" bindtap="onEditRecord">
           <view class="record-left">
             <text class="record-date">{{record.dateStr}}</text>
-            <text class="record-weight">{{record.weight}} kg</text>
+            <text class="record-weight">{{record.displayWeight || record.weight}} {{weightUnitLabel}}</text>
           </view>
           <view class="record-right">
             <text class="record-diff {{record.diffClass}}" wx:if="{{record.diff !== undefined && record.diff !== null}}">
@@ -234,7 +237,7 @@
     <text class="edit-panel-date">{{editDate}}</text>
   </view>
   <view class="edit-panel-content">
-    <input class="edit-weight-input" type="digit" placeholder="体重 (kg)" value="{{editWeight}}" bindinput="onEditWeightInput" confirm-type="done" bindconfirm="onSaveEdit" />
+    <input class="edit-weight-input" type="digit" placeholder="体重 ({{weightUnitLabel}})" value="{{editWeight}}" bindinput="onEditWeightInput" confirm-type="done" bindconfirm="onSaveEdit" />
   </view>
   <view class="edit-panel-actions">
     <button class="btn-cancel" bindtap="closeEditPanel">取消</button>
@@ -258,7 +261,7 @@
       <text class="weight-popup-label">{{weightPopupType === 'current' ? '当前体重' : '目标体重'}}</text>
       <view class="weight-popup-input-row">
         <input class="weight-popup-input" type="digit" value="{{weightInputValue}}" bindinput="onWeightPopupInput" placeholder="请输入体重" />
-        <text class="weight-popup-unit">kg</text>
+        <text class="weight-popup-unit">{{weightUnitLabel}}</text>
       </view>
     </view>
     <view class="weight-popup-error" wx:if="{{weightPopupError}}">{{weightPopupError}}</view>

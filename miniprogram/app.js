@@ -13,11 +13,41 @@ App({
     // 初始化主题（默认深色模式）
     this.initTheme();
     
+    // 初始化体重单位（默认千克）
+    this.initWeightUnit();
+    
     // 监听系统主题变化
     this.watchSystemTheme();
     
     // 应用主题到tabBar
     this.applyThemeToTabBar();
+  },
+  
+  // 初始化体重单位
+  initWeightUnit() {
+    let weightUnit = wx.getStorageSync('weightUnit');
+    if (!weightUnit) {
+      weightUnit = 'kg'; // 默认千克
+      wx.setStorageSync('weightUnit', weightUnit);
+    }
+    this.globalData.weightUnit = weightUnit;
+  },
+  
+  // 获取体重单位
+  getWeightUnit() {
+    return wx.getStorageSync('weightUnit') || 'kg';
+  },
+  
+  // 通知所有页面体重单位变化
+  notifyWeightUnitChange(unit) {
+    const weightUnit = unit || this.getWeightUnit();
+    this.globalData.weightUnit = weightUnit;
+    const pages = getCurrentPages();
+    pages.forEach(page => {
+      if (page.onWeightUnitChange) {
+        page.onWeightUnitChange(weightUnit);
+      }
+    });
   },
   
   // 初始化主题
@@ -314,6 +344,7 @@ App({
   globalData: {
     userInfo: null,
     theme: 'dark', // 默认为深色模式
-    tabBarConfig: null
+    tabBarConfig: null,
+    weightUnit: 'kg' // 体重单位
   }
 });

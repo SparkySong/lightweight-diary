@@ -64,12 +64,15 @@ Page({
     const avatarUrl = wx.getStorageSync('avatarUrl') || DEFAULT_AVATAR;
     const weightUnit = wx.getStorageSync('weightUnit') || 'kg';
     const calorieUnit = wx.getStorageSync('calorieUnit') || 'kcal';
+    const KG_TO_JIN = 2;
     const weightData = wx.getStorageSync('weightData') || {};
-    const goalWeight = weightData.targetWeight || null;
+    const goalWeightKg = weightData.targetWeight || null;
+    // 根据单位转换显示
+    const goalWeight = goalWeightKg ? (weightUnit === 'jin' ? goalWeightKg * KG_TO_JIN : goalWeightKg) : null;
     const height = wx.getStorageSync('userHeight') || null;
     // 热量目标暂不设置，等云端返回后再更新
     this.setData({ nickname, avatarUrl, height, goalWeight, weightUnit, calorieUnit, calorieGoal: 0, calorieGoalDisplay: '未设置' });
-    this.loadStats(goalWeight);
+    this.loadStats(goalWeightKg);
   },
 
   onShow() {
@@ -109,10 +112,13 @@ Page({
     const nickname = wx.getStorageSync('nickname') || '轻体用户';
     const weightUnit = wx.getStorageSync('weightUnit') || 'kg';
     const calorieUnit = wx.getStorageSync('calorieUnit') || 'kcal';
+    const KG_TO_JIN = 2;
 
     // 从本地存储加载体重数据
     const weightData = wx.getStorageSync('weightData') || {};
-    const goalWeight = weightData.targetWeight || null;
+    const goalWeightKg = weightData.targetWeight || null;
+    // 根据单位转换显示
+    const goalWeight = goalWeightKg ? (weightUnit === 'jin' ? goalWeightKg * KG_TO_JIN : goalWeightKg) : null;
     const height = wx.getStorageSync('userHeight') || null;
 
     // 同步云端身高数据到本地
@@ -140,8 +146,8 @@ Page({
     // 重新从本地获取（可能刚被云端数据更新）
     const syncedHeight = wx.getStorageSync('userHeight') || height;
 
-    // 加载统计数据
-    this.loadStats(goalWeight);
+    // 加载统计数据（使用原始 kg 值计算）
+    this.loadStats(goalWeightKg);
 
     this.setData({
       nickname,
@@ -202,6 +208,10 @@ loadStats(goalWeight) {
   },
 
   calcStats(records, goalWeight) {
+    const { weightUnit } = this.data;
+    const KG_TO_JIN = 2;
+    const unitLabel = weightUnit === 'kg' ? 'kg' : '斤';
+    
     // 打卡天数
     const daysCount = records.length;
 
@@ -211,12 +221,12 @@ loadStats(goalWeight) {
       const sorted = [...records].sort((a, b) => a.date.localeCompare(b.date));
       const first = sorted[0].weight;
       const last = sorted[sorted.length - 1].weight;
-      const diff = first - last;
-      if (diff > 0) {
-        totalLost = diff.toFixed(1);
-      } else {
-        totalLost = diff.toFixed(1);
+      let diff = first - last;
+      // 根据单位转换
+      if (weightUnit === 'jin') {
+        diff = diff * KG_TO_JIN;
       }
+      totalLost = Math.abs(diff).toFixed(1);
     }
 
     // 距目标还差多少
@@ -224,11 +234,15 @@ loadStats(goalWeight) {
     if (goalWeight && records.length > 0) {
       const sorted = [...records].sort((a, b) => a.date.localeCompare(b.date));
       const currentWeight = sorted[sorted.length - 1].weight;
-      const diff = currentWeight - goalWeight;
+      // goalWeight 和 currentWeight 都是 kg 值，直接计算后再转换
+      let diff = currentWeight - goalWeight;
+      if (weightUnit === 'jin') {
+        diff = diff * KG_TO_JIN;
+      }
       if (diff > 0) {
-        goalRemaining = diff.toFixed(1);
+        goalRemaining = `还差 ${diff.toFixed(1)} ${unitLabel}`;
       } else {
-        goalRemaining = '0';
+        goalRemaining = '🎉 已达标！';
       }
     }
 
@@ -305,13 +319,27 @@ loadStats(goalWeight) {
 
   onMenuItemTap(e) {
     const action = e.currentTarget.dataset.action;
+    const { weightUnit } = this.data;
+    const KG_TO_JIN = 2;
+    
     switch (action) {
       case 'profile':
+        // 目标体重需要根据单位转换显示
+        let displayGoalWeight = '';
+        if (this.data.goalWeight) {
+          const goalWeightKg = this.data.goalWeight;
+          // 从存储中获取原始 kg 值
+          const weightData = wx.getStorageSync('weightData') || {};
+          const originalGoalKg = weightData.targetWeight || goalWeightKg;
+          displayGoalWeight = weightUnit === 'jin' 
+            ? String(originalGoalKg * KG_TO_JIN) 
+            : String(this.data.goalWeight);
+        }
         this.setData({
           showProfileEdit: true,
           editNickname: this.data.nickname,
           editHeight: this.data.height ? String(this.data.height) : '',
-          editGoalWeight: this.data.goalWeight ? String(this.data.goalWeight) : ''
+          editGoalWeight: displayGoalWeight
         });
         break;
       case 'calorieGoal':
@@ -382,7 +410,8 @@ loadStats(goalWeight) {
   },
 
   async onSaveProfile() {
-    const { editNickname, editHeight, editGoalWeight } = this.data;
+    const { editNickname, editHeight, editGoalWeight, weightUnit } = this.data;
+    const KG_TO_JIN = 2;
 
     // 验证
     if (editNickname.trim()) {
@@ -403,10 +432,17 @@ loadStats(goalWeight) {
       }
     }
     if (editGoalWeight) {
-      const w = parseFloat(editGoalWeight);
-      if (w < 20 || w > 300) {
-        this.showToast('体重范围 20-300kg');
+      let w = parseFloat(editGoalWeight);
+      // 根据单位进行验证
+      const minWeight = weightUnit === 'jin' ? 40 : 20;
+      const maxWeight = weightUnit === 'jin' ? 600 : 300;
+      if (w < minWeight || w > maxWeight) {
+        this.showToast(`目标体重范围 ${minWeight}-${maxWeight}${weightUnit}`);
         return;
+      }
+      // 如果是斤，转换为千克存储
+      if (weightUnit === 'jin') {
+        w = w / KG_TO_JIN;
       }
       const weightData = wx.getStorageSync('weightData') || {};
       weightData.targetWeight = parseFloat(w.toFixed(1));
@@ -445,9 +481,21 @@ loadStats(goalWeight) {
 
   // ========== 偏好设置 ==========
   onWeightUnitChange(e) {
-    const unit = e.currentTarget.dataset.unit;
+    // 支持从 WXML 调用（有 event）和从 app.notifyWeightUnitChange 调用（无参数）
+    let unit;
+    if (e && e.currentTarget && e.currentTarget.dataset) {
+      unit = e.currentTarget.dataset.unit;
+    } else if (e && typeof e === 'string') {
+      // 从 app.notifyWeightUnitChange 调用时传入单位字符串
+      unit = e;
+    }
+    
+    if (!unit) return;
+    
     wx.setStorageSync('weightUnit', unit);
     this.setData({ weightUnit: unit });
+    // 刷新页面数据
+    this.loadUserData();
     this.showToast(unit === 'kg' ? '已切换为千克' : '已切换为斤');
   },
 
@@ -581,7 +629,7 @@ loadStats(goalWeight) {
       content = '一、服务条款\n\n欢迎使用轻体打卡小程序（以下简称"本小程序"）。在使用本小程序前，请您仔细阅读以下服务条款。\n\n1. 服务说明\n本小程序为用户提供体重记录、饮食记录、热量分析等健康管理辅助工具。所有数据仅供参考，不构成任何医疗建议。\n\n2. 用户责任\n用户应对自己输入的数据准确性负责。本小程序不会对用户因使用本服务而产生的任何直接或间接损失承担责任。\n\n3. 数据安全\n我们重视您的隐私保护，所有个人数据均通过微信云开发安全存储，我们不会向第三方泄露您的个人信息。\n\n4. 服务变更\n我们保留随时修改或中断服务的权利，恕不另行通知。\n\n5. 免责声明\n本小程序提供的热量数据、BMI计算等仅供参考，不能替代专业医疗或营养建议。如有健康问题，请咨询专业医生。\n\n二、知识产权\n\n本小程序的所有内容，包括但不限于文字、图片、代码、界面设计等，均受知识产权法保护，未经授权不得复制或使用。\n\n三、适用法律\n\n本协议适用中华人民共和国法律。如发生争议，双方应友好协商解决。';
     } else {
       title = '隐私政策';
-      content = '轻体打卡小程序隐私政策\n\n生效日期：2025年1月1日\n\n我们非常重视您的隐私保护。本隐私政策说明我们如何收集、使用和保护您的个人信息。\n\n一、信息收集\n我们收集的信息仅限于您主动输入的数据，包括：\n- 体重记录数据\n- 饮食记录数据\n- 身高、目标体重等个人健康信息\n- 昵称等基本信息\n\n二、信息使用\n您的信息仅用于以下目的：\n- 提供体重趋势分析和饮食热量分析功能\n- 保存和展示您的健康数据\n- 改善产品体验\n\n三、信息存储\n您的数据通过微信云开发安全存储，采用加密传输和存储技术，确保数据安全。\n\n四、信息共享\n我们不会将您的个人信息出售、出租或以任何方式分享给第三方，除非：\n- 获得您的明确同意\n- 法律法规要求\n\n五、信息删除\n您可以随时通过"数据管理"功能清空您的所有数据。卸载小程序后，云端数据将依据微信云开发的数据保留策略处理。\n\n六、未成年人保护\n我们不对未成年人提供独立服务。如果您是未成年人，请在监护人指导下使用本小程序。\n\n七、政策更新\n我们可能会不定期更新本隐私政策，更新后将在小程序内通知您。';
+      content = '轻体打卡小程序隐私政策\n\n生效日期：2026年4月13日\n\n我们非常重视您的隐私保护。本隐私政策说明我们如何收集、使用和保护您的个人信息。\n\n一、信息收集\n我们收集的信息包括您主动输入的数据和授权获取的信息：\n\n1. 您主动输入的数据：\n- 体重记录数据\n- 饮食记录数据\n- 身高、目标体重等个人健康信息\n\n2. 授权获取的信息：\n- 微信昵称：通过微信官方提供的昵称填写组件获取，用于在个人主页展示您的昵称，便于识别和个性化体验\n- 微信头像：通过微信官方提供的头像选择组件获取，用于在个人主页展示您的头像，提升使用体验\n\n上述微信昵称和头像的获取均通过微信官方能力实现，您可以在授权时自主选择是否提供。我们不会在未经您同意的情况下获取上述信息。\n\n二、信息使用\n您的信息仅用于以下目的：\n- 提供体重趋势分析和饮食热量分析功能\n- 保存和展示您的健康数据\n- 在个人主页展示您的昵称和头像，提供个性化体验\n- 改善产品体验\n\n三、信息存储\n您的数据通过微信云开发安全存储，采用加密传输和存储技术，确保数据安全。\n\n四、信息共享\n我们不会将您的个人信息出售、出租或以任何方式分享给第三方，除非：\n- 获得您的明确同意\n- 法律法规要求\n\n五、信息删除\n您可以随时通过"数据管理"功能清空您的所有数据。您也可以在个人信息设置中修改或更换昵称和头像。卸载小程序后，云端数据将依据微信云开发的数据保留策略处理。\n\n六、未成年人保护\n我们不对未成年人提供独立服务。如果您是未成年人，请在监护人指导下使用本小程序。\n\n七、政策更新\n我们可能会不定期更新本隐私政策，更新后将在小程序内通知您。';
     }
 
     this.setData({

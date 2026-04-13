@@ -34,12 +34,12 @@
         <view class="profile-stat-divider"></view>
         <view class="profile-stat-item">
           <text class="profile-stat-value">{{totalLost}}</text>
-          <text class="profile-stat-label">已减(kg)</text>
+          <text class="profile-stat-label">已减({{weightUnit === 'kg' ? 'kg' : '斤'}})</text>
         </view>
         <view class="profile-stat-divider"></view>
         <view class="profile-stat-item">
           <text class="profile-stat-value">{{goalRemaining}}</text>
-          <text class="profile-stat-label">距目标(kg)</text>
+          <text class="profile-stat-label">距目标({{weightUnit === 'kg' ? 'kg' : '斤'}})</text>
         </view>
       </view>
     </view>
@@ -55,7 +55,7 @@
           <text class="menu-text">个人信息</text>
         </view>
         <view class="menu-item-right">
-          <text class="menu-desc" wx:if="{{height}}">{{height}}cm · {{goalWeight}}kg</text>
+          <text class="menu-desc" wx:if="{{height}}">{{height}}cm · {{goalWeight}}{{weightUnit === 'kg' ? 'kg' : '斤'}}</text>
           <text class="menu-desc" wx:else>未设置</text>
           <text class="menu-arrow">›</text>
         </view>
@@ -80,7 +80,7 @@
           <text class="menu-text">偏好设置</text>
         </view>
         <view class="menu-item-right">
-          <text class="menu-desc">{{weightUnit}} · {{calorieUnit}}</text>
+          <text class="menu-desc">{{weightUnit === 'kg' ? '千克' : '斤'}} · {{calorieUnit}}</text>
           <text class="menu-arrow">›</text>
         </view>
       </view>
@@ -230,24 +230,24 @@
         <text class="setting-label">体重单位</text>
         <view class="setting-options">
           <view class="setting-option {{weightUnit === 'kg' ? 'active' : ''}}" bindtap="onWeightUnitChange" data-unit="kg">
-            <text>千克(kg)</text>
+            <text>千克 (kg)</text>
           </view>
           <view class="setting-option {{weightUnit === 'jin' ? 'active' : ''}}" bindtap="onWeightUnitChange" data-unit="jin">
-            <text>斤</text>
+            <text>斤 (1斤=0.5kg)</text>
           </view>
         </view>
       </view>
-      <view class="setting-group">
+      <!-- <view class="setting-group">
         <text class="setting-label">热量单位</text>
         <view class="setting-options">
           <view class="setting-option {{calorieUnit === 'kcal' ? 'active' : ''}}" bindtap="onCalorieUnitChange" data-unit="kcal">
-            <text>千卡(kcal)</text>
+            <text>千卡 (kcal)</text>
           </view>
           <view class="setting-option {{calorieUnit === 'kj' ? 'active' : ''}}" bindtap="onCalorieUnitChange" data-unit="kj">
-            <text>千焦(kJ)</text>
+            <text>千焦 (kJ)</text>
           </view>
         </view>
-      </view>
+      </view> -->
     </view>
     <view class="popup-footer">
       <button class="popup-btn popup-btn-confirm" bindtap="onClosePopup">完成</button>

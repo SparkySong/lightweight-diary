@@ -7,6 +7,9 @@ const app = getApp();
 // 分页配置
 const PAGE_SIZE = 15;
 
+// 体重单位转换常量
+const KG_TO_JIN = 2; // 1kg = 2斤
+
 Page({
   data: {
     records: [],
@@ -71,19 +74,43 @@ Page({
     weightPopupShow: false,
     weightPopupType: 'current', // 'current' 或 'target'
     weightInputValue: '',
-    weightPopupError: ''
+    weightPopupError: '',
+    // 体重单位相关
+    weightUnit: 'kg',         // 当前体重单位设置
+    weightUnitLabel: 'kg',    // 显示用的单位标签
   },
 
   onLoad() {
     this.setTodayDate();
+    this.initWeightUnit();
     this.loadAll();
     this.initTheme();
   },
 
   onShow() {
+    // 先刷新体重单位设置，再加载数据
+    this.initWeightUnit();
     this.loadAll();
     // 每次显示都重新初始化主题（确保从其他页面切换回来时主题同步）
     this.initTheme();
+  },
+  
+  // 初始化体重单位
+  initWeightUnit() {
+    const weightUnit = app.getWeightUnit();
+    const weightUnitLabel = weightUnit === 'kg' ? 'kg' : '斤';
+    this.setData({ weightUnit, weightUnitLabel });
+  },
+  
+  // 体重单位变化回调（从偏好设置页面切换后调用）
+  onWeightUnitChange(unit) {
+    if (!unit) return;
+    // 先同步存储中的设置
+    app.globalData.weightUnit = unit;
+    const weightUnitLabel = unit === 'kg' ? 'kg' : '斤';
+    this.setData({ weightUnit: unit, weightUnitLabel });
+    // 重新加载所有数据以刷新显示
+    this.loadAll();
   },
 
   setTodayDate() {
@@ -132,16 +159,21 @@ Page({
         const localRecords = wx.getStorageSync('localRecords') || [];
         const localGoal = wx.getStorageSync('localGoal');
         const localProfile = wx.getStorageSync('localProfile') || { height: null, reminder: { enabled: false, remindTime: '08:00' }};
+        const { weightUnit } = this.data;
         
         if (localRecords.length > 0) {
-          this.setData({ records: localRecords });
-          this.updateStats(localRecords);
-          this.calcStreak(localRecords);
-          this.drawChart(localRecords);
+          // 对本地记录进行单位转换
+          const formattedRecords = this.formatRecordsForDisplay(localRecords, weightUnit);
+          this.setData({ records: formattedRecords, allRecords: formattedRecords });
+          this.updateStats(formattedRecords);
+          this.calcStreak(formattedRecords);
+          this.drawChart(formattedRecords);
         }
         if (localGoal) {
-          this.setData({ goalWeight: localGoal, showGoalInput: false });
-          this.updateGoalProgress(localGoal);
+          // 目标体重也需要转换
+          const displayGoal = weightUnit === 'jin' ? localGoal * KG_TO_JIN : localGoal;
+          this.setData({ goalWeight: displayGoal, showGoalInput: false });
+          this.updateGoalProgress(displayGoal);
         }
         this.setData({
           height: localProfile.height,
@@ -168,7 +200,11 @@ Page({
         name: 'getRecords',
         data: { range: this.data.chartRange }
       });
-      const allRecords = res.result.data || [];
+      let allRecords = res.result.data || [];
+      
+      // 根据体重单位转换显示值
+      const { weightUnit } = this.data;
+      allRecords = this.formatRecordsForDisplay(allRecords, weightUnit);
       
       // 初始化分页数据
       const displayedRecords = allRecords.slice(0, PAGE_SIZE);
@@ -185,9 +221,30 @@ Page({
       this.updateStats(displayedRecords);
       this.drawChart(allRecords);
       this.calcStreak(allRecords);
+      // 确保 BMI 在数据设置完成后计算
+      this.calcBMI();
     } catch (e) {
       console.error('加载记录失败', e);
     }
+  },
+  
+  // 格式化记录用于显示（根据体重单位转换）
+  formatRecordsForDisplay(records, weightUnit) {
+    const isJin = weightUnit === 'jin';
+    return records.map(record => {
+      // 确保转换为数字类型
+      const originalWeight = parseFloat(record.weight);
+      // 转换为显示用的单位
+      const displayWeight = isJin ? originalWeight * KG_TO_JIN : originalWeight;
+      return {
+        ...record,
+        originalWeight: originalWeight,  // 保留原始 kg 值
+        weight: displayWeight,  // 数值类型，用于统计计算
+        weightStr: displayWeight.toFixed(1),  // 字符串类型，用于显示
+        displayWeight: displayWeight.toFixed(1),
+        dateStr: record.date
+      };
+    });
   },
   
   // 加载更多记录
@@ -229,6 +286,7 @@ Page({
   },
 
   async loadGoal() {
+    const { weightUnit } = this.data;
     try {
       // 先从本地存储获取目标体重
       const weightData = wx.getStorageSync('weightData') || {};
@@ -245,8 +303,11 @@ Page({
         goal = parseFloat(parseFloat(goal).toFixed(1));
         weightData.targetWeight = goal;
         wx.setStorageSync('weightData', weightData);
-        this.setData({ goalWeight: goal, showGoalInput: false });
-        this.updateGoalProgress(goal);
+        
+        // 根据单位转换显示
+        const displayGoal = weightUnit === 'jin' ? goal * KG_TO_JIN : goal;
+        this.setData({ goalWeight: displayGoal, showGoalInput: false });
+        this.updateGoalProgress(displayGoal); // 使用转换后的值（与 records 单位一致）
       } else {
         this.setData({ goalWeight: null, showGoalInput: true, goalRemaining: '未设置', goalProgress: 0 });
       }
@@ -273,8 +334,11 @@ Page({
 
   // --- BMI ---
   calcBMI() {
-    const { height, currentWeight } = this.data;
-    if (!height || currentWeight === '--') {
+    // 使用 allRecords 获取完整数据（包括 originalWeight）
+    const { height, allRecords } = this.data;
+    const records = allRecords && allRecords.length > 0 ? allRecords : this.data.records;
+    
+    if (!height || !records || records.length === 0) {
       this.setData({ 
         bmiValue: '--', 
         bmiCategory: '请设置身高', 
@@ -285,8 +349,25 @@ Page({
       });
       return;
     }
+    
+    // 获取最新体重
+    const sorted = [...records].sort((a, b) => b.date.localeCompare(a.date));
+    const latest = sorted[0];
+    
+    // 获取千克值 - 优先使用 originalWeight
+    let w;
+    if (latest.originalWeight !== undefined) {
+      // 已经转换过，originalWeight 是原始千克值
+      w = parseFloat(latest.originalWeight);
+    } else {
+      // 未转换的情况，从存储获取原始 kg 值
+      const weightUnit = wx.getStorageSync('weightUnit') || 'kg';
+      // records 中的 weight 可能是显示值，需要转回 kg
+      const displayWeight = parseFloat(latest.weight);
+      w = weightUnit === 'jin' ? displayWeight / KG_TO_JIN : displayWeight;
+    }
+    
     const h = height / 100;
-    const w = parseFloat(currentWeight);
     const bmi = (w / (h * h)).toFixed(1);
     // 计算 BMI 指示器位置 (0-40 范围)
     const bmiIndicatorLeft = Math.min(Math.max((bmi / 40) * 100, 0), 100);
@@ -424,6 +505,9 @@ Page({
 
   // --- Stats ---
   updateStats(records) {
+    const { weightUnit } = this.data;
+    const unitLabel = weightUnit === 'kg' ? 'kg' : '斤';
+    
     if (records.length === 0) {
       this.setData({
         currentWeight: '--', lastChange: '等待记录', lastChangeClass: 'neutral',
@@ -435,12 +519,14 @@ Page({
     const sorted = [...records].sort((a, b) => b.date.localeCompare(a.date));
     const latest = sorted[0];
 
+    // latest.weight 已经是转换后的值（kg 或 斤）
     let lastChange = '首次记录';
     let lastChangeClass = 'neutral';
     if (sorted.length >= 2) {
       const diff = latest.weight - sorted[1].weight;
-      if (diff < 0) { lastChange = `↓ ${Math.abs(diff).toFixed(1)} kg`; lastChangeClass = 'down'; }
-      else if (diff > 0) { lastChange = `↑ ${diff.toFixed(1)} kg`; lastChangeClass = 'up'; }
+      const absDisplayDiff = Math.abs(diff).toFixed(1);
+      if (diff < 0) { lastChange = `↓ ${absDisplayDiff} ${unitLabel}`; lastChangeClass = 'down'; }
+      else if (diff > 0) { lastChange = `↑ ${absDisplayDiff} ${unitLabel}`; lastChangeClass = 'up'; }
       else { lastChange = '持平'; lastChangeClass = 'neutral'; }
     }
 
@@ -451,8 +537,11 @@ Page({
     if (totalDiff < 0) { totalLost = Math.abs(totalDiff).toFixed(1); totalLostColor = '#00b894'; }
     else if (totalDiff > 0) { totalLost = `+${totalDiff.toFixed(1)}`; totalLostColor = '#e17055'; }
 
+    // latest.weight 已经是正确的显示值（已经过 formatRecordsForDisplay 转换）
+    const displayWeight = latest.weight.toFixed(1);
+
     this.setData({
-      currentWeight: latest.weight.toFixed(1),
+      currentWeight: displayWeight,
       lastChange, lastChangeClass,
       totalLost, totalLostColor,
       daysCount: records.length
@@ -463,11 +552,15 @@ Page({
   },
 
   updateGoalProgress(goal) {
+    const { weightUnit } = this.data;
+    const unitLabel = weightUnit === 'kg' ? 'kg' : '斤';
     const records = this.data.records;
     if (records.length === 0) return;
     const sorted = [...records].sort((a, b) => a.date.localeCompare(b.date));
     const first = sorted[0];
     const latest = [...records].sort((a, b) => b.date.localeCompare(a.date))[0];
+    
+    // goalWeight 和 records 中的 weight 都已经是转换后的同单位值，直接计算
     const totalToLose = first.weight - goal;
     const remaining = latest.weight - goal;
     let progress = 0, goalRemaining = '', goalReached = false;
@@ -475,12 +568,12 @@ Page({
     if (totalToLose > 0) {
       const currentLost = first.weight - latest.weight;
       progress = Math.min(100, Math.max(0, (currentLost / totalToLose) * 100));
-      if (remaining > 0) goalRemaining = `还差 ${remaining.toFixed(1)} kg`;
+      if (remaining > 0) goalRemaining = `还差 ${Math.abs(remaining).toFixed(1)} ${unitLabel}`;
       else { goalRemaining = '🎉 已达标！'; goalReached = true; }
     } else if (totalToLose < 0) {
       const currentGain = latest.weight - first.weight;
       progress = Math.min(100, Math.max(0, (currentGain / Math.abs(totalToLose)) * 100));
-      if (remaining < 0) goalRemaining = `还差 ${Math.abs(remaining).toFixed(1)} kg`;
+      if (remaining < 0) goalRemaining = `还差 ${Math.abs(remaining).toFixed(1)} ${unitLabel}`;
       else { goalRemaining = '🎉 已达标！'; goalReached = true; }
     }
     this.setData({ goalRemaining, goalProgress: progress, goalProgressWidth: progress, goalReached });
@@ -516,6 +609,9 @@ Page({
     const ctx = wx.createCanvasContext('chart');
     ctx.clearRect(0, 0, W, H);
 
+    const { weightUnit } = this.data;
+    const isJin = weightUnit === 'jin';
+
     let sorted = [...data].sort((a, b) => a.date.localeCompare(b.date));
     if (this.data.chartRange !== 'all') {
       const cutoff = new Date();
@@ -537,26 +633,31 @@ Page({
     const cW = W - pad.l - pad.r;
     const cH = H - pad.t - pad.b;
 
-    const weights = sorted.map(d => d.weight);
+    // 使用已转换的 displayWeight（已经是正确的显示单位）
+    const weights = sorted.map(d => parseFloat(d.weight));
     let minW = Math.min(...weights), maxW = Math.max(...weights);
     if (maxW - minW < 2) { minW -= 1; maxW += 1; }
     const range = maxW - minW;
     minW -= range * 0.1;
     maxW += range * 0.1;
 
-    // Goal line
-    const goal = this.data.goalWeight;
-    if (goal && goal >= minW && goal <= maxW) {
-      const gy = pad.t + cH - ((goal - minW) / (maxW - minW)) * cH;
-      ctx.setStrokeStyle('rgba(253, 203, 110, 0.3)');
-      ctx.setLineWidth(1);
-      ctx.setLineDash([6, 4], 0);
-      ctx.beginPath(); ctx.moveTo(pad.l, gy); ctx.lineTo(W - pad.r, gy); ctx.stroke();
-      ctx.setLineDash([], 0);
-      ctx.setFillStyle('#fdcb6e');
-      ctx.setFontSize(10);
-      ctx.setTextAlign('right');
-      ctx.fillText(`目标 ${goal}`, W - pad.r, gy - 4);
+    // Goal line - 从存储获取原始 kg 值，然后根据当前单位转换显示
+    const originalGoal = wx.getStorageSync('weightData')?.targetWeight;
+    if (originalGoal) {
+      const displayGoal = isJin ? originalGoal * KG_TO_JIN : originalGoal;
+      const goalY = isJin ? originalGoal * KG_TO_JIN : originalGoal;
+      if (goalY >= minW && goalY <= maxW) {
+        const gy = pad.t + cH - ((goalY - minW) / (maxW - minW)) * cH;
+        ctx.setStrokeStyle('rgba(253, 203, 110, 0.3)');
+        ctx.setLineWidth(1);
+        ctx.setLineDash([6, 4], 0);
+        ctx.beginPath(); ctx.moveTo(pad.l, gy); ctx.lineTo(W - pad.r, gy); ctx.stroke();
+        ctx.setLineDash([], 0);
+        ctx.setFillStyle('#fdcb6e');
+        ctx.setFontSize(10);
+        ctx.setTextAlign('right');
+        ctx.fillText(`目标 ${displayGoal.toFixed(1)}`, W - pad.r, gy - 4);
+      }
     }
 
     // Grid
@@ -575,7 +676,7 @@ Page({
 
     const points = sorted.map((d, i) => ({
       x: sorted.length === 1 ? pad.l + cW / 2 : pad.l + (cW / (sorted.length - 1)) * i,
-      y: pad.t + cH - ((d.weight - minW) / (maxW - minW)) * cH,
+      y: pad.t + cH - ((parseFloat(d.weight) - minW) / (maxW - minW)) * cH,
       ...d
     }));
 
@@ -614,10 +715,23 @@ Page({
   onWeightInput(e) { this.setData({ inputWeight: e.detail.value }); },
 
   async onCheckin() {
-    const { inputDate, inputWeight } = this.data;
+    const { inputDate, inputWeight, weightUnit } = this.data;
     if (!inputDate) { this.showToast('请选择日期'); return; }
-    const weight = parseFloat(inputWeight);
-    if (!weight || weight < 20 || weight > 300) { this.showToast('请输入有效体重'); return; }
+    let weight = parseFloat(inputWeight);
+    if (!weight) { this.showToast('请输入有效体重'); return; }
+    
+    // 根据单位进行验证
+    const minWeight = weightUnit === 'jin' ? 40 : 20;
+    const maxWeight = weightUnit === 'jin' ? 600 : 300;
+    if (weight < minWeight || weight > maxWeight) {
+      this.showToast(`请输入${minWeight}-${maxWeight}之间的有效体重`);
+      return;
+    }
+    
+    // 如果是斤，转换为千克存储
+    if (weightUnit === 'jin') {
+      weight = weight / KG_TO_JIN;
+    }
 
     wx.showLoading({ title: '打卡中...' });
     try {
@@ -646,12 +760,37 @@ Page({
   },
 
   async onSetGoal() {
-    const val = parseFloat(parseFloat(this.data.inputGoal).toFixed(1));
-    if (!val || val < 20 || val > 300) { this.showToast('请输入有效目标体重'); return; }
+    const { weightUnit } = this.data;
+    let val = parseFloat(this.data.inputGoal);
+    if (!val) { this.showToast('请输入有效目标体重'); return; }
+    
+    // 根据单位进行验证
+    const minWeight = weightUnit === 'jin' ? 40 : 20;
+    const maxWeight = weightUnit === 'jin' ? 600 : 300;
+    if (val < minWeight || val > maxWeight) {
+      this.showToast(`请输入${minWeight}-${maxWeight}之间的有效目标体重`);
+      return;
+    }
+    
+    // 如果是斤，转换为千克存储
+    if (weightUnit === 'jin') {
+      val = val / KG_TO_JIN;
+    }
+    
+    val = parseFloat(val.toFixed(1));
     try {
       await wx.cloud.callFunction({ name: 'setGoal', data: { goal: val } });
+      
+      // 同时保存到本地
+      const weightData = wx.getStorageSync('weightData') || {};
+      weightData.targetWeight = val;
+      wx.setStorageSync('weightData', weightData);
+      
       this.showToast('目标已设定 🎯');
-      this.setData({ goalWeight: val, showGoalInput: false, inputGoal: '' });
+      
+      // 根据单位转换显示
+      const displayGoal = weightUnit === 'jin' ? val * KG_TO_JIN : val;
+      this.setData({ goalWeight: displayGoal, showGoalInput: false, inputGoal: '' });
       this.updateGoalProgress(val);
     } catch (e) { this.showToast('设定失败'); }
   },
@@ -867,10 +1006,11 @@ Page({
   // --- 编辑体重功能 ---
   onEditRecord(e) {
     const record = e.currentTarget.dataset.record;
+    // record.weight 已经是数值类型（转换后的），需要格式化为字符串显示
     this.setData({
       editRecordId: record._id,
       editDate: record.date,
-      editWeight: String(record.weight),
+      editWeight: String(parseFloat(record.weight).toFixed(1)),
       showEditPanel: true
     });
   },
@@ -889,11 +1029,25 @@ Page({
   },
 
   async onSaveEdit() {
-    const { editRecordId, editWeight } = this.data;
-    const weight = parseFloat(editWeight);
-    if (!editRecordId || !weight || weight < 20 || weight > 300) {
+    const { editRecordId, editWeight, weightUnit } = this.data;
+    let weight = parseFloat(editWeight);
+    
+    if (!editRecordId || !weight) {
       this.showToast('请输入有效体重');
       return;
+    }
+    
+    // 根据单位验证范围
+    const minWeight = weightUnit === 'jin' ? 40 : 20;
+    const maxWeight = weightUnit === 'jin' ? 600 : 300;
+    if (weight < minWeight || weight > maxWeight) {
+      this.showToast(`请输入${minWeight}-${maxWeight}之间的有效体重`);
+      return;
+    }
+    
+    // 如果是斤，转换为千克存储
+    if (weightUnit === 'jin') {
+      weight = weight / KG_TO_JIN;
     }
 
     wx.showLoading({ title: '保存中...' });
@@ -967,11 +1121,26 @@ Page({
 
   // 保存体重
   async saveWeightPopup() {
-    const value = parseFloat(this.data.weightInputValue);
+    const { weightUnit } = this.data;
+    let value = parseFloat(this.data.weightInputValue);
     
-    if (!value || value < 20 || value > 300) {
-      this.setData({ weightPopupError: '请输入20-300之间的有效体重' });
+    if (!value) {
+      this.setData({ weightPopupError: '请输入有效体重' });
       return;
+    }
+    
+    // 根据单位进行验证（斤的范围是40-600，kg的范围是20-300）
+    const minWeight = weightUnit === 'jin' ? 40 : 20;
+    const maxWeight = weightUnit === 'jin' ? 600 : 300;
+    
+    if (value < minWeight || value > maxWeight) {
+      this.setData({ weightPopupError: `请输入${minWeight}-${maxWeight}之间的有效体重` });
+      return;
+    }
+    
+    // 如果是斤，转换为千克存储
+    if (weightUnit === 'jin') {
+      value = value / KG_TO_JIN;
     }
     
     this.setData({ weightPopupError: '' });
@@ -1000,14 +1169,22 @@ Page({
         weightData.targetWeight = parseFloat(value.toFixed(1));
         wx.setStorageSync('weightData', weightData);
         
+        // 同时同步到云端
+        try {
+          await wx.cloud.callFunction({ name: 'setGoal', data: { goal: weightData.targetWeight } });
+        } catch (e) {
+          console.warn('同步目标体重到云端失败', e);
+        }
+        
         this.showToast('目标体重已设置 🎯');
         this.closeWeightPopup();
         
-        // 更新目标体重显示
-        this.setData({ goalWeight: weightData.targetWeight });
+        // 根据单位转换显示
+        const displayGoal = weightUnit === 'jin' ? weightData.targetWeight * KG_TO_JIN : weightData.targetWeight;
+        this.setData({ goalWeight: displayGoal });
         
-        // 重新计算目标相关信息
-        this.updateGoalProgress(weightData.targetWeight);
+        // 重新计算目标相关信息（使用转换后的displayGoal，与records单位一致）
+        this.updateGoalProgress(displayGoal);
       }
     } catch (e) {
       console.error('保存体重失败', e);

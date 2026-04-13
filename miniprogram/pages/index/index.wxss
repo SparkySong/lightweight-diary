@@ -450,6 +450,27 @@
 /* Goal */
 .goal-input-wrap { margin-bottom: 8rpx; }
 .goal-input { flex: 1; }
+.goal-input-with-unit {
+  display: flex;
+  align-items: center;
+  background: #0f0f13;
+  border: 1rpx solid #2a2a3a;
+  border-radius: 20rpx;
+  padding: 0 20rpx;
+  height: 88rpx;
+}
+.goal-input-with-unit .goal-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+.goal-input-unit {
+  font-size: 28rpx;
+  color: #8888a0;
+  margin-left: 8rpx;
+  font-weight: 500;
+}
 .goal-display {
   display: flex;
   justify-content: space-between;
@@ -1141,6 +1162,18 @@
 }
 
 .theme-light .goal-empty {
+  color: #868e96;
+}
+
+/* 目标输入框带单位标签 - 浅色主题 */
+.theme-light .goal-input-with-unit {
+  background: #f8f9fa;
+  border-color: #dee2e6;
+}
+.theme-light .goal-input-with-unit .goal-input {
+  color: #212529;
+}
+.theme-light .goal-input-unit {
   color: #868e96;
 }
 
