@@ -204,9 +204,9 @@
             <text class="record-weight">{{record.displayWeight || record.weight}} {{weightUnitLabel}}</text>
           </view>
           <view class="record-right">
-            <text class="record-diff {{record.diffClass}}" wx:if="{{record.diff !== undefined && record.diff !== null}}">
-              <block wx:if="{{record.diff < 0}}">↓{{(-record.diff)}}</block>
-              <block wx:elif="{{record.diff > 0}}">↑{{record.diff}}</block>
+            <text class="record-diff {{record.diffClass}}" wx:if="{{record.displayDiff !== undefined && record.displayDiff !== null}}">
+              <block wx:if="{{record.displayDiff < 0}}">↓{{(-record.displayDiff)}}</block>
+              <block wx:elif="{{record.displayDiff > 0}}">↑{{record.displayDiff}}</block>
               <block wx:else>→</block>
             </text>
             <view class="edit-icon" catchtap="onEditRecord" data-record="{{record}}">✏️</view>

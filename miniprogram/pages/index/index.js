@@ -238,12 +238,17 @@ Page({
       const originalWeight = parseFloat(record.weight);
       // 转换为显示用的单位
       const displayWeight = isJin ? originalWeight * KG_TO_JIN : originalWeight;
+      // diff 也需要转换单位
+      const displayDiff = (record.diff !== undefined && record.diff !== null)
+        ? (isJin ? record.diff * KG_TO_JIN : record.diff)
+        : undefined;
       return {
         ...record,
         originalWeight: originalWeight,  // 保留原始 kg 值
         weight: displayWeight,  // 数值类型，用于统计计算
         weightStr: displayWeight.toFixed(1),  // 字符串类型，用于显示
         displayWeight: displayWeight.toFixed(1),
+        displayDiff: displayDiff,  // 转换后的 diff
         dateStr: record.date
       };
     });
