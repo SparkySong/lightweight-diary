@@ -93,6 +93,8 @@ Page({
     this.loadAll();
     // 每次显示都重新初始化主题（确保从其他页面切换回来时主题同步）
     this.initTheme();
+    // 如果提醒已开启，自动请求订阅消息续期（微信订阅消息是一次性的）
+    this.renewReminderIfNeeded();
   },
   
   // 初始化体重单位
@@ -451,25 +453,16 @@ Page({
   async onToggleReminder() {
     if (!this.data.reminderEnabled) {
       // 开启提醒 - 请求订阅消息权限
-      try {
-        const templateId = '5X2tUq0NbycqoeFiymKj4FiKaLts5K5ZdSgzqHf4Lt4';
-        const res = await wx.requestSubscribeMessage({
-          tmplIds: [templateId]
-        });
-        if (res[templateId] === 'accept') {
-          await wx.cloud.callFunction({
-            name: 'subscribeReminder',
-            data: { enabled: true, remindTime: this.data.remindTime }
-          });
-          this.setData({ reminderEnabled: true });
-          this.showToast('提醒已开启 🔔');
-        } else {
-          this.showToast('需要授权通知权限');
-        }
-      } catch (e) {
-        // 用户拒绝或出错
-        console.error('订阅消息失败:', e);
-        this.showToast('开启提醒失败');
+      const success = await this.requestSubscribeAndSave(this.data.remindTime);
+      if (success) {
+        this.setData({ reminderEnabled: true });
+        this.showToast('提醒已开启 🔔');
+        // 记录今天已请求
+        const today = new Date();
+        const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+        wx.setStorageSync('lastSubscribeDate', todayStr);
+      } else {
+        this.showToast('需要授权通知权限');
       }
     } else {
       // 关闭提醒
@@ -478,6 +471,8 @@ Page({
         data: { enabled: false }
       });
       this.setData({ reminderEnabled: false });
+      // 清除订阅日期记录
+      wx.removeStorageSync('lastSubscribeDate');
       this.showToast('提醒已关闭');
     }
   },
@@ -489,13 +484,85 @@ Page({
   },
   
   onRemindTimeChange(e) {
-    this.setData({ remindTime: e.detail.value });
+    const newTime = e.detail.value;
+    this.setData({ remindTime: newTime });
     if (this.data.reminderEnabled) {
+      // 先直接保存时间到云端（不依赖订阅授权结果）
       wx.cloud.callFunction({
         name: 'subscribeReminder',
-        data: { enabled: true, remindTime: e.detail.value }
+        data: { enabled: true, remindTime: newTime }
       });
+      // 同时尝试续期订阅（静默请求，失败不影响时间保存）
+      this.renewSubscribeSilent();
     }
+  },
+
+  // 静默续期订阅（不阻塞用户操作，失败也不影响功能）
+  async renewSubscribeSilent() {
+    const templateId = '5X2tUq0NbycqoeFiymKj4FiKaLts5K5ZdSgzqHf4Lt4';
+    try {
+      const res = await wx.requestSubscribeMessage({
+        tmplIds: [templateId]
+      });
+      if (res[templateId] === 'accept') {
+        // 订阅成功，记录今天已请求
+        const today = new Date();
+        const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+        wx.setStorageSync('lastSubscribeDate', todayStr);
+      }
+    } catch (e) {
+      // 静默失败，不影响用户体验
+      console.warn('续期订阅失败:', e);
+    }
+  },
+
+  // 请求订阅消息并保存设置到云端
+  async requestSubscribeAndSave(remindTime) {
+    const templateId = '5X2tUq0NbycqoeFiymKj4FiKaLts5K5ZdSgzqHf4Lt4';
+    try {
+      const res = await wx.requestSubscribeMessage({
+        tmplIds: [templateId]
+      });
+      if (res[templateId] === 'accept') {
+        await wx.cloud.callFunction({
+          name: 'subscribeReminder',
+          data: { enabled: true, remindTime: remindTime || this.data.remindTime }
+        });
+        return true;
+      } else {
+        console.warn('用户拒绝订阅消息授权');
+        return false;
+      }
+    } catch (e) {
+      console.error('请求订阅消息失败:', e);
+      return false;
+    }
+  },
+
+  // 自动续期订阅消息（已开启提醒的用户，每次打开小程序时请求一次）
+  async renewReminderIfNeeded() {
+    if (!this.data.reminderEnabled) return;
+    
+    // 检查今天是否已经请求过订阅
+    const today = new Date();
+    const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    const lastSubscribeDate = wx.getStorageSync('lastSubscribeDate');
+    
+    if (lastSubscribeDate === todayStr) {
+      // 今天已经请求过，不再重复请求
+      return;
+    }
+    
+    // 延迟2秒请求，避免页面刚加载时就弹窗影响体验
+    setTimeout(async () => {
+      if (!this.data.reminderEnabled) return;
+      
+      const success = await this.requestSubscribeAndSave(this.data.remindTime);
+      if (success) {
+        // 记录今天已请求
+        wx.setStorageSync('lastSubscribeDate', todayStr);
+      }
+    }, 2000);
   },
 
   // --- Navigation ---
