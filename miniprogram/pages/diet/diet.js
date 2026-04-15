@@ -4,6 +4,25 @@ const app = getApp();
 // 分页配置
 const PAGE_SIZE = 10;
 
+// 🔑 关键修复：从存储获取当前生效的主题（用于 data 初始值，避免闪烁）
+const getInitTheme = () => {
+  const themeSetting = wx.getStorageSync('appTheme') || 'dark';
+  if (themeSetting === 'system') {
+    try {
+      if (wx.getDeviceInfo && wx.getDeviceInfo().theme) {
+        return wx.getDeviceInfo().theme;
+      }
+      if (wx.getSystemInfoSync && wx.getSystemInfoSync().theme) {
+        return wx.getSystemInfoSync().theme;
+      }
+      return wx.getStorageSync('lastSystemTheme') || 'dark';
+    } catch (e) {
+      return 'dark';
+    }
+  }
+  return themeSetting;
+};
+
 // 本地食物数据库（卡路里单位：每份/100g千卡）
 const foodDatabase = [
   // 主食类
@@ -319,8 +338,8 @@ Page({
     showAddPanel: false,
     toastMsg: '',
     toastShow: false,
-    // 主题相关 - 初始值从全局获取，避免首次渲染闪烁
-    currentTheme: app.globalData.theme || 'dark',
+    // 主题相关 - 🔑 关键：初始值从存储直接读取，避免闪烁
+    currentTheme: getInitTheme(),
     // 编辑相关
     isEditing: false,
     editRecordId: '',
@@ -341,27 +360,24 @@ Page({
   },
 
   onLoad() {
+    // 🔑 关键修复：立即同步设置主题，避免切换页面时闪烁
     this.setTodayDate();
     this.initTheme();
-    // 加载云端自定义食物
+    // 加载云端自定义食物（不阻塞主题渲染）
     this.loadCustomFoods();
   },
 
   onShow() {
-    // 每次进入页面都重新初始化主题（确保 tabBar 切换后主题正确）
+    // 🔑 关键修复：立即同步刷新主题，再加载数据
     this.initTheme();
     
     this.loadRecords();
-    // 加载云端自定义食物（确保每次进入页面都同步最新数据）
+    // 加载云端自定义食物
     this.loadCustomFoods();
-    // 页面显示时检测主题变化（特别针对跟随系统模式）
-    const themeSetting = app.getThemeSetting();
-    if (themeSetting === 'system') {
-      // 跟随系统模式时，每次页面显示都检测系统主题
-      this.onThemeChange();
-    }
-    // 更新tabBar主题
-    app.applyThemeToTabBar();
+  },
+
+  onTabItemTap() {
+    this.initTheme();
   },
   
   // 加载云端自定义食物库

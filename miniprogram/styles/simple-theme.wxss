@@ -13,7 +13,6 @@
 /* 深色主题（默认） */
 page.theme-dark {
   background-color: var(--page-bg-dark, #0f0f13);
-  transition: background-color 0.5s ease;
 }
 
 /* 确保深色主题的下拉区域也是深色 */
@@ -32,7 +31,6 @@ page.theme-dark .page__bd {
 /* 浅色主题 */
 page.theme-light {
   background-color: var(--page-bg-light, #f8f9fa);
-  transition: background-color 0.5s ease;
 }
 
 /* 确保浅色主题的下拉区域也是浅色 */
@@ -88,7 +86,6 @@ page.theme-dark .custom-nav-area {
   background: linear-gradient(180deg, rgba(15, 15, 19, 0.96) 0%, rgba(15, 15, 19, 0.85) 100%);
   backdrop-filter: saturate(180%) blur(15rpx);
   -webkit-backdrop-filter: saturate(180%) blur(15rpx);
-  transition: background 0.5s ease;
   background-color: var(--nav-bg-dark, rgba(15, 15, 19, 0.96));
 }
 
@@ -132,7 +129,6 @@ page.theme-light .custom-nav-area {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.9) 100%);
   backdrop-filter: saturate(180%) blur(15rpx);
   -webkit-backdrop-filter: saturate(180%) blur(15rpx);
-  transition: background 0.5s ease;
   background-color: var(--nav-bg-light, rgba(255, 255, 255, 0.98));
 }
 

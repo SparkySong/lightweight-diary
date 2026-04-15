@@ -1,6 +1,24 @@
 // pages/calorie-detail/calorie-detail.js
 const app = getApp();
 
+const getInitTheme = () => {
+  const themeSetting = wx.getStorageSync('appTheme') || 'dark';
+  if (themeSetting === 'system') {
+    try {
+      if (wx.getDeviceInfo && wx.getDeviceInfo().theme) {
+        return wx.getDeviceInfo().theme;
+      }
+      if (wx.getSystemInfoSync && wx.getSystemInfoSync().theme) {
+        return wx.getSystemInfoSync().theme;
+      }
+      return wx.getStorageSync('lastSystemTheme') || 'dark';
+    } catch (e) {
+      return 'dark';
+    }
+  }
+  return themeSetting;
+};
+
 // 低卡替代方案数据
 const lowCalRecipes = {
   dinner: ['鸡胸肉沙拉🥗', '水煮虾+蔬菜🥬', '清蒸鱼+西兰花🐟', '豆腐蔬菜汤🍲', '藜麦沙拉🌾'],
@@ -10,7 +28,7 @@ const lowCalRecipes = {
 
 Page({
   data: {
-    currentTheme: app.globalData.theme || 'dark',
+    currentTheme: getInitTheme(),
     todayDate: '',
     unit: 'kcal',
     customTarget: '',
@@ -90,7 +108,7 @@ Page({
   },
 
   initTheme() {
-    const theme = app.getTheme();
+    const theme = app.getEffectiveTheme();
     // 只有主题变化时才更新
     if (this.data.currentTheme !== theme) {
       this.setData({ currentTheme: theme });
@@ -99,10 +117,16 @@ Page({
     // 动态设置导航栏颜色
     wx.setNavigationBarColor({
       frontColor: theme === 'light' ? '#000000' : '#ffffff',
-      backgroundColor: theme === 'light' ? '#ffffff' : '#0f0f13',
-      animation: { duration: 200, timingFunc: 'easeIn' }
+      backgroundColor: theme === 'light' ? '#f8f9fa' : '#0f0f13',
+      animation: { duration: 0, timingFunc: 'linear' }
     });
     
+    if (wx.setBackgroundTextStyle) {
+      wx.setBackgroundTextStyle({
+        textStyle: theme === 'light' ? 'dark' : 'light'
+      });
+    }
+
     if (theme === 'light') {
       wx.setBackgroundColor({
         backgroundColor: '#f8f9fa',
@@ -116,6 +140,15 @@ Page({
         backgroundColorBottom: '#0f0f13',
       });
     }
+  },
+
+  onThemeChange() {
+    this.initTheme();
+    setTimeout(() => {
+      this.drawPieChart();
+      this.drawLineChart();
+      this.drawBarChart();
+    }, 0);
   },
 
   async loadUserData() {

@@ -1,7 +1,13 @@
 <!--pages/index/index.wxml-->
 <page class="{{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}}" bindtap="onPageTap" catchtap="onCancelGoalInput">
-<!-- 页面元信息，在 JS 中动态设置背景色 -->
-<page-meta background-text-style="dark" background-color="#f8f9fa" background-color-top="#f8f9fa" background-color-bottom="#f8f9fa" />
+<!-- 页面元信息，在 JS 中动态设置背景色和状态栏 -->
+<page-meta 
+  background-text-style="{{currentTheme === 'light' ? 'dark' : 'light'}}" 
+  background-color="{{currentTheme === 'light' ? '#f8f9fa' : '#0f0f13'}}" 
+  background-color-top="{{currentTheme === 'light' ? '#f8f9fa' : '#0f0f13'}}" 
+  background-color-bottom="{{currentTheme === 'light' ? '#f8f9fa' : '#0f0f13'}}" 
+  navigation-bar-style="{{currentTheme === 'light' ? 'dark' : 'light'}}"
+/>
 
 <!-- 自定义导航栏区域（完全隐藏原生状态栏，用背景色覆盖） -->
 <view class="custom-nav-area"></view>

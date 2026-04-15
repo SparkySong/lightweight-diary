@@ -1,7 +1,7 @@
 <!--pages/calorie-detail/calorie-detail.wxml-->
 <page class="{{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}}">
 <page-meta 
-  background-text-style="{{currentTheme === 'light' ? 'light' : 'dark'}}" 
+  background-text-style="{{currentTheme === 'light' ? 'dark' : 'light'}}" 
   background-color="{{currentTheme === 'light' ? '#f8f9fa' : '#0f0f13'}}"
   background-color-top="{{currentTheme === 'light' ? '#f8f9fa' : '#0f0f13'}}"
   background-color-bottom="{{currentTheme === 'light' ? '#f8f9fa' : '#0f0f13'}}" />

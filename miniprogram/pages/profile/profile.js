@@ -5,12 +5,42 @@ const VERSION = '1.0.0';
 // 默认头像 base64（灰色圆形占位图）
 const DEFAULT_AVATAR = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MCIgaGVpZ2h0PSI4MCIgdmlld0JveD0iMCAwIDgwIDgwIj48Y2lyY2xlIGN4PSI0MCIgY3k9IjQwIiByPSI0MCIgZmlsbD0iIzNhM2E0YSIvPjxjaXJjbGUgY3g9IjQwIiBjeT0iMzIiIHI9IjE2IiBmaWxsPSIjNmE2YTdhIi8+PGVsbGlwc2UgY3g9IjQwIiBjeT0iNjgiIHJ4PSIyNCIgcnk9IjE2IiBmaWxsPSIjNmE2YTdhIi8+PC9zdmc+';
 
+// 🔑 关键修复：从存储获取当前生效的主题（用于 data 初始值，避免闪烁）
+const getInitTheme = () => {
+  const themeSetting = wx.getStorageSync('appTheme') || 'dark';
+  if (themeSetting === 'system') {
+    try {
+      if (wx.getDeviceInfo && wx.getDeviceInfo().theme) {
+        return wx.getDeviceInfo().theme;
+      }
+      if (wx.getSystemInfoSync && wx.getSystemInfoSync().theme) {
+        return wx.getSystemInfoSync().theme;
+      }
+      return wx.getStorageSync('lastSystemTheme') || 'dark';
+    } catch (e) {
+      return 'dark';
+    }
+  }
+  return themeSetting;
+};
+
+const getInitThemeSetting = () => {
+  return wx.getStorageSync('appTheme') || 'dark';
+};
+
+const getInitThemeDesc = () => {
+  const t = getInitThemeSetting();
+  if (t === 'system') return '跟随系统';
+  if (t === 'dark') return '深色模式';
+  return '浅色模式';
+};
+
 Page({
   data: {
-    // 主题
-    currentTheme: app.globalData.theme || 'dark',
-    themeSetting: (function() { const t = wx.getStorageSync('appTheme'); return t || 'dark'; })(),
-    themeDesc: (function() { const t = wx.getStorageSync('appTheme') || 'dark'; if (t === 'system') return '跟随系统'; if (t === 'dark') return '深色模式'; return '浅色模式'; })(),
+    // 主题 - 🔑 关键：初始值从存储直接读取，避免闪烁
+    currentTheme: getInitTheme(),
+    themeSetting: getInitThemeSetting(),
+    themeDesc: getInitThemeDesc(),
     // 用户信息
     nickname: '轻体用户',
     avatarUrl: DEFAULT_AVATAR,
@@ -52,6 +82,7 @@ Page({
   },
 
   onLoad() {
+    // 🔑 关键修复：立即同步设置主题，避免切换页面时闪烁
     this.initTheme();
     // 同步初始化基础数据（避免异步加载未完成时弹窗为空）
     this.initBasicData();
@@ -86,14 +117,26 @@ Page({
     this.loadUserData();
   },
 
+  onTabItemTap() {
+    this.initTheme();
+  },
+
   // ========== 主题相关 ==========
   initTheme() {
     const themeSetting = wx.getStorageSync('appTheme') || 'dark';
     const effectiveTheme = app.getEffectiveTheme();
     const themeDesc = this.calcThemeDesc(themeSetting);
-    this.setData({ currentTheme: effectiveTheme, themeSetting, themeDesc });
+    if (
+      this.data.currentTheme !== effectiveTheme ||
+      this.data.themeSetting !== themeSetting ||
+      this.data.themeDesc !== themeDesc
+    ) {
+      this.setData({ currentTheme: effectiveTheme, themeSetting, themeDesc });
+    }
     // 设置状态栏颜色
     this.setNavigationBarColor(effectiveTheme);
+    // 设置下拉刷新背景色
+    this.setPullDownRefreshBg(effectiveTheme);
     app.applyThemeToTabBar();
   },
 
@@ -104,6 +147,8 @@ Page({
     this.setData({ currentTheme: effectiveTheme, themeSetting, themeDesc });
     // 设置状态栏颜色
     this.setNavigationBarColor(effectiveTheme);
+    // 设置下拉刷新背景色
+    this.setPullDownRefreshBg(effectiveTheme);
     app.applyThemeToTabBar();
   },
 
@@ -120,6 +165,29 @@ Page({
         frontColor: '#ffffff',
         backgroundColor: '#0f0f13',
         animation: { duration: 200, timingFunc: 'easeInOut' }
+      });
+    }
+  },
+
+  // 设置下拉刷新背景色
+  setPullDownRefreshBg(theme) {
+    if (theme === 'light') {
+      wx.setBackgroundColor({
+        backgroundColor: '#f8f9fa',
+        backgroundColorTop: '#f8f9fa',
+        backgroundColorBottom: '#f8f9fa',
+      });
+      wx.setBackgroundTextStyle({
+        textStyle: 'dark'
+      });
+    } else {
+      wx.setBackgroundColor({
+        backgroundColor: '#0f0f13',
+        backgroundColorTop: '#0f0f13',
+        backgroundColorBottom: '#0f0f13',
+      });
+      wx.setBackgroundTextStyle({
+        textStyle: 'light'
       });
     }
   },

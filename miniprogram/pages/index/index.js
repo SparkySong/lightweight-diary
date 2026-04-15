@@ -10,6 +10,30 @@ const PAGE_SIZE = 15;
 // 体重单位转换常量
 const KG_TO_JIN = 2; // 1kg = 2斤
 
+// 🔑 关键修复：从存储获取当前生效的主题（用于 data 初始值，避免闪烁）
+const getInitTheme = () => {
+  const themeSetting = wx.getStorageSync('appTheme') || 'dark';
+  if (themeSetting === 'system') {
+    // 跟随系统模式时，尝试获取系统主题
+    try {
+      if (wx.getDeviceInfo && wx.getDeviceInfo().theme) {
+        return wx.getDeviceInfo().theme;
+      }
+      if (wx.getSystemInfoSync && wx.getSystemInfoSync().theme) {
+        return wx.getSystemInfoSync().theme;
+      }
+      return wx.getStorageSync('lastSystemTheme') || 'dark';
+    } catch (e) {
+      return 'dark';
+    }
+  }
+  return themeSetting;
+};
+
+const getInitThemeSetting = () => {
+  return wx.getStorageSync('appTheme') || 'dark';
+};
+
 Page({
   data: {
     records: [],
@@ -48,9 +72,9 @@ Page({
     // Reminder
     reminderEnabled: false,
     remindTime: '08:00',
-    // 主题相关
-    currentTheme: 'dark',
-    currentThemeSetting: 'dark', // 用户设置的主题（可能为 system）
+    // 主题相关 - 🔑 关键：初始值从存储直接读取，避免闪烁
+    currentTheme: getInitTheme(),
+    currentThemeSetting: getInitThemeSetting(),
     themeColors: null,
     showThemeMenu: false,
     // 下拉刷新
@@ -81,20 +105,25 @@ Page({
   },
 
   onLoad() {
+    // 🔑 关键修复：立即同步设置主题，避免切换页面时闪烁
     this.setTodayDate();
     this.initWeightUnit();
+    this.initTheme(); // 在数据加载前立即初始化主题
+    // 数据加载放在主题初始化之后，不阻塞主题渲染
     this.loadAll();
-    this.initTheme();
   },
 
   onShow() {
-    // 先刷新体重单位设置，再加载数据
+    // 🔑 关键修复：立即同步刷新主题，再加载数据
     this.initWeightUnit();
+    this.initTheme(); // 在数据加载前立即同步主题
     this.loadAll();
-    // 每次显示都重新初始化主题（确保从其他页面切换回来时主题同步）
-    this.initTheme();
-    // 如果提醒已开启，自动请求订阅消息续期（微信订阅消息是一次性的）
+    // 如果提醒已开启，自动请求订阅消息续期
     this.renewReminderIfNeeded();
+  },
+
+  onTabItemTap() {
+    this.initTheme();
   },
   
   // 初始化体重单位
@@ -941,10 +970,12 @@ Page({
   initTheme() {
     const themeSetting = app.getThemeSetting();
     const effectiveTheme = app.getEffectiveTheme();
-    this.setData({ 
-      currentTheme: effectiveTheme,
-      currentThemeSetting: themeSetting
-    });
+    if (this.data.currentTheme !== effectiveTheme || this.data.currentThemeSetting !== themeSetting) {
+      this.setData({ 
+        currentTheme: effectiveTheme,
+        currentThemeSetting: themeSetting
+      });
+    }
     
     // 动态设置下拉刷新背景色
     this.setPullDownRefreshBg(effectiveTheme);
