@@ -981,6 +981,14 @@ Page({
             textStyle: 'dark' // 浅色背景上用黑色文字
           });
         }
+        // 设置状态栏文字颜色为深色
+        if (wx.setNavigationBarColor) {
+          wx.setNavigationBarColor({
+            frontColor: '#000000',
+            backgroundColor: '#f8f9fa',
+            animation: { duration: 200, timingFunc: 'easeInOut' }
+          });
+        }
       } else {
         // 深色模式：设置深色背景
         if (wx.setBackgroundColor && typeof wx.setBackgroundColor === 'function') {
@@ -993,6 +1001,14 @@ Page({
         if (wx.setBackgroundTextStyle && typeof wx.setBackgroundTextStyle === 'function') {
           wx.setBackgroundTextStyle({
             textStyle: 'light' // 深色背景上用白色文字
+          });
+        }
+        // 设置状态栏文字颜色为浅色
+        if (wx.setNavigationBarColor) {
+          wx.setNavigationBarColor({
+            frontColor: '#ffffff',
+            backgroundColor: '#0f0f13',
+            animation: { duration: 200, timingFunc: 'easeInOut' }
           });
         }
       }

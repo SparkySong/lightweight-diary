@@ -2,7 +2,11 @@
   "permissions": {
     "openapi": [
       "subscribeMessage.send"
-    ]
+    ],
+    "database": {
+      "user_reminders": "read",
+      "weight_records": "read"
+    }
   },
   "triggers": [
     {
@@ -12,3 +16,4 @@
     }
   ]
 }
+

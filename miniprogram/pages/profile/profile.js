@@ -92,6 +92,8 @@ Page({
     const effectiveTheme = app.getEffectiveTheme();
     const themeDesc = this.calcThemeDesc(themeSetting);
     this.setData({ currentTheme: effectiveTheme, themeSetting, themeDesc });
+    // 设置状态栏颜色
+    this.setNavigationBarColor(effectiveTheme);
     app.applyThemeToTabBar();
   },
 
@@ -100,7 +102,26 @@ Page({
     const effectiveTheme = app.getEffectiveTheme();
     const themeDesc = this.calcThemeDesc(themeSetting);
     this.setData({ currentTheme: effectiveTheme, themeSetting, themeDesc });
+    // 设置状态栏颜色
+    this.setNavigationBarColor(effectiveTheme);
     app.applyThemeToTabBar();
+  },
+
+  // 设置状态栏颜色
+  setNavigationBarColor(theme) {
+    if (theme === 'light') {
+      wx.setNavigationBarColor({
+        frontColor: '#000000',
+        backgroundColor: '#f8f9fa',
+        animation: { duration: 200, timingFunc: 'easeInOut' }
+      });
+    } else {
+      wx.setNavigationBarColor({
+        frontColor: '#ffffff',
+        backgroundColor: '#0f0f13',
+        animation: { duration: 200, timingFunc: 'easeInOut' }
+      });
+    }
   },
 
   calcThemeDesc(setting) {

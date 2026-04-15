@@ -25,6 +25,17 @@
   z-index: 9999;
 }
 
+/* 浅色主题导航栏 */
+.theme-light .custom-nav-area,
+page.theme-light {
+  --nav-bg: #f8f9fa;
+}
+
+.theme-dark .custom-nav-area,
+page.theme-dark {
+  --nav-bg: #0f0f13;
+}
+
 /* Header */
 .header {
   padding: 20rpx 0 30rpx;

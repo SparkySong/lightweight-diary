@@ -894,6 +894,12 @@ Page({
       wx.setBackgroundTextStyle({
         textStyle: 'dark' // 浅色背景上用黑色文字
       });
+      // 设置状态栏文字颜色为深色
+      wx.setNavigationBarColor({
+        frontColor: '#000000',
+        backgroundColor: '#f8f9fa',
+        animation: { duration: 200, timingFunc: 'easeInOut' }
+      });
     } else {
       // 深色模式：设置深色背景
       wx.setBackgroundColor({
@@ -903,6 +909,12 @@ Page({
       });
       wx.setBackgroundTextStyle({
         textStyle: 'light' // 深色背景上用白色文字
+      });
+      // 设置状态栏文字颜色为浅色
+      wx.setNavigationBarColor({
+        frontColor: '#ffffff',
+        backgroundColor: '#0f0f13',
+        animation: { duration: 200, timingFunc: 'easeInOut' }
       });
     }
   },

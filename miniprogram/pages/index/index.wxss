@@ -70,6 +70,16 @@
 }
 
 /* 主题适配 */
+.theme-light .custom-nav-area,
+.theme-light page {
+  --nav-bg: #f8f9fa;
+}
+
+.theme-dark .custom-nav-area,
+.theme-dark page {
+  --nav-bg: #0f0f13;
+}
+
 .theme-light .cloud-status {
   background-color: rgba(225, 112, 85, 0.08);
   border-bottom: 1px solid rgba(225, 112, 85, 0.2);
