@@ -1155,20 +1155,21 @@
 .record-right {
   display: flex;
   align-items: center;
-  gap: 16rpx;
+  gap: 6rpx;
 }
 .record-diff {
-  font-size: 24rpx;
+  font-size: 26rpx;
   font-weight: 500;
-  padding: 6rpx 14rpx;
-  border-radius: 20rpx;
   display: flex;
   align-items: center;
   gap: 6rpx;
+  line-height: 1;
+  min-width: 90rpx;
+  justify-content: flex-end;
 }
-.record-diff.down { background: rgba(95, 168, 149, 0.15); color: #5FA895; }
-.record-diff.up { background: rgba(201, 139, 139, 0.15); color: #C98B8B; }
-.record-diff.neutral { background: rgba(107, 114, 128, 0.1); color: #6B7280; }
+.record-diff.down { color: #5FA895; }
+.record-diff.up { color: #C98B8B; }
+.record-diff.neutral { color: #6B7280; }
 
 /* 趋势图标 */
 .trend-icon {

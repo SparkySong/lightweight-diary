@@ -245,19 +245,19 @@
             <text class="record-weight">{{record.displayWeight || record.weight}} {{weightUnitLabel}}</text>
           </view>
           <view class="record-right">
-            <text class="record-diff {{record.diffClass}}" wx:if="{{record.displayDiff !== undefined && record.displayDiff !== null}}">
+            <view class="record-diff {{record.diffClass}}" wx:if="{{record.displayDiff !== undefined && record.displayDiff !== null}}">
               <block wx:if="{{record.displayDiff < 0}}">
                 <view class="trend-icon trend-down"></view>
-                {{(-record.displayDiff)}}
+                <text>{{(-record.displayDiff)}}</text>
               </block>
               <block wx:elif="{{record.displayDiff > 0}}">
                 <view class="trend-icon trend-up"></view>
-                {{record.displayDiff}}
+                <text>{{record.displayDiff}}</text>
               </block>
               <block wx:else>
                 <view class="trend-icon trend-flat"></view>
               </block>
-            </text>
+            </view>
             <view class="edit-icon" catchtap="onEditRecord" data-record="{{record}}">
               <view class="icon-edit-small"></view>
             </view>
