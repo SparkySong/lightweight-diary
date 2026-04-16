@@ -2,9 +2,9 @@
 <page class="{{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}}">
 <page-meta 
   background-text-style="{{currentTheme === 'light' ? 'dark' : 'light'}}" 
-  background-color="{{currentTheme === 'light' ? '#f8f9fa' : '#0f0f13'}}" 
-  background-color-top="{{currentTheme === 'light' ? '#f8f9fa' : '#0f0f13'}}"
-  background-color-bottom="{{currentTheme === 'light' ? '#f8f9fa' : '#0f0f13'}}"
+  background-color="{{currentTheme === 'light' ? '#F8FAF9' : '#121212'}}" 
+  background-color-top="{{currentTheme === 'light' ? '#F8FAF9' : '#121212'}}"
+  background-color-bottom="{{currentTheme === 'light' ? '#F8FAF9' : '#121212'}}"
   page-style="position: relative;" />
 
 <!-- 自定义导航栏区域 -->
@@ -24,7 +24,7 @@
     <view class="profile-info">
       <view class="nickname-row" bindtap="onNicknameTap">
         <text class="profile-nickname">{{nickname}}</text>
-        <text class="nickname-edit-icon">✎</text>
+        <view class="nickname-edit-icon"></view>
       </view>
       <view class="profile-stats">
         <view class="profile-stat-item">
@@ -51,7 +51,7 @@
       <!-- 个人信息设置 -->
       <view class="menu-item" bindtap="onMenuItemTap" data-action="profile">
         <view class="menu-item-left">
-          <text class="menu-icon">👤</text>
+          <view class="menu-icon menu-icon-profile"></view>
           <text class="menu-text">个人信息</text>
         </view>
         <view class="menu-item-right">
@@ -65,7 +65,7 @@
       <!-- 每日热量目标 -->
       <view class="menu-item" bindtap="onMenuItemTap" data-action="calorieGoal">
         <view class="menu-item-left">
-          <text class="menu-icon">🔥</text>
+          <view class="menu-icon menu-icon-calorie"></view>
           <text class="menu-text">热量目标</text>
         </view>
         <view class="menu-item-right">
@@ -77,7 +77,7 @@
       <!-- 单位与偏好设置 -->
       <view class="menu-item" bindtap="onMenuItemTap" data-action="preferences">
         <view class="menu-item-left">
-          <text class="menu-icon">⚙️</text>
+          <view class="menu-icon menu-icon-settings"></view>
           <text class="menu-text">偏好设置</text>
         </view>
         <view class="menu-item-right">
@@ -89,7 +89,7 @@
       <!-- 深色模式设置 -->
       <view class="menu-item" bindtap="onMenuItemTap" data-action="theme">
         <view class="menu-item-left">
-          <text class="menu-icon">🌙</text>
+          <view class="menu-icon menu-icon-theme"></view>
           <text class="menu-text">主题设置</text>
         </view>
         <view class="menu-item-right">
@@ -103,7 +103,7 @@
       <!-- 数据管理 -->
       <view class="menu-item" bindtap="onMenuItemTap" data-action="dataManage">
         <view class="menu-item-left">
-          <text class="menu-icon">📊</text>
+          <view class="menu-icon menu-icon-data"></view>
           <text class="menu-text">数据管理</text>
         </view>
         <view class="menu-item-right">
@@ -114,7 +114,7 @@
       <!-- 帮助与反馈 -->
       <view class="menu-item" bindtap="onMenuItemTap" data-action="help">
         <view class="menu-item-left">
-          <text class="menu-icon">❓</text>
+          <view class="menu-icon menu-icon-help"></view>
           <text class="menu-text">帮助与反馈</text>
         </view>
         <view class="menu-item-right">
@@ -125,7 +125,7 @@
       <!-- 关于 -->
       <view class="menu-item" bindtap="onMenuItemTap" data-action="about">
         <view class="menu-item-left">
-          <text class="menu-icon">ℹ️</text>
+          <view class="menu-icon menu-icon-about"></view>
           <text class="menu-text">关于我们</text>
         </view>
         <view class="menu-item-right">
@@ -154,7 +154,9 @@
   <view class="popup-panel nickname-popup" catchtap="stopPropagation">
     <view class="popup-header">
       <text class="popup-title">设置昵称</text>
-      <text class="popup-close" bindtap="onCloseNicknameEdit">✕</text>
+      <view class="popup-close" bindtap="onCloseNicknameEdit">
+        <view class="icon-close"></view>
+      </view>
     </view>
     <view class="popup-body">
       <view class="form-group">
@@ -173,7 +175,9 @@
   <view class="popup-panel" catchtap="stopPropagation">
     <view class="popup-header">
       <text class="popup-title">编辑个人信息</text>
-      <text class="popup-close" bindtap="onClosePopup">✕</text>
+      <view class="popup-close" bindtap="onClosePopup">
+        <view class="icon-close"></view>
+      </view>
     </view>
     <view class="popup-body">
       <view class="form-group">
@@ -205,7 +209,9 @@
   <view class="popup-panel" catchtap="stopPropagation">
     <view class="popup-header">
       <text class="popup-title">设置每日热量目标</text>
-      <text class="popup-close" bindtap="onClosePopup">✕</text>
+      <view class="popup-close" bindtap="onClosePopup">
+        <view class="icon-close"></view>
+      </view>
     </view>
     <view class="popup-body">
       <view class="form-group">
@@ -213,7 +219,7 @@
         <input class="form-input" type="number" value="{{editCalorieGoal}}" bindinput="onCalorieGoalInput" placeholder="如 1800" adjust-position="false" cursor-spacing="80" />
       </view>
       <view class="form-tips">
-        <text class="form-tip">💡 一般建议：减脂 1200-1500kcal，维持 1500-2000kcal</text>
+        <text class="form-tip">一般建议：减脂 1200-1500kcal，维持 1500-2000kcal</text>
       </view>
     </view>
     <view class="popup-footer">
@@ -228,7 +234,9 @@
   <view class="popup-panel" catchtap="stopPropagation">
     <view class="popup-header">
       <text class="popup-title">偏好设置</text>
-      <text class="popup-close" bindtap="onClosePopup">✕</text>
+      <view class="popup-close" bindtap="onClosePopup">
+        <view class="icon-close"></view>
+      </view>
     </view>
     <view class="popup-body">
       <view class="setting-group">
@@ -242,17 +250,6 @@
           </view>
         </view>
       </view>
-      <!-- <view class="setting-group">
-        <text class="setting-label">热量单位</text>
-        <view class="setting-options">
-          <view class="setting-option {{calorieUnit === 'kcal' ? 'active' : ''}}" bindtap="onCalorieUnitChange" data-unit="kcal">
-            <text>千卡 (kcal)</text>
-          </view>
-          <view class="setting-option {{calorieUnit === 'kj' ? 'active' : ''}}" bindtap="onCalorieUnitChange" data-unit="kj">
-            <text>千焦 (kJ)</text>
-          </view>
-        </view>
-      </view> -->
     </view>
     <view class="popup-footer">
       <button class="popup-btn popup-btn-confirm" bindtap="onClosePopup">完成</button>
@@ -265,22 +262,24 @@
   <view class="popup-panel" catchtap="stopPropagation">
     <view class="popup-header">
       <text class="popup-title">主题设置</text>
-      <text class="popup-close" bindtap="onClosePopup">✕</text>
+      <view class="popup-close" bindtap="onClosePopup">
+        <view class="icon-close"></view>
+      </view>
     </view>
     <view class="popup-body">
       <view class="theme-options">
         <view class="theme-option {{themeSetting === 'system' ? 'active' : ''}}" bindtap="onSwitchTheme" data-theme="system">
-          <text class="theme-option-icon">📱</text>
+          <view class="theme-option-icon icon-device"></view>
           <text class="theme-option-text">跟随系统</text>
           <text class="theme-option-check" wx:if="{{themeSetting === 'system'}}">✓</text>
         </view>
         <view class="theme-option {{themeSetting === 'dark' ? 'active' : ''}}" bindtap="onSwitchTheme" data-theme="dark">
-          <text class="theme-option-icon">🌙</text>
+          <view class="theme-option-icon icon-moon"></view>
           <text class="theme-option-text">深色模式</text>
           <text class="theme-option-check" wx:if="{{themeSetting === 'dark'}}">✓</text>
         </view>
         <view class="theme-option {{themeSetting === 'light' ? 'active' : ''}}" bindtap="onSwitchTheme" data-theme="light">
-          <text class="theme-option-icon">☀️</text>
+          <view class="theme-option-icon icon-sun"></view>
           <text class="theme-option-text">浅色模式</text>
           <text class="theme-option-check" wx:if="{{themeSetting === 'light'}}">✓</text>
         </view>
@@ -294,19 +293,21 @@
   <view class="popup-panel" catchtap="stopPropagation">
     <view class="popup-header">
       <text class="popup-title">数据管理</text>
-      <text class="popup-close" bindtap="onClosePopup">✕</text>
+      <view class="popup-close" bindtap="onClosePopup">
+        <view class="icon-close"></view>
+      </view>
     </view>
     <view class="popup-body">
       <view class="data-manage-item" bindtap="onViewHistory">
         <view class="data-manage-left">
-          <text class="data-manage-icon">📋</text>
+          <view class="data-manage-icon icon-list"></view>
           <text class="data-manage-text">查看历史记录</text>
         </view>
         <text class="menu-arrow">›</text>
       </view>
       <view class="data-manage-item data-manage-danger" bindtap="onClearAllData">
         <view class="data-manage-left">
-          <text class="data-manage-icon">🗑️</text>
+          <view class="data-manage-icon icon-trash"></view>
           <text class="data-manage-text">清空所有数据</text>
         </view>
         <text class="menu-arrow">›</text>
@@ -320,18 +321,22 @@
   <view class="popup-panel" catchtap="stopPropagation">
     <view class="popup-header">
       <text class="popup-title">关于我们</text>
-      <text class="popup-close" bindtap="onClosePopup">✕</text>
+      <view class="popup-close" bindtap="onClosePopup">
+        <view class="icon-close"></view>
+      </view>
     </view>
     <view class="popup-body about-body">
-      <text class="about-logo">⚖️</text>
+      <view class="about-logo">
+        <view class="logo-icon"></view>
+      </view>
       <text class="about-name">轻体打卡</text>
       <text class="about-version">v{{version}}</text>
       <text class="about-desc">一款简洁的体重管理与饮食记录工具，帮助你坚持记录、科学减脂，遇见更好的自己。</text>
       <view class="about-features">
-        <text class="about-feature">✅ 体重打卡与趋势追踪</text>
-        <text class="about-feature">✅ 饮食记录与热量分析</text>
-        <text class="about-feature">✅ BMI 计算与目标管理</text>
-        <text class="about-feature">✅ 深色/浅色主题切换</text>
+        <text class="about-feature">体重打卡与趋势追踪</text>
+        <text class="about-feature">饮食记录与热量分析</text>
+        <text class="about-feature">BMI 计算与目标管理</text>
+        <text class="about-feature">深色/浅色主题切换</text>
       </view>
     </view>
   </view>
@@ -342,7 +347,9 @@
   <view class="popup-panel" catchtap="stopPropagation">
     <view class="popup-header">
       <text class="popup-title">帮助与反馈</text>
-      <text class="popup-close" bindtap="onClosePopup">✕</text>
+      <view class="popup-close" bindtap="onClosePopup">
+        <view class="icon-close"></view>
+      </view>
     </view>
     <view class="popup-body help-body">
       <view class="help-item">
@@ -374,7 +381,9 @@
   <view class="popup-panel popup-panel-large" catchtap="stopPropagation">
     <view class="popup-header">
       <text class="popup-title">{{agreementTitle}}</text>
-      <text class="popup-close" bindtap="onClosePopup">✕</text>
+      <view class="popup-close" bindtap="onClosePopup">
+        <view class="icon-close"></view>
+      </view>
     </view>
     <view class="popup-body agreement-body">
       <scroll-view scroll-y class="agreement-scroll">

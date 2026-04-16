@@ -7,18 +7,18 @@
   ],
   "darkmode": true,
   "window": {
-    "navigationBarBackgroundColor": "#0f0f13",
+    "navigationBarBackgroundColor": "#121212",
     "navigationBarTitleText": "",
     "navigationBarTextStyle": "white",
-    "backgroundColor": "#0f0f13",
+    "backgroundColor": "#121212",
     "navigationStyle": "custom",
     "enablePullDownRefresh": true,
     "backgroundTextStyle": "dark"
   },
   "tabBar": {
-    "color": "#8888a0",
-    "selectedColor": "#6c5ce7",
-    "backgroundColor": "#0f0f13",
+    "color": "#6B7280",
+    "selectedColor": "#5FA895",
+    "backgroundColor": "#121212",
     "borderStyle": "black",
     "list": [
       {

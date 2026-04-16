@@ -1,13 +1,79 @@
-/* app.wxss */
+/* app.wxss - 全局样式 */
 page {
-  /* 背景色由主题CSS file控制 */
-  color: #e8e8ef;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  color: #F5F5F5;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
   font-size: 28rpx;
   min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* 浅色主题下的字体颜色调整 */
 page.theme-light {
-  color: #212529;
+  color: #1F2937;
+}
+
+/* 全局字体层级 */
+.text-display {
+  font-size: 48rpx;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.text-headline {
+  font-size: 36rpx;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.text-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.text-body {
+  font-size: 28rpx;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.text-caption {
+  font-size: 24rpx;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+.text-small {
+  font-size: 22rpx;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+/* 通用卡片样式 */
+.card-base {
+  border-radius: 16rpx;
+  padding: 28rpx 24rpx;
+  transition: all 0.3s ease;
+}
+
+/* 胶囊按钮 */
+.btn-capsule {
+  border-radius: 50rpx;
+  padding: 16rpx 40rpx;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.btn-capsule:active {
+  opacity: 0.85;
+  transform: scale(0.98);
+}
+
+/* 线性图标样式 */
+.icon-linear {
+  stroke-width: 2;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }

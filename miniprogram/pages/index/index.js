@@ -408,26 +408,27 @@ Page({
     // 计算 BMI 指示器位置 (0-40 范围)
     const bmiIndicatorLeft = Math.min(Math.max((bmi / 40) * 100, 0), 100);
 
+    const isDark = this.data.currentTheme === 'dark';
     let category, color, bgColor;
     if (bmi < 18.5) { 
       category = '偏瘦'; 
-      color = '#74b9ff'; 
-      bgColor = 'rgba(116, 185, 255, 0.2)';
+      color = isDark ? '#6B7280' : '#868E96'; 
+      bgColor = isDark ? 'rgba(107, 114, 128, 0.2)' : 'rgba(134, 142, 150, 0.15)';
     }
     else if (bmi < 24) { 
       category = '正常'; 
-      color = '#00b894'; 
-      bgColor = 'rgba(0, 184, 148, 0.2)';
+      color = isDark ? '#5FA895' : '#4A9B8A'; 
+      bgColor = isDark ? 'rgba(95, 168, 149, 0.2)' : 'rgba(74, 155, 138, 0.15)';
     }
     else if (bmi < 28) { 
       category = '偏胖'; 
-      color = '#fdcb6e'; 
-      bgColor = 'rgba(253, 203, 110, 0.2)';
+      color = isDark ? '#D4A574' : '#C49A6C'; 
+      bgColor = isDark ? 'rgba(212, 165, 116, 0.2)' : 'rgba(196, 154, 108, 0.15)';
     }
     else { 
       category = '肥胖'; 
-      color = '#e17055'; 
-      bgColor = 'rgba(225, 112, 85, 0.2)';
+      color = isDark ? '#C98B8B' : '#B87B7B'; 
+      bgColor = isDark ? 'rgba(201, 139, 139, 0.2)' : 'rgba(184, 123, 123, 0.15)';
     }
 
     this.setData({ 
@@ -634,9 +635,10 @@ Page({
     const sortedAsc = [...records].sort((a, b) => a.date.localeCompare(b.date));
     const first = sortedAsc[0];
     const totalDiff = latest.weight - first.weight;
-    let totalLost = '0.0', totalLostColor = '#e8e8ef';
-    if (totalDiff < 0) { totalLost = Math.abs(totalDiff).toFixed(1); totalLostColor = '#00b894'; }
-    else if (totalDiff > 0) { totalLost = `+${totalDiff.toFixed(1)}`; totalLostColor = '#e17055'; }
+    const isDark = this.data.currentTheme === 'dark';
+    let totalLost = '0.0', totalLostColor = isDark ? '#9CA3AF' : '#6B7280';
+    if (totalDiff < 0) { totalLost = Math.abs(totalDiff).toFixed(1); totalLostColor = isDark ? '#5FA895' : '#4A9B8A'; }
+    else if (totalDiff > 0) { totalLost = `+${totalDiff.toFixed(1)}`; totalLostColor = isDark ? '#C98B8B' : '#B87B7B'; }
 
     // latest.weight 已经是正确的显示值（已经过 formatRecordsForDisplay 转换）
     const displayWeight = latest.weight.toFixed(1);
@@ -722,7 +724,8 @@ Page({
     }
 
     if (sorted.length < 1) {
-      ctx.setFillStyle('#8888a0');
+      const isDark = this.data.currentTheme === 'dark';
+      ctx.setFillStyle(isDark ? '#6B7280' : '#9CA3AF');
       ctx.setFontSize(13);
       ctx.setTextAlign('center');
       ctx.fillText('记录数据后将显示趋势图', W / 2, H / 2);
@@ -749,31 +752,34 @@ Page({
       const goalY = isJin ? originalGoal * KG_TO_JIN : originalGoal;
       if (goalY >= minW && goalY <= maxW) {
         const gy = pad.t + cH - ((goalY - minW) / (maxW - minW)) * cH;
-        ctx.setStrokeStyle('rgba(253, 203, 110, 0.3)');
+        ctx.setStrokeStyle('rgba(212, 165, 116, 0.3)');
         ctx.setLineWidth(1);
         ctx.setLineDash([6, 4], 0);
         ctx.beginPath(); ctx.moveTo(pad.l, gy); ctx.lineTo(W - pad.r, gy); ctx.stroke();
         ctx.setLineDash([], 0);
-        ctx.setFillStyle('#fdcb6e');
+        ctx.setFillStyle('#D4A574');
         ctx.setFontSize(10);
         ctx.setTextAlign('right');
         ctx.fillText(`目标 ${displayGoal.toFixed(1)}`, W - pad.r, gy - 4);
       }
     }
 
-    // Grid
-    ctx.setStrokeStyle('rgba(42, 42, 58, 0.6)');
+    // Grid - 使用浅灰色虚线
+    const isDark = this.data.currentTheme === 'dark';
+    ctx.setStrokeStyle(isDark ? 'rgba(156, 163, 175, 0.15)' : 'rgba(156, 163, 175, 0.2)');
     ctx.setLineWidth(1);
+    ctx.setLineDash([4, 4], 0);
     const gridLines = 4;
     for (let i = 0; i <= gridLines; i++) {
       const y = pad.t + (cH / gridLines) * i;
       ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(W - pad.r, y); ctx.stroke();
       const val = maxW - ((maxW - minW) / gridLines) * i;
-      ctx.setFillStyle('#8888a0');
+      ctx.setFillStyle(isDark ? '#6B7280' : '#9CA3AF');
       ctx.setFontSize(10);
       ctx.setTextAlign('right');
       ctx.fillText(val.toFixed(1), pad.l - 6, y + 4);
     }
+    ctx.setLineDash([], 0);
 
     const points = sorted.map((d, i) => ({
       x: sorted.length === 1 ? pad.l + cW / 2 : pad.l + (cW / (sorted.length - 1)) * i,
@@ -781,29 +787,43 @@ Page({
       ...d
     }));
 
-    // Area
+    // Area - 使用薄荷绿渐变填充
     ctx.beginPath(); ctx.moveTo(points[0].x, pad.t + cH);
     points.forEach(p => ctx.lineTo(p.x, p.y));
     ctx.lineTo(points[points.length - 1].x, pad.t + cH);
-    ctx.closePath(); ctx.setFillStyle('rgba(108, 92, 231, 0.15)'); ctx.fill();
+    ctx.closePath(); 
+    ctx.setFillStyle(isDark ? 'rgba(95, 168, 149, 0.12)' : 'rgba(74, 155, 138, 0.1)'); 
+    ctx.fill();
 
-    // Line
-    ctx.setStrokeStyle('#6c5ce7'); ctx.setLineWidth(2.5); ctx.setLineJoin('round');
+    // Line - 使用薄荷绿色，更平滑
+    ctx.setStrokeStyle(isDark ? '#5FA895' : '#4A9B8A'); 
+    ctx.setLineWidth(2.5); 
+    ctx.setLineJoin('round');
+    ctx.setLineCap('round');
     ctx.beginPath();
     points.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
     ctx.stroke();
 
-    // Dots
-    points.forEach(p => {
-      ctx.beginPath(); ctx.arc(p.x, p.y, 3.5, 0, Math.PI * 2);
-      ctx.setFillStyle('#6c5ce7'); ctx.fill();
-      ctx.setStrokeStyle('#1a1a24'); ctx.setLineWidth(2); ctx.stroke();
+    // Dots - 优化数据点样式
+    points.forEach((p, idx) => {
+      // 外圈
+      ctx.beginPath(); 
+      ctx.arc(p.x, p.y, 5, 0, Math.PI * 2);
+      ctx.setFillStyle(isDark ? '#121212' : '#FFFFFF'); 
+      ctx.fill();
+      // 内圈
+      ctx.beginPath(); 
+      ctx.arc(p.x, p.y, 3.5, 0, Math.PI * 2);
+      ctx.setFillStyle(isDark ? '#5FA895' : '#4A9B8A'); 
+      ctx.fill();
     });
 
     // Date labels
     const maxLabels = 6;
     const step = Math.max(1, Math.floor(sorted.length / maxLabels));
-    ctx.setFillStyle('#8888a0'); ctx.setFontSize(9); ctx.setTextAlign('center');
+    ctx.setFillStyle(isDark ? '#6B7280' : '#9CA3AF'); 
+    ctx.setFontSize(9); 
+    ctx.setTextAlign('center');
     for (let i = 0; i < sorted.length; i += step) {
       const d = sorted[i].date;
       ctx.fillText(`${parseInt(d.slice(5, 7))}/${parseInt(d.slice(8, 10))}`, points[i].x, H - 6);
@@ -1002,9 +1022,9 @@ Page({
         // 浅色模式：设置浅色背景
         if (wx.setBackgroundColor && typeof wx.setBackgroundColor === 'function') {
           wx.setBackgroundColor({
-            backgroundColor: '#f8f9fa',
-            backgroundColorTop: '#f8f9fa',
-            backgroundColorBottom: '#f8f9fa',
+            backgroundColor: '#F8FAF9',
+            backgroundColorTop: '#F8FAF9',
+            backgroundColorBottom: '#F8FAF9',
           });
         }
         if (wx.setBackgroundTextStyle && typeof wx.setBackgroundTextStyle === 'function') {
@@ -1016,7 +1036,7 @@ Page({
         if (wx.setNavigationBarColor) {
           wx.setNavigationBarColor({
             frontColor: '#000000',
-            backgroundColor: '#f8f9fa',
+            backgroundColor: '#F8FAF9',
             animation: { duration: 200, timingFunc: 'easeInOut' }
           });
         }
@@ -1024,9 +1044,9 @@ Page({
         // 深色模式：设置深色背景
         if (wx.setBackgroundColor && typeof wx.setBackgroundColor === 'function') {
           wx.setBackgroundColor({
-            backgroundColor: '#0f0f13',
-            backgroundColorTop: '#0f0f13',
-            backgroundColorBottom: '#0f0f13',
+            backgroundColor: '#121212',
+            backgroundColorTop: '#121212',
+            backgroundColorBottom: '#121212',
           });
         }
         if (wx.setBackgroundTextStyle && typeof wx.setBackgroundTextStyle === 'function') {
@@ -1038,7 +1058,7 @@ Page({
         if (wx.setNavigationBarColor) {
           wx.setNavigationBarColor({
             frontColor: '#ffffff',
-            backgroundColor: '#0f0f13',
+            backgroundColor: '#121212',
             animation: { duration: 200, timingFunc: 'easeInOut' }
           });
         }

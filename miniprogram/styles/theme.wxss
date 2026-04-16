@@ -1,85 +1,103 @@
-/* 主题样式变量定义 */
+/* 主题样式变量定义 - 现代简约健康App风格 */
 
-/* 深色主题（默认） */
+/* 深色主题（默认）- 使用深灰替代纯黑，低饱和度配色 */
 :root {
-  /* 基础颜色 */
-  --color-bg-primary: #0f0f13;
-  --color-bg-secondary: #1a1a24;
-  --color-bg-tertiary: #242432;
-  --color-text-primary: #ffffff;
-  --color-text-secondary: #8888a0;
-  --color-text-tertiary: #6c5ce7;
-  --color-accent-primary: #6c5ce7;
-  --color-accent-secondary: #a29bfe;
-  --color-border: #2c2c3c;
+  /* 基础颜色 - 深色模式 */
+  --color-bg-primary: #121212;        /* 主背景：深灰替代纯黑 */
+  --color-bg-secondary: #1E1E1E;      /* 卡片背景 */
+  --color-bg-tertiary: #2D2D2D;       /* 输入框背景 */
+  --color-text-primary: #F5F5F5;      /* 主文字：柔和白 */
+  --color-text-secondary: #9CA3AF;    /* 次要文字：柔和灰 */
+  --color-text-tertiary: #6B7280;     /* 辅助文字 */
+  
+  /* 品牌主色 - 低饱和度薄荷绿/灰蓝色 */
+  --color-accent-primary: #5FA895;    /* 主色调：薄荷绿 */
+  --color-accent-secondary: #6B8E9F;  /* 辅助色：灰蓝色 */
+  --color-accent-tertiary: #7C9A8F;   /* 第三色：柔和绿 */
+  
+  --color-border: #2D2D2D;            /* 边框色 */
   
   /* 组件相关 */
-  --color-stat-card-bg: #1a1a24;
-  --color-chart-bg: #1a1a24;
-  --color-input-bg: #242432;
-  --color-input-border: #2c2c3c;
-  --color-button-primary: #6c5ce7;
-  --color-button-secondary: #1a1a24;
+  --color-stat-card-bg: rgba(30, 30, 30, 0.85);
+  --color-chart-bg: #1E1E1E;
+  --color-input-bg: #2D2D2D;
+  --color-input-border: #3D3D3D;
+  --color-button-primary: #5FA895;
+  --color-button-secondary: #2D2D2D;
   
-  /* 状态颜色 */
-  --color-success: #00b894;
-  --color-warning: #fdcb6e;
-  --color-danger: #e17055;
-  --color-info: #a29bfe;
+  /* 状态颜色 - 低饱和度 */
+  --color-success: #5FA895;           /* 薄荷绿 */
+  --color-warning: #D4A574;           /* 暖橙色替代高饱和 */
+  --color-danger: #C98B8B;            /* 柔和红 */
+  --color-info: #8B9DC3;              /* 淡紫色 */
   
-  /* BMI 颜色 */
-  --color-bmi-bg: #8888a0;
-  --color-bmi-underweight: #636e72;
-  --color-bmi-healthy: #00b894;
-  --color-bmi-overweight: #fdcb6e;
-  --color-bmi-obese: #e17055;
+  /* BMI 颜色 - 低饱和度 */
+  --color-bmi-bg: #4B5563;
+  --color-bmi-underweight: #6B7280;
+  --color-bmi-healthy: #5FA895;
+  --color-bmi-overweight: #D4A574;
+  --color-bmi-obese: #C98B8B;
   
   /* 导航栏 */
-  --color-nav-bg: #0f0f13;
-  --color-tab-bar-bg: #0f0f13;
-  --color-tab-icon: #8888a0;
-  --color-tab-icon-active: #6c5ce7;
+  --color-nav-bg: #121212;
+  --color-tab-bar-bg: #121212;
+  --color-tab-icon: #6B7280;
+  --color-tab-icon-active: #5FA895;
+  
+  /* 趋势图颜色 */
+  --color-trend-line: #5FA895;
+  --color-trend-fill: rgba(95, 168, 149, 0.1);
+  --color-grid-line: rgba(156, 163, 175, 0.15);
 }
 
 /* 浅色主题 */
 [data-theme="light"] {
-  /* 基础颜色 */
-  --color-bg-primary: #f8f9fa;
-  --color-bg-secondary: #ffffff;
-  --color-bg-tertiary: #f1f3f5;
-  --color-text-primary: #212529;
-  --color-text-secondary: #868e96;
-  --color-text-tertiary: #4c6ef5;
-  --color-accent-primary: #4c6ef5;
-  --color-accent-secondary: #748ffc;
-  --color-border: #dee2e6;
+  /* 基础颜色 - 浅色模式 */
+  --color-bg-primary: #F8FAF9;        /* 主背景：极淡薄荷灰 */
+  --color-bg-secondary: #FFFFFF;      /* 卡片背景 */
+  --color-bg-tertiary: #F0F4F3;       /* 输入框背景 */
+  --color-text-primary: #1F2937;      /* 主文字 */
+  --color-text-secondary: #6B7280;    /* 次要文字 */
+  --color-text-tertiary: #9CA3AF;     /* 辅助文字 */
+  
+  /* 品牌主色 - 低饱和度 */
+  --color-accent-primary: #4A9B8A;    /* 主色调：薄荷绿 */
+  --color-accent-secondary: #5A7D8C;  /* 辅助色：灰蓝色 */
+  --color-accent-tertiary: #6B9080;   /* 第三色 */
+  
+  --color-border: #E5E7EB;            /* 边框色 */
   
   /* 组件相关 */
-  --color-stat-card-bg: #ffffff;
-  --color-chart-bg: #ffffff;
-  --color-input-bg: #ffffff;
-  --color-input-border: #dee2e6;
-  --color-button-primary: #4c6ef5;
-  --color-button-secondary: #ffffff;
+  --color-stat-card-bg: #FFFFFF;
+  --color-chart-bg: #FFFFFF;
+  --color-input-bg: #F0F4F3;
+  --color-input-border: #E5E7EB;
+  --color-button-primary: #4A9B8A;
+  --color-button-secondary: #FFFFFF;
   
   /* 状态颜色 */
-  --color-success: #40c057;
-  --color-warning: #fab005;
-  --color-danger: #fa5252;
-  --color-info: #748ffc;
+  --color-success: #4A9B8A;
+  --color-warning: #C49A6C;
+  --color-danger: #B87B7B;
+  --color-info: #7A8FB8;
   
   /* BMI 颜色 */
-  --color-bmi-bg: #adb5bd;
-  --color-bmi-underweight: #868e96;
-  --color-bmi-healthy: #40c057;
-  --color-bmi-overweight: #fab005;
-  --color-bmi-obese: #fa5252;
+  --color-bmi-bg: #D1D5DB;
+  --color-bmi-underweight: #9CA3AF;
+  --color-bmi-healthy: #4A9B8A;
+  --color-bmi-overweight: #C49A6C;
+  --color-bmi-obese: #B87B7B;
   
   /* 导航栏 */
-  --color-nav-bg: #ffffff;
-  --color-tab-bar-bg: #ffffff;
-  --color-tab-icon: #868e96;
-  --color-tab-icon-active: #4c6ef5;
+  --color-nav-bg: #F8FAF9;
+  --color-tab-bar-bg: #F8FAF9;
+  --color-tab-icon: #9CA3AF;
+  --color-tab-icon-active: #4A9B8A;
+  
+  /* 趋势图颜色 */
+  --color-trend-line: #4A9B8A;
+  --color-trend-fill: rgba(74, 155, 138, 0.1);
+  --color-grid-line: rgba(156, 163, 175, 0.2);
 }
 
 /* 应用主题样式到组件 */

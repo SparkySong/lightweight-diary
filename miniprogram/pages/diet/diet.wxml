@@ -3,9 +3,9 @@
 <!-- 页面元信息，用于动态设置背景色和下拉刷新样式 -->
 <page-meta 
   background-text-style="{{currentTheme === 'light' ? 'dark' : 'light'}}" 
-  background-color="{{currentTheme === 'light' ? '#f8f9fa' : '#0f0f13'}}" 
-  background-color-top="{{currentTheme === 'light' ? '#f8f9fa' : '#0f0f13'}}"
-  background-color-bottom="{{currentTheme === 'light' ? '#f8f9fa' : '#0f0f13'}}"
+  background-color="{{currentTheme === 'light' ? '#F8FAF9' : '#121212'}}" 
+  background-color-top="{{currentTheme === 'light' ? '#F8FAF9' : '#121212'}}"
+  background-color-bottom="{{currentTheme === 'light' ? '#F8FAF9' : '#121212'}}"
   navigation-bar-style="{{currentTheme === 'light' ? 'dark' : 'light'}}"
 />
 
@@ -20,12 +20,14 @@
       <view class="header-actions">
       </view>
     </view>
-    <text class="subtitle">管住嘴，迈开腿 🏃</text>
+    <text class="subtitle">管住嘴，迈开腿</text>
   </view>
 
   <!-- 热量分析入口卡片 -->
   <view class="calorie-analysis-card" bindtap="goToCalorieAnalysis">
-    <view class="analysis-icon">📊</view>
+    <view class="analysis-icon">
+      <view class="icon-chart-bar"></view>
+    </view>
     <view class="analysis-content">
       <text class="analysis-title">热量分析</text>
       <text class="analysis-desc">查看每日热量摄入与达标情况</text>
@@ -35,14 +37,22 @@
 
   <!-- Add Button / Panel -->
   <view class="add-section" wx:if="{{!showAddPanel}}">
-    <button class="btn-add" bindtap="toggleAddPanel">➕ 记录饮食</button>
+    <button class="btn-add" bindtap="toggleAddPanel">
+      <view class="btn-icon icon-plus"></view>
+      <text>记录饮食</text>
+    </button>
   </view>
 
   <!-- Add/Edit Panel -->
   <view class="card add-panel" wx:if="{{showAddPanel}}">
     <view class="panel-header">
-      <text class="card-title">{{isEditing ? '✏️ 编辑饮食' : '📝 添加饮食记录'}}</text>
-      <text class="close-btn" bindtap="{{isEditing ? 'cancelEdit' : 'toggleAddPanel'}}">✕</text>
+      <view class="panel-title-wrap">
+        <view class="title-icon {{isEditing ? 'icon-edit' : 'icon-document'}}"></view>
+        <text class="card-title">{{isEditing ? '编辑饮食' : '添加饮食记录'}}</text>
+      </view>
+      <view class="close-btn" bindtap="{{isEditing ? 'cancelEdit' : 'toggleAddPanel'}}">
+        <view class="icon-close"></view>
+      </view>
     </view>
 
     <!-- Date -->
@@ -69,7 +79,10 @@
           </view>
           <!-- 食物搜索建议 - 单独显示，不影响布局 -->
           <view class="food-search-panel" wx:if="{{showSearchPanel && searchActiveIndex === foodIdx && searchResults.length > 0}}">
-            <view class="search-hint">👆 选择以下食物自动填充卡路里：</view>
+            <view class="search-hint">
+              <view class="hint-icon icon-hand"></view>
+              选择以下食物自动填充卡路里：
+            </view>
             <view class="search-results">
               <view class="search-item" wx:for="{{searchResults}}" wx:key="name" wx:for-item="result" data-item="{{result}}" data-idx="{{foodIdx}}" catchtap="selectFood">
                 <text class="search-item-name">{{result.name}}</text>
@@ -103,12 +116,15 @@
       </view>
     </view>
 
-    <button class="btn-submit" bindtap="onSubmit">✅ 保存记录</button>
+    <button class="btn-submit" bindtap="onSubmit">
+      <view class="btn-icon icon-check"></view>
+      <text>保存记录</text>
+    </button>
   </view>
 
   <!-- Records by Day -->
   <view wx:if="{{days.length === 0 && !showAddPanel}}" class="empty-state">
-    <text class="empty-emoji">🍽️</text>
+    <view class="empty-icon icon-bowl"></view>
     <text class="empty-text">还没有饮食记录</text>
     <text class="empty-hint">点击上方按钮开始记录</text>
   </view>
@@ -131,8 +147,12 @@
           <text class="meal-type-label">{{meal.mealLabel}}</text>
           <view class="meal-actions">
             <text class="meal-cal">{{meal.totalCal}} kcal</text>
-            <view class="edit-icon" catchtap="onEditDiet" data-meal="{{meal}}">✏️</view>
-            <view class="delete-btn" data-id="{{meal._id}}" catchtap="onDeleteDiet">✕</view>
+            <view class="edit-icon" catchtap="onEditDiet" data-meal="{{meal}}">
+              <view class="icon-edit-small"></view>
+            </view>
+            <view class="delete-btn" data-id="{{meal._id}}" catchtap="onDeleteDiet">
+              <view class="icon-delete"></view>
+            </view>
           </view>
         </view>
         <view class="food-tags">
@@ -153,7 +173,7 @@
   </scroll-view>
 
   <view class="footer">
-    <text>🥗 饮食控制是减肥成功的关键</text>
+    <text>饮食控制是减肥成功的关键</text>
   </view>
 </view>
 

@@ -3,13 +3,13 @@
 <!-- 页面元信息，在 JS 中动态设置背景色和状态栏 -->
 <page-meta 
   background-text-style="{{currentTheme === 'light' ? 'dark' : 'light'}}" 
-  background-color="{{currentTheme === 'light' ? '#f8f9fa' : '#0f0f13'}}" 
-  background-color-top="{{currentTheme === 'light' ? '#f8f9fa' : '#0f0f13'}}" 
-  background-color-bottom="{{currentTheme === 'light' ? '#f8f9fa' : '#0f0f13'}}" 
+  background-color="{{currentTheme === 'light' ? '#F8FAF9' : '#121212'}}" 
+  background-color-top="{{currentTheme === 'light' ? '#F8FAF9' : '#121212'}}" 
+  background-color-bottom="{{currentTheme === 'light' ? '#F8FAF9' : '#121212'}}" 
   navigation-bar-style="{{currentTheme === 'light' ? 'dark' : 'light'}}"
 />
 
-<!-- 自定义导航栏区域（完全隐藏原生状态栏，用背景色覆盖） -->
+<!-- 自定义导航栏区域 -->
 <view class="custom-nav-area"></view>
 
 <view class="container {{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}}">
@@ -18,63 +18,78 @@
     <view class="header-title-row">
       <text class="title">打卡记录</text>
       <view class="header-actions">
-        <!-- 主题切换按钮 -->
+        <!-- 主题切换按钮 - 简化为图标 -->
         <view class="theme-toggle" bindtap="onToggleThemeMenu">
-          <text class="theme-icon" wx:if="{{currentThemeSetting === 'system'}}">📱</text>
-          <text class="theme-icon" wx:elif="{{currentTheme === 'dark'}}">🌙</text>
-          <text class="theme-icon" wx:else>☀️</text>
+          <view class="theme-icon-svg" wx:if="{{currentThemeSetting === 'system'}}">
+            <view class="icon-device"></view>
+          </view>
+          <view class="theme-icon-svg theme-moon" wx:elif="{{currentTheme === 'dark'}}"></view>
+          <view class="theme-icon-svg theme-sun" wx:else></view>
         </view>
       </view>
     </view>
-    <text class="subtitle" wx:if="{{streak > 0}}">🔥 已连续打卡 {{streak}} 天！</text>
+    <text class="subtitle" wx:if="{{streak > 0}}">
+      <view class="streak-icon"></view>
+      已连续打卡 {{streak}} 天
+    </text>
     <text class="subtitle" wx:else>坚持记录，遇见更好的自己</text>
     
     <!-- 主题选择菜单 -->
     <view class="theme-menu" wx:if="{{showThemeMenu}}">
       <view class="theme-menu-item {{currentThemeSetting === 'system' ? 'active' : ''}}" 
             bindtap="onSwitchTheme" data-theme="system">
-        <text class="theme-menu-icon">📱</text>
+        <view class="theme-menu-icon icon-device-small"></view>
         <text class="theme-menu-text">跟随系统</text>
       </view>
       <view class="theme-menu-item {{currentThemeSetting === 'dark' ? 'active' : ''}}" 
             bindtap="onSwitchTheme" data-theme="dark">
-        <text class="theme-menu-icon">🌙</text>
+        <view class="theme-menu-icon icon-moon-small"></view>
         <text class="theme-menu-text">深色模式</text>
       </view>
       <view class="theme-menu-item {{currentThemeSetting === 'light' ? 'active' : ''}}" 
             bindtap="onSwitchTheme" data-theme="light">
-        <text class="theme-menu-icon">☀️</text>
+        <view class="theme-menu-icon icon-sun-small"></view>
         <text class="theme-menu-text">浅色模式</text>
       </view>
     </view>
   </view>
 
-  <!-- Stats Cards -->
+  <!-- Stats Cards - 简化为三列核心数据 -->
   <view class="stats">
     <view class="stat-card" bindtap="openWeightPopup" data-type="current">
       <text class="stat-label">当前体重</text>
-      <text class="stat-value">{{currentWeight}}</text>
-      <text class="stat-unit" wx:if="{{currentWeight !== '--'}}">{{weightUnitLabel}}</text>
+      <view class="stat-value-wrap">
+        <text class="stat-value">{{currentWeight}}</text>
+        <text class="stat-unit" wx:if="{{currentWeight !== '--'}}">{{weightUnitLabel}}</text>
+      </view>
       <text class="stat-change {{lastChangeClass}}">{{lastChange}}</text>
     </view>
     <view class="stat-card" bindtap="openWeightPopup" data-type="target">
       <text class="stat-label">目标体重</text>
-      <text class="stat-value">{{goalWeight || '--'}}<text class="stat-unit" wx:if="{{goalWeight}}">{{weightUnitLabel}}</text></text>
+      <view class="stat-value-wrap">
+        <text class="stat-value">{{goalWeight || '--'}}</text>
+        <text class="stat-unit" wx:if="{{goalWeight}}">{{weightUnitLabel}}</text>
+      </view>
       <text class="stat-change neutral" wx:if="{{!goalWeight}}">未设置</text>
       <text class="stat-change {{goalReached ? 'down' : 'neutral'}}" wx:else>{{goalRemaining}}</text>
     </view>
     <view class="stat-card">
       <text class="stat-label">已减</text>
-      <text class="stat-value" style="color:{{totalLostColor}}">{{totalLost}}</text>
-      <text class="stat-unit" wx:if="{{totalLost !== '--'}}">{{weightUnitLabel}}</text>
+      <view class="stat-value-wrap">
+        <text class="stat-value" style="color:{{totalLostColor}}">{{totalLost}}</text>
+        <text class="stat-unit" wx:if="{{totalLost !== '--'}}">{{weightUnitLabel}}</text>
+      </view>
       <text class="stat-change neutral">{{daysCount}} 天</text>
     </view>
   </view>
 
-  <!-- BMI Card -->
+  <!-- BMI Card - 优化进度条设计 -->
   <view class="card bmi-card">
     <view class="card-header">
-      <text class="card-title">📊 BMI 指数</text>
+      <view class="card-title-wrap">
+        <view class="title-icon icon-chart"></view>
+        <text class="card-title">BMI 指数</text>
+      </view>
       <text class="bmi-badge" style="background:{{bmiBgColor}};color:{{bmiColor}}">{{bmiCategory}}</text>
     </view>
     <view class="bmi-content">
@@ -82,7 +97,8 @@
         <text class="bmi-number" style="color:{{bmiColor}}">{{bmiValue}}</text>
         <text class="bmi-range">正常范围 18.5-24</text>
       </view>
-      <view class="bmi-bar">
+      <!-- 优化后的BMI分段进度条 -->
+      <view class="bmi-track">
         <view class="bmi-segment underweight"></view>
         <view class="bmi-segment normal"></view>
         <view class="bmi-segment overweight"></view>
@@ -90,10 +106,10 @@
         <view class="bmi-indicator" wx:if="{{bmiValue !== '--'}}" style="left: {{bmiIndicatorLeft}}%;"></view>
       </view>
       <view class="bmi-labels">
-        <text>偏瘦</text>
-        <text>正常</text>
-        <text>偏胖</text>
-        <text>肥胖</text>
+        <text class="bmi-label" data-range="偏瘦">偏瘦</text>
+        <text class="bmi-label" data-range="正常">正常</text>
+        <text class="bmi-label" data-range="偏胖">偏胖</text>
+        <text class="bmi-label" data-range="肥胖">肥胖</text>
       </view>
     </view>
     <!-- Height Setting -->
@@ -109,10 +125,13 @@
     </view>
   </view>
 
-  <!-- Chart -->
-  <view class="card">
+  <!-- Chart - 优化趋势图 -->
+  <view class="card chart-card">
     <view class="card-header">
-      <text class="card-title">📈 体重趋势</text>
+      <view class="card-title-wrap">
+        <view class="title-icon icon-trend"></view>
+        <text class="card-title">体重趋势</text>
+      </view>
       <view class="range-btns">
         <view class="range-btn {{chartRange === 7 ? 'active' : ''}}" data-range="7" bindtap="onRangeChange">7天</view>
         <view class="range-btn {{chartRange === 30 ? 'active' : ''}}" data-range="30" bindtap="onRangeChange">30天</view>
@@ -122,10 +141,11 @@
     <canvas canvas-id="chart" id="chart" class="chart-canvas" />
   </view>
 
-  <!-- Checkin -->
-  <view class="card">
+  <!-- Checkin - 优化打卡区域 -->
+  <view class="card checkin-card">
     <view class="card-title-wrap">
-      <text class="card-title">📝 今日打卡</text>
+      <view class="title-icon icon-edit"></view>
+      <text class="card-title">今日打卡</text>
     </view>
     <view class="input-row">
       <picker mode="date" value="{{inputDate}}" bindchange="onDateChange">
@@ -136,14 +156,23 @@
         <input class="weight-input" type="digit" value="{{inputWeight}}" bindinput="onWeightInput" confirm-type="done" bindconfirm="onCheckin" />
       </view>
     </view>
-    <button class="btn-primary" bindtap="onCheckin">✅ 打卡记录</button>
+    <button class="btn-primary btn-capsule" bindtap="onCheckin">
+      <view class="btn-icon icon-check"></view>
+      <text>打卡记录</text>
+    </button>
   </view>
 
-  <!-- Goal -->
+  <!-- Goal - 优化目标卡片 -->
   <view class="card goal-card" >
     <view class="goal-header">
-      <text class="card-title">🎯 目标体重</text>
-      <text catchtap="onEditGoal" class="goal-edit-hint" wx:if="{{goalWeight && !showGoalInput}}">✏️ 点击修改</text>
+      <view class="card-title-wrap">
+        <view class="title-icon icon-target"></view>
+        <text class="card-title">目标体重</text>
+      </view>
+      <text catchtap="onEditGoal" class="goal-edit-hint" wx:if="{{goalWeight && !showGoalInput}}">
+        <view class="edit-icon-small"></view>
+        修改
+      </text>
     </view>
     <view class="goal-input-wrap" wx:if="{{showGoalInput}}" catchtap="stopPropagation">
       <view class="input-row">
@@ -165,19 +194,20 @@
       </view>
     </view>
     <view class="goal-empty" wx:if="{{!goalWeight && !showGoalInput}}">
-      <text>点击设置目标体重 🎯</text>
+      <view class="empty-icon icon-target-outline"></view>
+      <text>点击设置目标体重</text>
     </view>
   </view>
 
-  <!-- Quick Actions -->
+  <!-- Quick Actions - 优化快捷操作 -->
   <view class="quick-actions">
     <view class="action-card" bindtap="goToDiet">
-      <text class="action-icon">🥗</text>
+      <view class="action-icon icon-food"></view>
       <text class="action-label">饮食记录</text>
       <text class="action-desc">记录每日饮食</text>
     </view>
     <view class="action-card" bindtap="onToggleReminder">
-      <text class="action-icon">{{reminderEnabled ? '🔔' : '🔕'}}</text>
+      <view class="action-icon {{reminderEnabled ? 'icon-bell' : 'icon-bell-off'}}"></view>
       <text class="action-label">{{reminderEnabled ? '提醒已开启' : '开启提醒'}}</text>
       <text class="action-desc" wx:if="{{reminderEnabled}}">每天 {{remindTime}}</text>
       <view class="time-picker-wrap" wx:if="{{reminderEnabled}}" catchtap="onTimePickerTap">
@@ -188,12 +218,15 @@
     </view>
   </view>
 
-  <!-- History -->
+  <!-- History - 优化记录列表 -->
   <view class="card history-card">
-    <text class="card-title">📋 打卡记录</text>
+    <view class="card-title-wrap">
+      <view class="title-icon icon-list"></view>
+      <text class="card-title">打卡记录</text>
+    </view>
     <view class="empty-state" wx:if="{{records.length === 0}}">
-      <text class="empty-emoji">📭</text>
-      <text class="empty-text">还没有记录，开始你的第一次打卡吧！</text>
+      <view class="empty-icon icon-inbox"></view>
+      <text class="empty-text">还没有记录，开始你的第一次打卡吧</text>
     </view>
     
     <!-- 记录列表滚动容器 -->
@@ -211,12 +244,24 @@
           </view>
           <view class="record-right">
             <text class="record-diff {{record.diffClass}}" wx:if="{{record.displayDiff !== undefined && record.displayDiff !== null}}">
-              <block wx:if="{{record.displayDiff < 0}}">↓{{(-record.displayDiff)}}</block>
-              <block wx:elif="{{record.displayDiff > 0}}">↑{{record.displayDiff}}</block>
-              <block wx:else>→</block>
+              <block wx:if="{{record.displayDiff < 0}}">
+                <view class="trend-icon trend-down"></view>
+                {{(-record.displayDiff)}}
+              </block>
+              <block wx:elif="{{record.displayDiff > 0}}">
+                <view class="trend-icon trend-up"></view>
+                {{record.displayDiff}}
+              </block>
+              <block wx:else>
+                <view class="trend-icon trend-flat"></view>
+              </block>
             </text>
-            <view class="edit-icon" catchtap="onEditRecord" data-record="{{record}}">✏️</view>
-            <view class="delete-btn" data-id="{{record._id}}" data-date="{{record.date}}" catchtap="onDelete">✕</view>
+            <view class="edit-icon" catchtap="onEditRecord" data-record="{{record}}">
+              <view class="icon-edit-small"></view>
+            </view>
+            <view class="delete-btn" data-id="{{record._id}}" data-date="{{record.date}}" catchtap="onDelete">
+              <view class="icon-delete"></view>
+            </view>
           </view>
         </view>
       </view>
@@ -231,7 +276,7 @@
   </view>
 
   <view class="footer">
-    <text>💪 每天进步一点点</text>
+    <text>每天进步一点点</text>
   </view>
 </view>
 
@@ -242,7 +287,10 @@
 <view class="edit-panel-mask {{showEditPanel ? 'show' : ''}} {{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}}" bindtap="closeEditPanel"></view>
 <view class="edit-panel {{showEditPanel ? 'show' : ''}} {{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}}">
   <view class="edit-panel-header">
-    <text class="edit-panel-title">✏️ 修改体重</text>
+    <view class="panel-title-wrap">
+      <view class="title-icon icon-edit"></view>
+      <text class="edit-panel-title">修改体重</text>
+    </view>
     <text class="edit-panel-date">{{editDate}}</text>
   </view>
   <view class="edit-panel-content">
@@ -258,12 +306,17 @@
 <view class="toast {{toastShow ? 'show' : ''}}">{{toastMsg}}</view>
 </page>
 
-<!-- 体重编辑弹框 - 放在page内（container外部）并添加主题类 -->
+<!-- 体重编辑弹框 -->
 <view class="weight-popup-overlay {{weightPopupShow ? 'show' : ''}} {{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}}" bindtap="closeWeightPopup"></view>
 <view class="weight-popup {{weightPopupShow ? 'show' : ''}} {{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}}">
   <view class="weight-popup-header">
-    <text class="weight-popup-title">{{weightPopupType === 'current' ? '📝 ' + (currentWeight !== '--' ? '编辑当前体重' : '记录当前体重') : '🎯 ' + (goalWeight ? '编辑目标体重' : '设置目标体重')}}</text>
-    <text class="weight-popup-close" bindtap="closeWeightPopup">✕</text>
+    <view class="popup-title-wrap">
+      <view class="title-icon {{weightPopupType === 'current' ? 'icon-edit' : 'icon-target'}}"></view>
+      <text class="weight-popup-title">{{weightPopupType === 'current' ? (currentWeight !== '--' ? '编辑当前体重' : '记录当前体重') : (goalWeight ? '编辑目标体重' : '设置目标体重')}}</text>
+    </view>
+    <view class="weight-popup-close" bindtap="closeWeightPopup">
+      <view class="icon-close"></view>
+    </view>
   </view>
   <view class="weight-popup-body">
     <view class="weight-popup-input-group">
