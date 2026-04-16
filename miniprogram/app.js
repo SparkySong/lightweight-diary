@@ -205,7 +205,7 @@ App({
     const theme = this.getTheme();
     const tabBarConfig = {
       color: theme === 'dark' ? '#8888a0' : '#868e96',
-      selectedColor: theme === 'dark' ? '#6c5ce7' : '#4c6ef5',
+      selectedColor: theme === 'dark' ? '#5FA895' : '#4A9B8A',
       backgroundColor: theme === 'dark' ? '#0f0f13' : '#ffffff',
       borderStyle: theme === 'dark' ? 'black' : 'white'
     };
@@ -233,14 +233,13 @@ App({
         const route = currentPage.route;
         
         // 根据主题决定图标路径
-        // 浅色主题：激活用普通图标，未激活用高亮图标
-        // 深色主题：激活用高亮图标，未激活用普通图标
-        const indexIconPath = theme === 'light' ? 'images/tab-weight-active.png' : 'images/tab-weight.png';
-        const indexSelectedIconPath = theme === 'light' ? 'images/tab-weight.png' : 'images/tab-weight-active.png';
-        const dietIconPath = theme === 'light' ? 'images/tab-diet-active.png' : 'images/tab-diet.png';
-        const dietSelectedIconPath = theme === 'light' ? 'images/tab-diet.png' : 'images/tab-diet-active.png';
-        const profileIconPath = theme === 'light' ? 'images/profile-active.png' : 'images/profile.png';
-        const profileSelectedIconPath = theme === 'light' ? 'images/profile.png' : 'images/profile-active.png';
+        // 统一逻辑：普通状态用灰色图标，选中状态用绿色高亮图标
+        const indexIconPath = 'images/tab-weight.png';
+        const indexSelectedIconPath = 'images/tab-weight-active.png';
+        const dietIconPath = 'images/tab-diet.png';
+        const dietSelectedIconPath = 'images/tab-diet-active.png';
+        const profileIconPath = 'images/profile.png';
+        const profileSelectedIconPath = 'images/profile-active.png';
         
         // 根据当前页面更新图标选中状态
         if (route === 'pages/index/index') {

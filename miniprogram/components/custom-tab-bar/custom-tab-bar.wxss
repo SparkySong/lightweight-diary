@@ -48,18 +48,12 @@
   width: 100%;
   height: 100%;
   transition: all 0.3s ease;
-}
-
-/* 确保图标在深色背景下可见 */
-.tab-icon .icon {
-  filter: brightness(1.8) contrast(1.3);
-  opacity: 1;
+  /* 移除滤镜，使用图标本身的颜色 */
 }
 
 /* 选中状态更明显 */
 .tab-bar-item.active .tab-icon .icon {
-  transform: scale(1.1);
-  filter: brightness(2.2) contrast(1.5);
+  transform: scale(1.05);
 }
 
 .tab-text {
@@ -70,7 +64,7 @@
 }
 
 .tab-bar-item.active .tab-text {
-  color: var(--color-tab-icon-active, #6c5ce7);
+  color: var(--color-tab-icon-active, #5FA895);
 }
 
 /* 点击反馈效果 */
