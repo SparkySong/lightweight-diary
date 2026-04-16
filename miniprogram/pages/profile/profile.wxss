@@ -85,7 +85,6 @@ page.theme-dark {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  border: 2rpx solid rgba(255, 255, 255, 0.08);
 }
 
 .profile-info {
@@ -867,7 +866,7 @@ page.theme-dark {
 }
 
 .container.theme-light .profile-avatar {
-  border-color: rgba(0, 0, 0, 0.08);
+  /* 移除边框 */
 }
 
 .container.theme-light .profile-nickname {
