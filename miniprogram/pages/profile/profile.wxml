@@ -269,17 +269,17 @@
     <view class="popup-body">
       <view class="theme-options">
         <view class="theme-option {{themeSetting === 'system' ? 'active' : ''}}" bindtap="onSwitchTheme" data-theme="system">
-          <view class="theme-option-icon icon-device"></view>
+          <image class="theme-option-img" src="/images/theme-system.png" mode="aspectFit"></image>
           <text class="theme-option-text">跟随系统</text>
           <text class="theme-option-check" wx:if="{{themeSetting === 'system'}}">✓</text>
         </view>
         <view class="theme-option {{themeSetting === 'dark' ? 'active' : ''}}" bindtap="onSwitchTheme" data-theme="dark">
-          <view class="theme-option-icon icon-moon"></view>
+          <image class="theme-option-img" src="/images/theme-moon.png" mode="aspectFit"></image>
           <text class="theme-option-text">深色模式</text>
           <text class="theme-option-check" wx:if="{{themeSetting === 'dark'}}">✓</text>
         </view>
         <view class="theme-option {{themeSetting === 'light' ? 'active' : ''}}" bindtap="onSwitchTheme" data-theme="light">
-          <view class="theme-option-icon icon-sun"></view>
+          <image class="theme-option-img" src="/images/theme-sun.png" mode="aspectFit"></image>
           <text class="theme-option-text">浅色模式</text>
           <text class="theme-option-check" wx:if="{{themeSetting === 'light'}}">✓</text>
         </view>

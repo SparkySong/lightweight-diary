@@ -623,18 +623,15 @@ page.theme-dark {
   border-color: #5FA895;
 }
 
-.theme-option-icon {
-  width: 36rpx;
-  height: 36rpx;
+.theme-option-img {
+  width: 48rpx;
+  height: 48rpx;
   margin-right: 20rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #9CA3AF;
+  flex-shrink: 0;
 }
 
-.theme-option.active .theme-option-icon {
-  color: #5FA895;
+.theme-option.active .theme-option-img {
+  opacity: 1;
 }
 
 .theme-option-text {
