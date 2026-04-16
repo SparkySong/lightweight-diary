@@ -156,10 +156,10 @@
         <input class="weight-input" type="digit" value="{{inputWeight}}" bindinput="onWeightInput" confirm-type="done" bindconfirm="onCheckin" />
       </view>
     </view>
-    <button class="btn-primary btn-capsule" bindtap="onCheckin">
-      <view class="btn-icon icon-check"></view>
-      <text>打卡记录</text>
-    </button>
+    <!-- 打卡按钮 -->
+<button class="btn-primary btn-capsule" bindtap="onCheckin">
+  <text>打卡记录</text>
+</button>
   </view>
 
   <!-- Goal - 优化目标卡片 -->
@@ -233,6 +233,8 @@
     <scroll-view 
       class="records-scroll"
       scroll-y
+      enhanced
+      disable-scroll
       bindscrolltolower="onRecordsScrollToLower"
       lower-threshold="100"
       wx:if="{{records.length > 0}}">

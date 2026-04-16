@@ -117,7 +117,6 @@
     </view>
 
     <button class="btn-submit" bindtap="onSubmit">
-      <view class="btn-icon icon-check"></view>
       <text>保存记录</text>
     </button>
   </view>
@@ -133,6 +132,8 @@
   <scroll-view 
     class="records-scroll"
     scroll-y
+    enhanced
+    disable-scroll
     bindscrolltolower="onScrollToLower"
     lower-threshold="100"
     wx:if="{{days.length > 0}}">

@@ -279,7 +279,7 @@ Page({
     }
     
     // 计算图例数据 - 使用低饱和度配色
-    const isDark = currentTheme === 'dark';
+    const isDark = this.data.currentTheme === 'dark';
     const mealLegend = [
       { name: '早餐', color: isDark ? '#D4A574' : '#C49A6C', cal: meals.breakfast, percent: totalCal > 0 ? Math.round(meals.breakfast / totalCal * 100) : 0 },
       { name: '午餐', color: isDark ? '#5FA895' : '#4A9B8A', cal: meals.lunch, percent: totalCal > 0 ? Math.round(meals.lunch / totalCal * 100) : 0 },

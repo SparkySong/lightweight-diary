@@ -659,7 +659,7 @@
 .day-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: baseline;
   padding: 8rpx 4rpx 12rpx;
 }
 
@@ -667,12 +667,14 @@
   font-size: 26rpx;
   font-weight: 600;
   color: #F5F5F5;
+  letter-spacing: 0.5rpx;
 }
 
 .day-total {
   font-size: 24rpx;
   color: #D4A574;
   font-weight: 600;
+  letter-spacing: 0.3rpx;
 }
 
 /* Meal Card */
@@ -877,10 +879,19 @@
   color: #4B5563;
 }
 
-/* 记录列表滚动容器 */
+/* 记录列表滚动容器 - 隐藏滚动条 */
 .records-scroll {
   height: calc(100vh - 400rpx);
   margin-bottom: 20rpx;
+}
+
+/* 隐藏滚动条 */
+.records-scroll::-webkit-scrollbar {
+  display: none;
+}
+.records-scroll {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 /* 加载更多 */

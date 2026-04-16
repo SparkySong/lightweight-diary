@@ -491,7 +491,7 @@ Page({
       const success = await this.requestSubscribeAndSave(this.data.remindTime);
       if (success) {
         this.setData({ reminderEnabled: true });
-        this.showToast('提醒已开启 🔔');
+        this.showToast('提醒已开启');
         // 记录今天已请求
         const today = new Date();
         const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
@@ -672,12 +672,12 @@ Page({
       const currentLost = first.weight - latest.weight;
       progress = Math.min(100, Math.max(0, (currentLost / totalToLose) * 100));
       if (remaining > 0) goalRemaining = `还差 ${Math.abs(remaining).toFixed(1)} ${unitLabel}`;
-      else { goalRemaining = '🎉 已达标！'; goalReached = true; }
+      else { goalRemaining = '已达标！'; goalReached = true; }
     } else if (totalToLose < 0) {
       const currentGain = latest.weight - first.weight;
       progress = Math.min(100, Math.max(0, (currentGain / Math.abs(totalToLose)) * 100));
       if (remaining < 0) goalRemaining = `还差 ${Math.abs(remaining).toFixed(1)} ${unitLabel}`;
-      else { goalRemaining = '🎉 已达标！'; goalReached = true; }
+      else { goalRemaining = '已达标！'; goalReached = true; }
     }
     this.setData({ goalRemaining, goalProgress: progress, goalProgressWidth: progress, goalReached });
   },
@@ -787,21 +787,73 @@ Page({
       ...d
     }));
 
-    // Area - 使用薄荷绿渐变填充
-    ctx.beginPath(); ctx.moveTo(points[0].x, pad.t + cH);
-    points.forEach(p => ctx.lineTo(p.x, p.y));
+    // Area - 使用 Catmull-Rom 样条填充，保持与线条一致
+    ctx.beginPath();
+    ctx.moveTo(points[0].x, pad.t + cH);
+    
+    if (points.length === 1) {
+      ctx.lineTo(points[0].x, points[0].y);
+    } else if (points.length === 2) {
+      ctx.lineTo(points[0].x, points[0].y);
+      ctx.lineTo(points[1].x, points[1].y);
+    } else {
+      for (let i = 0; i < points.length - 1; i++) {
+        const p0 = points[Math.max(0, i - 1)];
+        const p1 = points[i];
+        const p2 = points[i + 1];
+        const p3 = points[Math.min(points.length - 1, i + 2)];
+        
+        const cp1x = p1.x + (p2.x - p0.x) / 6;
+        const cp1y = p1.y + (p2.y - p0.y) / 6;
+        const cp2x = p2.x - (p3.x - p1.x) / 6;
+        const cp2y = p2.y - (p3.y - p1.y) / 6;
+        
+        ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p2.x, p2.y);
+      }
+    }
+    
     ctx.lineTo(points[points.length - 1].x, pad.t + cH);
-    ctx.closePath(); 
-    ctx.setFillStyle(isDark ? 'rgba(95, 168, 149, 0.12)' : 'rgba(74, 155, 138, 0.1)'); 
+    ctx.closePath();
+    
+    // 渐变填充
+    if (isDark) {
+      ctx.setFillStyle(ctx.createLinearGradient(0, pad.t, 0, pad.t + cH, [[0, 'rgba(95, 168, 149, 0.15)'], [1, 'rgba(95, 168, 149, 0.02)']])); 
+    } else {
+      ctx.setFillStyle(ctx.createLinearGradient(0, pad.t, 0, pad.t + cH, [[0, 'rgba(74, 155, 138, 0.12)'], [1, 'rgba(74, 155, 138, 0.01)']])); 
+    }
     ctx.fill();
 
-    // Line - 使用薄荷绿色，更平滑
+    // Line - 使用 Catmull-Rom 样条曲线，确保经过每个数据点
     ctx.setStrokeStyle(isDark ? '#5FA895' : '#4A9B8A'); 
     ctx.setLineWidth(2.5); 
     ctx.setLineJoin('round');
     ctx.setLineCap('round');
     ctx.beginPath();
-    points.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+    
+    if (points.length === 1) {
+      ctx.moveTo(points[0].x, points[0].y);
+    } else if (points.length === 2) {
+      ctx.moveTo(points[0].x, points[0].y);
+      ctx.lineTo(points[1].x, points[1].y);
+    } else {
+      // Catmull-Rom 样条：确保线条平滑且经过每个控制点
+      ctx.moveTo(points[0].x, points[0].y);
+      
+      for (let i = 0; i < points.length - 1; i++) {
+        const p0 = points[Math.max(0, i - 1)];
+        const p1 = points[i];
+        const p2 = points[i + 1];
+        const p3 = points[Math.min(points.length - 1, i + 2)];
+        
+        // 计算控制点，使用 Catmull-Rom 转 Bezier 的方法
+        const cp1x = p1.x + (p2.x - p0.x) / 6;
+        const cp1y = p1.y + (p2.y - p0.y) / 6;
+        const cp2x = p2.x - (p3.x - p1.x) / 6;
+        const cp2y = p2.y - (p3.y - p1.y) / 6;
+        
+        ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p2.x, p2.y);
+      }
+    }
     ctx.stroke();
 
     // Dots - 优化数据点样式
@@ -860,7 +912,7 @@ Page({
         name: 'addRecord', data: { date: inputDate, weight }
       });
       if (res.result.success) {
-        this.showToast(res.result.updated ? '记录已更新 ✏️' : '打卡成功 ✅');
+        this.showToast(res.result.updated ? '记录已更新' : '打卡成功');
         this.setData({ inputWeight: '' });
         this.loadAll();
       }
@@ -907,7 +959,7 @@ Page({
       weightData.targetWeight = val;
       wx.setStorageSync('weightData', weightData);
       
-      this.showToast('目标已设定 🎯');
+      this.showToast('目标已设定');
       
       // 根据单位转换显示
       const displayGoal = weightUnit === 'jin' ? val * KG_TO_JIN : val;
@@ -1083,8 +1135,8 @@ Page({
         wx.showModal({
           title: '选择当前系统主题',
           content: '您的微信版本暂不支持自动检测主题，请确认您的微信当前是深色还是浅色模式？',
-          confirmText: '🌙 深色',
-          cancelText: '☀️ 浅色',
+          confirmText: '深色',
+          cancelText: '浅色',
           success: (res) => {
             const systemTheme = res.confirm ? 'dark' : 'light';
             this.applyThemeWithSystem(theme, systemTheme);
@@ -1126,11 +1178,11 @@ Page({
     // 显示提示
     let toastMsg = '';
     if (themeSetting === 'system') {
-      toastMsg = '已切换到跟随系统 📱';
+      toastMsg = '已切换到跟随系统';
     } else if (themeSetting === 'dark') {
-      toastMsg = '切换到深色模式 🌙';
+      toastMsg = '切换到深色模式';
     } else {
-      toastMsg = '切换到浅色模式 ☀️';
+      toastMsg = '切换到浅色模式';
     }
     this.showToast(toastMsg);
   },
@@ -1196,7 +1248,7 @@ Page({
         data: { date: this.data.editDate, weight }
       });
       if (res.result.success) {
-        this.showToast('体重已更新 ✏️');
+        this.showToast('体重已更新');
         this.closeEditPanel();
         this.loadAll();
       }
@@ -1296,7 +1348,7 @@ Page({
         });
         
         if (res.result && res.result.success) {
-          this.showToast('体重已记录 📝');
+          this.showToast('体重已记录');
           this.closeWeightPopup();
           this.loadAll();
         } else {
@@ -1315,7 +1367,7 @@ Page({
           console.warn('同步目标体重到云端失败', e);
         }
         
-        this.showToast('目标体重已设置 🎯');
+        this.showToast('目标体重已设置');
         this.closeWeightPopup();
         
         // 根据单位转换显示

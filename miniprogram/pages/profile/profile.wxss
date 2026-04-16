@@ -118,35 +118,26 @@ page.theme-dark {
 }
 
 .nickname-edit-icon {
-  font-size: 24rpx;
   color: #6B7280;
-  margin-left: 12rpx;
-  width: 24rpx;
-  height: 24rpx;
+  margin-left: 10rpx;
+  width: 22rpx;
+  height: 22rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.nickname-edit-icon::before {
-  content: '';
-  width: 16rpx;
-  height: 16rpx;
-  border: 2rpx solid currentColor;
-  border-radius: 2rpx;
+  flex-shrink: 0;
   position: relative;
 }
 
-.nickname-edit-icon::after {
+/* 简化的编辑图标 - 铅笔形状 */
+.nickname-edit-icon::before {
   content: '';
+  width: 14rpx;
+  height: 14rpx;
+  border-right: 2rpx solid currentColor;
+  border-bottom: 2rpx solid currentColor;
+  transform: rotate(-45deg);
   position: absolute;
-  width: 8rpx;
-  height: 2rpx;
-  background: #1E1E1E;
-  border-left: 2rpx solid currentColor;
-  transform: rotate(45deg);
-  margin-left: 8rpx;
-  margin-top: -4rpx;
 }
 
 .avatar-edit-icon {
@@ -884,6 +875,10 @@ page.theme-dark {
 
 .container.theme-light .profile-nickname {
   color: #1F2937;
+}
+
+.container.theme-light .nickname-edit-icon {
+  color: #9CA3AF;
 }
 
 .container.theme-light .profile-stat-value {
