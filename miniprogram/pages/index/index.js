@@ -118,8 +118,6 @@ Page({
     this.initWeightUnit();
     this.initTheme(); // 在数据加载前立即同步主题
     this.loadAll();
-    // 如果提醒已开启，自动请求订阅消息续期
-    this.renewReminderIfNeeded();
   },
 
   onTabItemTap() {
@@ -522,32 +520,12 @@ Page({
     const newTime = e.detail.value;
     this.setData({ remindTime: newTime });
     if (this.data.reminderEnabled) {
-      // 先直接保存时间到云端（不依赖订阅授权结果）
+      // 直接保存时间到云端
       wx.cloud.callFunction({
         name: 'subscribeReminder',
         data: { enabled: true, remindTime: newTime }
       });
-      // 同时尝试续期订阅（静默请求，失败不影响时间保存）
-      this.renewSubscribeSilent();
-    }
-  },
-
-  // 静默续期订阅（不阻塞用户操作，失败也不影响功能）
-  async renewSubscribeSilent() {
-    const templateId = '5X2tUq0NbycqoeFiymKj4FiKaLts5K5ZdSgzqHf4Lt4';
-    try {
-      const res = await wx.requestSubscribeMessage({
-        tmplIds: [templateId]
-      });
-      if (res[templateId] === 'accept') {
-        // 订阅成功，记录今天已请求
-        const today = new Date();
-        const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-        wx.setStorageSync('lastSubscribeDate', todayStr);
-      }
-    } catch (e) {
-      // 静默失败，不影响用户体验
-      console.warn('续期订阅失败:', e);
+      this.showToast('提醒时间已更新');
     }
   },
 
@@ -572,32 +550,6 @@ Page({
       console.error('请求订阅消息失败:', e);
       return false;
     }
-  },
-
-  // 自动续期订阅消息（已开启提醒的用户，每次打开小程序时请求一次）
-  async renewReminderIfNeeded() {
-    if (!this.data.reminderEnabled) return;
-    
-    // 检查今天是否已经请求过订阅
-    const today = new Date();
-    const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-    const lastSubscribeDate = wx.getStorageSync('lastSubscribeDate');
-    
-    if (lastSubscribeDate === todayStr) {
-      // 今天已经请求过，不再重复请求
-      return;
-    }
-    
-    // 延迟2秒请求，避免页面刚加载时就弹窗影响体验
-    setTimeout(async () => {
-      if (!this.data.reminderEnabled) return;
-      
-      const success = await this.requestSubscribeAndSave(this.data.remindTime);
-      if (success) {
-        // 记录今天已请求
-        wx.setStorageSync('lastSubscribeDate', todayStr);
-      }
-    }, 2000);
   },
 
   // --- Navigation ---
