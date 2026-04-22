@@ -24,7 +24,7 @@
 /* Header */
 .header {
   position: relative;
-  padding: 30rpx 0 30rpx;
+  padding: 20rpx 0 30rpx;
   margin-top: 0;
 }
 
@@ -130,9 +130,6 @@
 .subtitle {
   font-size: 24rpx;
   color: #9CA3AF;
-  display: flex;
-  align-items: center;
-  gap: 8rpx;
 }
 
 .streak-icon {

@@ -29,7 +29,6 @@
       </view> -->
     </view>
     <text class="subtitle" wx:if="{{streak > 0}}">
-      <view class="streak-icon"></view>
       已连续打卡 {{streak}} 天
     </text>
     <text class="subtitle" wx:else>坚持记录，遇见更好的自己</text>

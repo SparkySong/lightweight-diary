@@ -24,7 +24,7 @@
 /* Header */
 .header {
   position: relative;
-  padding: 30rpx 0 30rpx;
+  padding: 20rpx 0 30rpx;
   margin-top: 0;
 }
 
