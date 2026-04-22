@@ -17,8 +17,8 @@
   <view class="header">
     <view class="header-title-row">
       <text class="title">打卡记录</text>
-      <view class="header-actions">
-        <!-- 主题切换按钮 - 简化为图标 -->
+      <!-- 切换主题图标 -->
+      <!-- <view class="header-actions" style="padding-right: {{navBarRightPadding}}px;">
         <view class="theme-toggle" bindtap="onToggleThemeMenu">
           <view class="theme-icon-svg" wx:if="{{currentThemeSetting === 'system'}}">
             <view class="icon-device"></view>
@@ -26,7 +26,7 @@
           <view class="theme-icon-svg theme-moon" wx:elif="{{currentTheme === 'dark'}}"></view>
           <view class="theme-icon-svg theme-sun" wx:else></view>
         </view>
-      </view>
+      </view> -->
     </view>
     <text class="subtitle" wx:if="{{streak > 0}}">
       <view class="streak-icon"></view>
@@ -35,7 +35,7 @@
     <text class="subtitle" wx:else>坚持记录，遇见更好的自己</text>
     
     <!-- 主题选择菜单 -->
-    <view class="theme-menu" wx:if="{{showThemeMenu}}">
+    <view class="theme-menu" wx:if="{{showThemeMenu}}" style="right: {{navBarRightPadding}}px;">
       <view class="theme-menu-item {{currentThemeSetting === 'system' ? 'active' : ''}}" 
             bindtap="onSwitchTheme" data-theme="system">
         <view class="theme-menu-icon icon-device-small"></view>

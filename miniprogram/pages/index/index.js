@@ -102,12 +102,16 @@ Page({
     // 体重单位相关
     weightUnit: 'kg',         // 当前体重单位设置
     weightUnitLabel: 'kg',    // 显示用的单位标签
+    // 导航栏胶囊按钮适配
+    navBarRightPadding: 0,    // 胶囊按钮右侧安全距离
+    statusBarHeight: 0,       // 状态栏高度
   },
 
   onLoad() {
     // 🔑 关键修复：立即同步设置主题，避免切换页面时闪烁
     this.setTodayDate();
     this.initWeightUnit();
+    this.initNavBarPadding();  // 计算胶囊按钮安全距离
     this.initTheme(); // 在数据加载前立即初始化主题
     // 数据加载放在主题初始化之后，不阻塞主题渲染
     this.loadAll();
@@ -129,6 +133,43 @@ Page({
     const weightUnit = app.getWeightUnit();
     const weightUnitLabel = weightUnit === 'kg' ? 'kg' : '斤';
     this.setData({ weightUnit, weightUnitLabel });
+  },
+
+  // 初始化导航栏胶囊按钮安全距离（防止被胶囊按钮遮挡）
+  initNavBarPadding() {
+    try {
+      // 获取系统信息
+      const systemInfo = wx.getSystemInfoSync();
+      let statusBarHeight = systemInfo.statusBarHeight || 0;
+
+      // 获取胶囊按钮位置信息
+      if (wx.getMenuButtonBoundingClientRect) {
+        const menuButton = wx.getMenuButtonBoundingClientRect();
+        if (menuButton && menuButton.width) {
+          // 计算右侧安全距离 = 屏幕宽度 - 胶囊按钮右边界
+          const screenWidth = systemInfo.screenWidth;
+          // 胶囊按钮右边界到屏幕右侧的距离，再加上一些额外间距
+          const navBarRightPadding = (screenWidth - menuButton.right) + 16; // 额外16rpx(约8px)的安全间距
+          
+          this.setData({
+            statusBarHeight,
+            navBarRightPadding: Math.max(navBarRightPadding, 20) // 最小保证20px
+          });
+        }
+      } else {
+        // 兜底：使用默认值
+        this.setData({
+          statusBarHeight,
+          navBarRightPadding: 20
+        });
+      }
+    } catch (e) {
+      console.warn('获取胶囊按钮信息失败:', e);
+      this.setData({
+        navBarRightPadding: 20,
+        statusBarHeight: 0
+      });
+    }
   },
   
   // 体重单位变化回调（从偏好设置页面切换后调用）
