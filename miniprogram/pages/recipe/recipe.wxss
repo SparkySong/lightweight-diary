@@ -460,6 +460,16 @@
   color: var(--text-primary, #F5F5F5);
 }
 
+/* 日期标签 */
+.plan-date-label {
+  font-size: 20rpx;
+  color: var(--text-secondary, #6B7280);
+  background: rgba(95, 168, 149, 0.1);
+  padding: 3rpx 12rpx;
+  border-radius: 8rpx;
+  font-weight: 500;
+}
+
 .plan-close {
   width: 44rpx;
   height: 44rpx;
@@ -922,6 +932,11 @@
 
 .theme-light .plan-close {
   background: #F0F4F3;
+}
+
+.theme-light .plan-date-label {
+  background: rgba(74, 155, 138, 0.08);
+  color: #7A8E9F;
 }
 
 .theme-light .close-x::before,

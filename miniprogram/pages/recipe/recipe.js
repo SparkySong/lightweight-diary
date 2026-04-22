@@ -19,8 +19,8 @@ const getInitTheme = () => {
   return themeSetting;
 };
 
-// 静态食谱数据（含标签和图标）
-const recipeData = [
+// 静态原始数据（不改动）
+const rawRecipeData = [
   {
     category: '早餐',
     limit: '≤300kcal',
@@ -85,7 +85,53 @@ const recipeData = [
   }
 ];
 
-// 随机取数组中一个元素
+// ========== 基于日期的伪随机数生成器 ==========
+
+function hashString(str) {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  return Math.abs(hash);
+}
+
+function createSeededRandom(seed) {
+  let s = seed;
+  return function() {
+    s = (s * 16807 + 0) % 2147483647;
+    return (s - 1) / 2147483646;
+  };
+}
+
+function getTodayKey() {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+function getTodayLabel() {
+  const d = new Date();
+  const month = d.getMonth() + 1;
+  const day = d.getDate();
+  const weekDays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+  return `${month}月${day}日 ${weekDays[d.getDay()]}`;
+}
+
+// 基于日期种子打乱数组顺序（Fisher-Yates + 种子随机），同一天结果相同
+function shuffleSeeded(arr, rng) {
+  const result = arr.slice();
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+}
+
+// 纯随机取元素
 function pickOne(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
@@ -93,20 +139,29 @@ function pickOne(arr) {
 Page({
   data: {
     currentTheme: getInitTheme(),
-    recipeList: recipeData,
+    recipeList: [],
     toastShow: false,
     toastMsg: '',
     // 每日推荐
     showDailyPlan: false,
-    dailyPlan: []
+    dailyPlan: [],
+    totalCal: 0,
+    todayLabel: '',
+    _lastDayKey: ''
   },
 
   onLoad() {
     this.initTheme();
+    this.generateDailyRecipeList();
   },
 
   onShow() {
     this.initTheme();
+    // 每次显示时检查日期是否变了，如果换了天则重新打乱列表
+    const todayKey = getTodayKey();
+    if (todayKey !== this.data._lastDayKey) {
+      this.generateDailyRecipeList();
+    }
   },
 
   initTheme() {
@@ -146,6 +201,28 @@ Page({
     this.initTheme();
   },
 
+  // 📅 每日打乱食谱列表（基于日期种子，同一天固定）
+  generateDailyRecipeList() {
+    const todayKey = getTodayKey();
+    const baseSeed = hashString(todayKey);
+
+    // 为每个分类用不同的种子打乱
+    const shuffledList = rawRecipeData.map((cat, index) => {
+      const catSeed = hashString(baseSeed + '-' + index);
+      const rng = createSeededRandom(catSeed);
+      return {
+        ...cat,
+        items: shuffleSeeded(cat.items, rng)
+      };
+    });
+
+    this.setData({
+      _lastDayKey: todayKey,
+      recipeList: shuffledList,
+      todayLabel: getTodayLabel()
+    });
+  },
+
   // 切换分类折叠/展开
   toggleSection(e) {
     const index = e.currentTarget.dataset.index;
@@ -157,7 +234,7 @@ Page({
 
   // 🎲 随机推荐今日三餐
   randomRecommend() {
-    const plan = recipeData.map(cat => ({
+    const plan = rawRecipeData.map(cat => ({
       category: cat.category,
       emoji: cat.emoji,
       icon: cat.icon,
@@ -172,16 +249,12 @@ Page({
       showDailyPlan: true
     });
 
-    // 滚动到推荐区域
+    // 向下滚动一点，确保推荐卡片在可视区域内
     setTimeout(() => {
-      wx.createSelectorQuery().select('.daily-plan-card').boundingClientRect(rect => {
-        if (rect) {
-          wx.pageScrollTo({
-            scrollTop: rect.top - 20,
-            duration: 300
-          });
-        }
-      }).exec();
+      wx.pageScrollTo({
+        scrollTop: 99999,
+        duration: 250
+      });
     }, 100);
   },
 
@@ -193,7 +266,7 @@ Page({
   // 再换一餐（单独替换某一类）
   reshuffleMeal(e) {
     const idx = e.currentTarget.dataset.index;
-    const cat = recipeData[idx];
+    const cat = rawRecipeData[idx];
     const newItem = pickOne(cat.items);
 
     const key = `dailyPlan[${idx}]`;

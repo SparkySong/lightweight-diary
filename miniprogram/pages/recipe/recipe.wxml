@@ -16,12 +16,12 @@
       </view>
       <view class="intro-text-wrap">
         <text class="intro-title">低卡食谱推荐</text>
-        <text class="intro-desc">科学搭配，控制热量不挨饿</text>
+        <text class="intro-desc">科学搭配，控制热量不挨饿 · 每日更新顺序</text>
       </view>
     </view>
   </view>
 
-  <!-- 食谱分类卡片 -->
+  <!-- 食谱分类卡片（每天顺序随机不同） -->
   <view class="category-card category-card-{{item.icon}} {{item.collapsed ? 'collapsed' : ''}}" wx:for="{{recipeList}}" wx:key="category">
     <!-- 分类头部（可点击折叠） -->
     <view class="category-header" bindtap="toggleSection" data-index="{{index}}">
@@ -68,6 +68,7 @@
       <view class="plan-title-row">
         <text class="plan-emoji">📋</text>
         <text class="plan-title">今日推荐搭配</text>
+        <text class="plan-date-label">{{todayLabel}}</text>
       </view>
       <view class="plan-close" bindtap="closeDailyPlan">
         <view class="close-x"></view>
@@ -85,7 +86,7 @@
     <!-- 每餐推荐列表 -->
     <view class="plan-meal-list">
       <view class="plan-meal-item meal-item-{{item.icon}}" wx:for="{{dailyPlan}}" wx:key="category">
-        <view class="plan-meal-left" bindtap="reshuffleMeal" data-index="{{index}}">
+        <view class="plan-meal-left">
           <view class="plan-meal-icon">{{item.emoji}}</view>
           <view class="plan-meal-info">
             <text class="plan-meal-category">{{item.category}}</text>
