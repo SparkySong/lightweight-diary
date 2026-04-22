@@ -15,13 +15,13 @@
         <view class="intro-icon icon-leaf"></view>
       </view>
       <view class="intro-text-wrap">
-        <text class="intro-title">低卡食谱推荐</text>
-        <text class="intro-desc">科学搭配，控制热量不挨饿 · 每日更新顺序</text>
+        <text class="intro-title">每日低卡食谱</text>
+        <text class="intro-desc">科学搭配，控制热量不挨饿 · 每天自动换新</text>
       </view>
     </view>
   </view>
 
-  <!-- 食谱分类卡片（每天顺序随机不同） -->
+  <!-- 食谱分类卡片（每天随机展示不同食谱） -->
   <view class="category-card category-card-{{item.icon}} {{item.collapsed ? 'collapsed' : ''}}" wx:for="{{recipeList}}" wx:key="category">
     <!-- 分类头部（可点击折叠） -->
     <view class="category-header" bindtap="toggleSection" data-index="{{index}}">

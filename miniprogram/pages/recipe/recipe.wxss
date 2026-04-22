@@ -180,6 +180,16 @@
   font-weight: 500;
 }
 
+/* 每日展示数量标签 */
+.daily-count-badge {
+  font-size: 20rpx;
+  color: var(--accent-green, #5FA895);
+  background: rgba(95, 168, 149, 0.1);
+  padding: 3rpx 12rpx;
+  border-radius: 8rpx;
+  font-weight: 600;
+}
+
 /* ========== 折叠按钮 ========== */
 .category-toggle {
   width: 48rpx;
@@ -295,6 +305,16 @@
 .tag-fiber {
   color: #7C9A8F;
   background: rgba(124, 154, 143, 0.1);
+}
+
+.tag-balanced {
+  color: #9B8BD4;
+  background: rgba(155, 139, 212, 0.12);
+}
+
+.tag-lowcal {
+  color: #C98B8B;
+  background: rgba(201, 139, 139, 0.12);
 }
 
 .tag-lowcal {
@@ -844,6 +864,11 @@
 
 .theme-light .category-limit {
   background: #F0F4F3;
+}
+
+.theme-light .daily-count-badge {
+  background: rgba(74, 155, 138, 0.08);
+  color: #4A9B8A;
 }
 
 .theme-light .category-toggle {
