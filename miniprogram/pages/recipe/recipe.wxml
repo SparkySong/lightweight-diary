@@ -1,0 +1,126 @@
+<!--pages/recipe/recipe.wxml-->
+<page class="{{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}}">
+<page-meta 
+  background-text-style="{{currentTheme === 'light' ? 'dark' : 'light'}}" 
+  background-color="{{currentTheme === 'light' ? '#F8FAF9' : '#121212'}}"
+  background-color-top="{{currentTheme === 'light' ? '#F8FAF9' : '#121212'}}"
+  background-color-bottom="{{currentTheme === 'light' ? '#F8FAF9' : '#121212'}}" />
+
+<view class="container {{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}}">
+
+  <!-- 页面简介卡片 -->
+  <view class="intro-card">
+    <view class="intro-header">
+      <view class="intro-icon-wrap">
+        <view class="intro-icon icon-leaf"></view>
+      </view>
+      <view class="intro-text-wrap">
+        <text class="intro-title">低卡食谱推荐</text>
+        <text class="intro-desc">科学搭配，控制热量不挨饿</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 食谱分类卡片 -->
+  <view class="category-card category-card-{{item.icon}} {{item.collapsed ? 'collapsed' : ''}}" wx:for="{{recipeList}}" wx:key="category">
+    <!-- 分类头部（可点击折叠） -->
+    <view class="category-header" bindtap="toggleSection" data-index="{{index}}">
+      <view class="category-left">
+        <view class="category-emoji">{{item.emoji}}</view>
+        <view class="category-info">
+          <text class="category-title">{{item.category}}推荐</text>
+          <text class="category-limit">{{item.limit}}</text>
+        </view>
+      </view>
+      <view class="category-toggle {{item.collapsed ? 'toggle-collapsed' : ''}}">
+        <view class="toggle-arrow"></view>
+      </view>
+    </view>
+
+    <!-- 食谱列表（可折叠） -->
+    <view class="category-body {{item.collapsed ? 'body-collapsed' : ''}}">
+      <!-- 顶部装饰线 -->
+      <view class="category-divider category-divider-{{item.icon}}"></view>
+
+      <view class="recipe-item" wx:for="{{item.items}}" wx:for-item="recipe" wx:key="name">
+        <view class="recipe-main">
+          <text class="recipe-name">{{recipe.name}}</text>
+          <view class="recipe-tag tag-{{recipe.tagClass}}">{{recipe.tag}}</view>
+        </view>
+        <view class="recipe-cal-wrap cal-wrap-{{item.icon}}">
+          <text class="recipe-cal-num">{{recipe.cal}}</text>
+          <text class="recipe-cal-unit">kcal</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 🎲 随机推荐今日三餐按钮 -->
+  <button class="btn-random" bindtap="randomRecommend">
+    <view class="btn-random-icon icon-dice"></view>
+    <text>🎲 随机推荐今日三餐</text>
+  </button>
+
+  <!-- 每日搭配方案卡片 -->
+  <view class="daily-plan-card {{showDailyPlan ? 'plan-show' : ''}}" wx:if="{{showDailyPlan}}">
+    <!-- 方案头部 -->
+    <view class="plan-header">
+      <view class="plan-title-row">
+        <text class="plan-emoji">📋</text>
+        <text class="plan-title">今日推荐搭配</text>
+      </view>
+      <view class="plan-close" bindtap="closeDailyPlan">
+        <view class="close-x"></view>
+      </view>
+    </view>
+
+    <!-- 总热量条 -->
+    <view class="plan-total-bar">
+      <text class="plan-total-label">全天总计</text>
+      <text class="plan-total-num">{{totalCal}}</text>
+      <text class="plan-total-unit">kcal</text>
+      <text class="plan-total-hint {{totalCal <= 1300 ? 'hint-good' : 'hint-normal'}}">{{totalCal <= 1300 ? '✨ 热量控制优秀' : '👍 合理范围内'}}</text>
+    </view>
+
+    <!-- 每餐推荐列表 -->
+    <view class="plan-meal-list">
+      <view class="plan-meal-item meal-item-{{item.icon}}" wx:for="{{dailyPlan}}" wx:key="category">
+        <view class="plan-meal-left" bindtap="reshuffleMeal" data-index="{{index}}">
+          <view class="plan-meal-icon">{{item.emoji}}</view>
+          <view class="plan-meal-info">
+            <text class="plan-meal-category">{{item.category}}</text>
+            <text class="plan-meal-name">{{item.name}}</text>
+          </view>
+        </view>
+        <view class="plan-meal-right">
+          <view class="plan-meal-tag tag-{{item.tagClass}}">{{item.tag}}</view>
+          <view class="plan-meal-cal cal-dot-{{item.icon}}">
+            <text class="plan-cal-num">{{item.cal}}</text>
+            <text class="plan-cal-unit">kcal</text>
+          </view>
+        </view>
+        <!-- 单独换一餐按钮 -->
+        <view class="plan-reshuffle-btn" bindtap="reshuffleMeal" data-index="{{index}}">
+          <text class="reshuffle-text">换一餐</text>
+          <view class="reshuffle-icon icon-refresh-sm"></view>
+        </view>
+      </view>
+    </view>
+
+    <view class="plan-footer-tip">
+      <text>点击「换一餐」可单独替换某一类食谱</text>
+    </view>
+  </view>
+
+  <!-- 底部提示 -->
+  <view class="footer">
+    <view class="footer-tips">
+      <view class="tips-icon icon-lightbulb"></view>
+      <text class="footer-text">食谱热量为估算值，实际热量因食材和烹饪方式略有差异</text>
+    </view>
+  </view>
+</view>
+
+<!-- Toast -->
+<view class="toast {{toastShow ? 'show' : ''}}">{{toastMsg}}</view>
+</page>

@@ -1,0 +1,996 @@
+/* pages/recipe/recipe.wxss */
+@import "/styles/simple-theme.wxss";
+@import "/styles/theme.wxss";
+
+/* ========== 容器 ========== */
+.container {
+  padding: 24rpx 30rpx;
+  padding-bottom: 120rpx;
+  min-height: 100vh;
+}
+
+/* ========== 页面简介卡片 ========== */
+.intro-card {
+  background: var(--card-bg, #1E1E1E);
+  border-radius: 20rpx;
+  padding: 32rpx 28rpx;
+  margin-bottom: 28rpx;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.2);
+}
+
+.intro-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4rpx;
+  background: linear-gradient(90deg, #5FA895, #7BB5AD);
+}
+
+.intro-header {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+}
+
+.intro-icon-wrap {
+  width: 76rpx;
+  height: 76rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(95, 168, 149, 0.18), rgba(95, 168, 149, 0.06));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.intro-icon {
+  color: #5FA895;
+  width: 36rpx;
+  height: 36rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-leaf {
+  width: 22rpx;
+  height: 26rpx;
+  border: 2.5rpx solid currentColor;
+  border-radius: 0 50% 0 50%;
+  position: relative;
+}
+
+.icon-leaf::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-45deg);
+  width: 12rpx;
+  height: 2rpx;
+  background: currentColor;
+}
+
+.intro-text-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6rpx;
+}
+
+.intro-title {
+  font-size: 34rpx;
+  font-weight: 700;
+  color: var(--text-primary, #F5F5F5);
+}
+
+.intro-desc {
+  font-size: 24rpx;
+  color: var(--text-secondary, #6B7280);
+  line-height: 1.4;
+}
+
+/* ========== 分类卡片 ========== */
+.category-card {
+  background: var(--card-bg, #1E1E1E);
+  border-radius: 20rpx;
+  margin-bottom: 24rpx;
+  overflow: hidden;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.15);
+  position: relative;
+  transition: box-shadow 0.3s ease;
+}
+
+/* 分类卡片顶部彩色线条 */
+.category-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4rpx;
+  z-index: 1;
+}
+
+.category-card-breakfast::before {
+  background: linear-gradient(90deg, #D4A574, #E0C098);
+}
+
+.category-card-lunch::before {
+  background: linear-gradient(90deg, #5FA895, #7BB5AD);
+}
+
+.category-card-dinner::before {
+  background: linear-gradient(90deg, #8B9EAF, #A3B4C2);
+}
+
+.category-card-snack::before {
+  background: linear-gradient(90deg, #C98B8B, #D9A5A5);
+}
+
+/* ========== 分类头部 ========== */
+.category-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24rpx 24rpx 20rpx;
+  position: relative;
+  z-index: 2;
+}
+
+.category-left {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.category-emoji {
+  width: 52rpx;
+  height: 52rpx;
+  border-radius: 14rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30rpx;
+  flex-shrink: 0;
+  background: var(--bg-secondary, #0f0f13);
+}
+
+.category-info {
+  display: flex;
+  align-items: baseline;
+  gap: 12rpx;
+}
+
+.category-title {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: var(--text-primary, #F5F5F5);
+}
+
+.category-limit {
+  font-size: 22rpx;
+  color: var(--text-secondary, #6B7280);
+  background: var(--bg-secondary, #0f0f13);
+  padding: 4rpx 14rpx;
+  border-radius: 8rpx;
+  font-weight: 500;
+}
+
+/* ========== 折叠按钮 ========== */
+.category-toggle {
+  width: 48rpx;
+  height: 48rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--bg-secondary, #0f0f13);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+}
+
+.toggle-arrow {
+  width: 14rpx;
+  height: 14rpx;
+  border-right: 3rpx solid var(--text-secondary, #6B7280);
+  border-bottom: 3rpx solid var(--text-secondary, #6B7280);
+  transform: rotate(-45deg);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-top: -4rpx;
+}
+
+.category-toggle.toggle-collapsed .toggle-arrow {
+  transform: rotate(45deg);
+  margin-top: 4rpx;
+}
+
+/* ========== 分类内容区 ========== */
+.category-body {
+  max-height: 2000rpx;
+  overflow: hidden;
+  transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+  opacity: 1;
+}
+
+.category-body.body-collapsed {
+  max-height: 0;
+  opacity: 0;
+}
+
+/* 分隔线 */
+.category-divider {
+  height: 1rpx;
+  margin: 0 24rpx;
+}
+
+.category-divider-breakfast { background: rgba(212, 165, 116, 0.15); }
+.category-divider-lunch { background: rgba(95, 168, 149, 0.15); }
+.category-divider-dinner { background: rgba(139, 158, 175, 0.15); }
+.category-divider-snack { background: rgba(201, 139, 139, 0.15); }
+
+/* ========== 食谱条目卡片 ========== */
+.recipe-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22rpx 24rpx;
+  margin: 8rpx 16rpx;
+  background: var(--item-bg, #191919);
+  border-radius: 14rpx;
+  gap: 16rpx;
+  transition: all 0.2s ease;
+}
+
+.recipe-item:active {
+  transform: scale(0.97);
+  opacity: 0.85;
+  background: var(--item-bg-active, #1F1F1F);
+}
+
+.recipe-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+  min-width: 0;
+}
+
+.recipe-name {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: var(--text-primary, #F5F5F5);
+  line-height: 1.5;
+}
+
+/* 标签样式 */
+.recipe-tag {
+  display: inline-flex;
+  align-items: center;
+  font-size: 20rpx;
+  font-weight: 600;
+  padding: 3rpx 12rpx;
+  border-radius: 6rpx;
+  width: fit-content;
+}
+
+.tag-protein {
+  color: #5FA895;
+  background: rgba(95, 168, 149, 0.1);
+}
+
+.tag-lowfat {
+  color: #8B9EAF;
+  background: rgba(139, 158, 175, 0.1);
+}
+
+.tag-lowgi {
+  color: #D4A574;
+  background: rgba(212, 165, 116, 0.1);
+}
+
+.tag-fiber {
+  color: #7C9A8F;
+  background: rgba(124, 154, 143, 0.1);
+}
+
+.tag-lowcal {
+  color: #C98B8B;
+  background: rgba(201, 139, 139, 0.1);
+}
+
+/* ========== 热量标签 ========== */
+.recipe-cal-wrap {
+  display: flex;
+  align-items: baseline;
+  gap: 2rpx;
+  flex-shrink: 0;
+  padding: 8rpx 16rpx;
+  border-radius: 12rpx;
+  background: rgba(95, 168, 149, 0.1);
+}
+
+.cal-wrap-breakfast { background: rgba(212, 165, 116, 0.1); }
+.cal-wrap-lunch { background: rgba(95, 168, 149, 0.1); }
+.cal-wrap-dinner { background: rgba(139, 158, 175, 0.1); }
+.cal-wrap-snack { background: rgba(201, 139, 139, 0.1); }
+
+.recipe-cal-num {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #5FA895;
+  line-height: 1;
+}
+
+.cal-wrap-breakfast .recipe-cal-num { color: #D4A574; }
+.cal-wrap-lunch .recipe-cal-num { color: #5FA895; }
+.cal-wrap-dinner .recipe-cal-num { color: #8B9EAF; }
+.cal-wrap-snack .recipe-cal-num { color: #C98B8B; }
+
+.recipe-cal-unit {
+  font-size: 18rpx;
+  font-weight: 500;
+  color: var(--text-secondary, #6B7280);
+}
+
+/* ========== 🎲 随机推荐按钮 ========== */
+.btn-random {
+  width: 100%;
+  background: linear-gradient(135deg, #5FA895, #4A9B8A);
+  border: none;
+  border-radius: 50rpx;
+  color: white;
+  font-size: 30rpx;
+  font-weight: 600;
+  padding: 24rpx 0;
+  margin-top: 8rpx;
+  margin-bottom: 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12rpx;
+  box-shadow: 0 6rpx 24rpx rgba(95, 168, 149, 0.3);
+  transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-random::after {
+  border: none;
+}
+
+.btn-random:active {
+  opacity: 0.88;
+  transform: scale(0.975);
+}
+
+.btn-random-icon {
+  width: 32rpx;
+  height: 32rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-dice {
+  width: 24rpx;
+  height: 24rpx;
+  border: 2.5rpx solid white;
+  border-radius: 6rpx;
+  position: relative;
+  background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
+}
+
+.icon-dice::before {
+  content: '';
+  position: absolute;
+  top: 4rpx;
+  left: 4rpx;
+  width: 5rpx;
+  height: 5rpx;
+  background: white;
+  border-radius: 50%;
+}
+
+.icon-dice::after {
+  content: '';
+  position: absolute;
+  bottom: 4rpx;
+  right: 4rpx;
+  width: 5rpx;
+  height: 5rpx;
+  background: white;
+  border-radius: 50%;
+}
+
+/* ========== 每日搭配方案卡片 ========== */
+.daily-plan-card {
+  background: var(--card-bg, #1E1E1E);
+  border-radius: 20rpx;
+  margin-bottom: 24rpx;
+  overflow: hidden;
+  box-shadow: 0 6rpx 28rpx rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  transform: translateY(30rpx);
+  transition: all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+  pointer-events: none;
+  position: relative;
+}
+
+.daily-plan-card.plan-show {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.daily-plan-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4rpx;
+  background: linear-gradient(90deg, #5FA895, #D4A574, #8B9EAF, #C98B8B);
+}
+
+/* 方案头部 */
+.plan-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 26rpx 28rpx 16rpx;
+}
+
+.plan-title-row {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.plan-emoji {
+  font-size: 32rpx;
+}
+
+.plan-title {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: var(--text-primary, #F5F5F5);
+}
+
+.plan-close {
+  width: 44rpx;
+  height: 44rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--bg-secondary, #0f0f13);
+  flex-shrink: 0;
+}
+
+.close-x {
+  width: 18rpx;
+  height: 18rpx;
+  position: relative;
+}
+
+.close-x::before,
+.close-x::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 16rpx;
+  height: 2.5rpx;
+  background: var(--text-secondary, #6B7280);
+  border-radius: 2rpx;
+}
+
+.close-x::before {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.close-x::after {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+/* 总热量条 */
+.plan-total-bar {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  padding: 16rpx 28rpx;
+  margin: 0 28rpx;
+  background: rgba(95, 168, 149, 0.08);
+  border-radius: 12rpx;
+  flex-wrap: wrap;
+}
+
+.plan-total-label {
+  font-size: 23rpx;
+  color: var(--text-secondary, #6B7280);
+  font-weight: 500;
+}
+
+.plan-total-num {
+  font-size: 36rpx;
+  font-weight: 800;
+  color: #5FA895;
+  line-height: 1;
+}
+
+.plan-total-unit {
+  font-size: 22rpx;
+  color: var(--text-secondary, #6B7280);
+  font-weight: 500;
+}
+
+.plan-total-hint {
+  font-size: 20rpx;
+  font-weight: 600;
+  padding: 3rpx 10rpx;
+  border-radius: 6rpx;
+  margin-left: auto;
+}
+
+.hint-good {
+  color: #5FA895;
+  background: rgba(95, 168, 149, 0.12);
+}
+
+.hint-normal {
+  color: #D4A574;
+  background: rgba(212, 165, 116, 0.12);
+}
+
+/* 每餐列表 */
+.plan-meal-list {
+  padding: 8rpx 20rpx 20rpx;
+}
+
+.plan-meal-item {
+  display: flex;
+  align-items: center;
+  padding: 20rpx 18rpx;
+  margin: 10rpx 0;
+  background: var(--item-bg, #191919);
+  border-radius: 16rpx;
+  gap: 14rpx;
+  position: relative;
+  border-left: 5rpx solid transparent;
+  transition: all 0.25s ease;
+}
+
+.meal-item-breakfast { border-left-color: #D4A574; }
+.meal-item-lunch { border-left-color: #5FA895; }
+.meal-item-dinner { border-left-color: #8B9EAF; }
+.meal-item-snack { border-left-color: #C98B8B; }
+
+.plan-meal-left {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+  min-width: 0;
+}
+
+.plan-meal-icon {
+  width: 52rpx;
+  height: 52rpx;
+  border-radius: 14rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+  flex-shrink: 0;
+  background: var(--bg-secondary, #0f0f13);
+}
+
+.plan-meal-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+  min-width: 0;
+}
+
+.plan-meal-category {
+  font-size: 21rpx;
+  font-weight: 600;
+  color: var(--text-secondary, #6B7280);
+}
+
+.plan-meal-name {
+  font-size: 25rpx;
+  font-weight: 600;
+  color: var(--text-primary, #F5F5F5);
+  line-height: 1.4;
+}
+
+.plan-meal-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6rpx;
+  flex-shrink: 0;
+}
+
+.plan-meal-tag {
+  display: inline-flex;
+  font-size: 18rpx;
+  font-weight: 600;
+  padding: 2rpx 10rpx;
+  border-radius: 5rpx;
+  width: fit-content;
+}
+
+.plan-meal-cal {
+  display: flex;
+  align-items: baseline;
+  gap: 2rpx;
+  padding: 5rpx 12rpx;
+  border-radius: 8rpx;
+}
+
+.cal-dot-breakfast { background: rgba(212, 165, 116, 0.12); }
+.cal-dot-lunch { background: rgba(95, 168, 149, 0.12); }
+.cal-dot-dinner { background: rgba(139, 158, 175, 0.12); }
+.cal-dot-snack { background: rgba(201, 139, 139, 0.12); }
+
+.plan-cal-num {
+  font-size: 26rpx;
+  font-weight: 700;
+  color: #5FA895;
+  line-height: 1;
+}
+
+.cal-dot-breakfast .plan-cal-num { color: #D4A574; }
+.cal-dot-lunch .plan-cal-num { color: #5FA895; }
+.cal-dot-dinner .plan-cal-num { color: #8B9EAF; }
+.cal-dot-snack .plan-cal-num { color: #C98B8B; }
+
+.plan-cal-unit {
+  font-size: 17rpx;
+  font-weight: 500;
+  color: var(--text-secondary, #6B7280);
+}
+
+/* 换一餐按钮 */
+.plan-reshuffle-btn {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+  padding: 8rpx 16rpx;
+  border-radius: 20rpx;
+  background: rgba(95, 168, 149, 0.08);
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.plan-reshuffle-btn:active {
+  background: rgba(95, 168, 149, 0.18);
+  transform: scale(0.94);
+}
+
+.reshuffle-text {
+  font-size: 20rpx;
+  font-weight: 600;
+  color: #5FA895;
+}
+
+.reshuffle-icon {
+  width: 22rpx;
+  height: 22rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-refresh-sm {
+  width: 16rpx;
+  height: 16rpx;
+  border: 2rpx solid #5FA895;
+  border-radius: 50%;
+  border-top-color: transparent;
+  transform: rotate(0deg);
+  transition: transform 0.35s ease;
+}
+
+.plan-reshuffle-btn:active .icon-refresh-sm {
+  transform: rotate(180deg);
+}
+
+/* 底部提示 */
+.plan-footer-tip {
+  text-align: center;
+  padding: 12rpx 28rpx 20rpx;
+}
+
+.plan-footer-tip text {
+  font-size: 21rpx;
+  color: var(--text-tertiary, #4B5563);
+}
+
+/* ========== 底部提示 ========== */
+.footer {
+  text-align: center;
+  padding: 16rpx 0;
+}
+
+.footer-tips {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 8rpx;
+}
+
+.footer-text {
+  font-size: 22rpx;
+  color: var(--text-tertiary, #4B5563);
+  line-height: 1.5;
+}
+
+.tips-icon {
+  width: 24rpx;
+  height: 24rpx;
+  flex-shrink: 0;
+  margin-top: 2rpx;
+  color: var(--text-secondary, #6B7280);
+}
+
+.tips-icon.icon-lightbulb {
+  width: 18rpx;
+  height: 22rpx;
+  border: 2px solid currentColor;
+  border-radius: 50% 50% 30% 30%;
+  position: relative;
+}
+
+.tips-icon.icon-lightbulb::before {
+  content: '';
+  position: absolute;
+  bottom: -6rpx;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 10rpx;
+  height: 4rpx;
+  border: 2rpx solid currentColor;
+  border-top: none;
+  border-radius: 0 0 3rpx 3rpx;
+}
+
+/* ========== Toast ========== */
+.toast {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.8);
+  background: var(--card-bg, #1E1E1E);
+  border: 1rpx solid #5FA895;
+  color: #5FA895;
+  padding: 24rpx 48rpx;
+  border-radius: 16rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+  z-index: 100000;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 16rpx 48rpx rgba(0, 0, 0, 0.4);
+  text-align: center;
+  max-width: 80%;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+/* ========================================
+   浅色主题
+   ======================================== */
+.theme-light {
+  --card-bg: #FFFFFF;
+  --item-bg: #F8FAF9;
+  --item-bg-active: #F0F4F3;
+  --bg-secondary: #F0F4F3;
+  --text-primary: #1A1A1A;
+  --text-secondary: #6B7280;
+  --text-tertiary: #9CA3AF;
+  --border-color: #E5E7EB;
+  --bar-bg: #F3F4F6;
+}
+
+.theme-light .intro-card {
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.06);
+}
+
+.theme-light .intro-icon-wrap {
+  background: linear-gradient(135deg, rgba(74, 155, 138, 0.12), rgba(74, 155, 138, 0.04));
+}
+
+.theme-light .intro-icon {
+  color: #4A9B8A;
+}
+
+.theme-light .icon-leaf {
+  color: #4A9B8A;
+}
+
+.theme-light .intro-card::before {
+  background: linear-gradient(90deg, #4A9B8A, #6BADA0);
+}
+
+/* 分类卡片浅色 */
+.theme-light .category-card {
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.05);
+}
+
+.theme-light .category-emoji {
+  background: #F0F4F3;
+}
+
+.theme-light .category-limit {
+  background: #F0F4F3;
+}
+
+.theme-light .category-toggle {
+  background: #F0F4F3;
+}
+
+/* 食谱条目浅色 */
+.theme-light .recipe-item {
+  background: #F8FAF9;
+}
+
+.theme-light .recipe-item:active {
+  background: #F0F4F3;
+}
+
+/* 分隔线浅色 */
+.theme-light .category-divider-breakfast { background: rgba(196, 154, 108, 0.12); }
+.theme-light .category-divider-lunch { background: rgba(74, 155, 138, 0.12); }
+.theme-light .category-divider-dinner { background: rgba(122, 142, 159, 0.12); }
+.theme-light .category-divider-snack { background: rgba(184, 123, 123, 0.12); }
+
+/* 标签浅色 */
+.theme-light .tag-protein {
+  color: #4A9B8A;
+  background: rgba(74, 155, 138, 0.08);
+}
+
+.theme-light .tag-lowfat {
+  color: #7A8E9F;
+  background: rgba(122, 142, 159, 0.08);
+}
+
+.theme-light .tag-lowgi {
+  color: #C49A6C;
+  background: rgba(196, 154, 108, 0.08);
+}
+
+.theme-light .tag-fiber {
+  color: #6B9080;
+  background: rgba(107, 144, 128, 0.08);
+}
+
+.theme-light .tag-lowcal {
+  color: #B87B7B;
+  background: rgba(184, 123, 123, 0.08);
+}
+
+/* 热量标签浅色 */
+.theme-light .cal-wrap-breakfast { background: rgba(196, 154, 108, 0.08); }
+.theme-light .cal-wrap-lunch { background: rgba(74, 155, 138, 0.08); }
+.theme-light .cal-wrap-dinner { background: rgba(122, 142, 159, 0.08); }
+.theme-light .cal-wrap-snack { background: rgba(184, 123, 123, 0.08); }
+
+.theme-light .cal-wrap-breakfast .recipe-cal-num { color: #C49A6C; }
+.theme-light .cal-wrap-lunch .recipe-cal-num { color: #4A9B8A; }
+.theme-light .cal-wrap-dinner .recipe-cal-num { color: #7A8E9F; }
+.theme-light .cal-wrap-snack .recipe-cal-num { color: #B87B7B; }
+
+/* 分类顶部线浅色 */
+.theme-light .category-card-breakfast::before {
+  background: linear-gradient(90deg, #C49A6C, #D4B48C);
+}
+
+.theme-light .category-card-lunch::before {
+  background: linear-gradient(90deg, #4A9B8A, #6BADA0);
+}
+
+.theme-light .category-card-dinner::before {
+  background: linear-gradient(90deg, #7A8E9F, #97AAB8);
+}
+
+.theme-light .category-card-snack::before {
+  background: linear-gradient(90deg, #B87B7B, #CE9E9E);
+}
+
+/* 随机推荐按钮浅色 */
+.theme-light .btn-random {
+  background: linear-gradient(135deg, #4A9B8A, #3D8B7A);
+  box-shadow: 0 6rpx 24rpx rgba(74, 155, 138, 0.25);
+}
+
+/* 每日搭配方案卡片浅色 */
+.theme-light .daily-plan-card {
+  box-shadow: 0 6rpx 28rpx rgba(0, 0, 0, 0.08);
+}
+
+.theme-light .plan-close {
+  background: #F0F4F3;
+}
+
+.theme-light .close-x::before,
+.theme-light .close-x::after {
+  background: #9CA3AF;
+}
+
+.theme-light .plan-total-bar {
+  background: rgba(74, 155, 138, 0.06);
+}
+
+.theme-light .plan-total-num {
+  color: #4A9B8A;
+}
+
+.theme-light .hint-good {
+  color: #4A9B8A;
+  background: rgba(74, 155, 138, 0.1);
+}
+
+.theme-light .hint-normal {
+  color: #C49A6C;
+  background: rgba(196, 154, 108, 0.1);
+}
+
+/* 每餐条目浅色 */
+.theme-light .plan-meal-item {
+  background: #F8FAF9;
+}
+
+.theme-light .plan-meal-icon {
+  background: #F0F4F3;
+}
+
+/* 换一餐按钮浅色 */
+.theme-light .plan-reshuffle-btn {
+  background: rgba(74, 155, 138, 0.06);
+}
+
+.theme-light .plan-reshuffle-btn:active {
+  background: rgba(74, 155, 138, 0.14);
+}
+
+.theme-light .reshuffle-text {
+  color: #4A9B8A;
+}
+
+.theme-light .icon-refresh-sm {
+  border-color: #4A9B8A;
+}
+
+.theme-light .cal-dot-breakfast { background: rgba(196, 154, 108, 0.07); }
+.theme-light .cal-dot-lunch { background: rgba(74, 155, 138, 0.07); }
+.theme-light .cal-dot-dinner { background: rgba(122, 142, 159, 0.07); }
+.theme-light .cal-dot-snack { background: rgba(184, 123, 123, 0.07); }
+
+.theme-light .cal-dot-breakfast .plan-cal-num { color: #C49A6C; }
+.theme-light .cal-dot-lunch .plan-cal-num { color: #4A9B8A; }
+.theme-light .cal-dot-dinner .plan-cal-num { color: #7A8E9F; }
+.theme-light .cal-dot-snack .plan-cal-num { color: #B87B7B; }
+
+/* Toast 浅色 */
+.theme-light .toast {
+  background: #FFFFFF;
+  border-color: #4A9B8A;
+  color: #4A9B8A;
+  box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.1);
+}
+
+.theme-light .tips-icon {
+  color: #9CA3AF;
+}

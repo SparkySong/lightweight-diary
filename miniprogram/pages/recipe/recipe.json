@@ -1,0 +1,8 @@
+{
+  "usingComponents": {},
+  "navigationBarTitleText": "低卡食谱推荐",
+  "navigationBarBackgroundColor": "#121212",
+  "navigationBarTextStyle": "white",
+  "navigationStyle": "default",
+  "enablePullDownRefresh": false
+}

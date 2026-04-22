@@ -3,7 +3,8 @@
     "pages/index/index",
     "pages/diet/diet",
     "pages/profile/profile",
-    "pages/calorie-detail/calorie-detail"
+    "pages/calorie-detail/calorie-detail",
+    "pages/recipe/recipe"
   ],
   "darkmode": true,
   "window": {

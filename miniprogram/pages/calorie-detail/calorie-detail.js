@@ -721,9 +721,8 @@ Page({
 
   // 查看食谱
   goToRecipe() {
-    wx.showToast({
-      title: '食谱功能开发中',
-      icon: 'none'
+    wx.navigateTo({
+      url: '/pages/recipe/recipe'
     });
   },
 

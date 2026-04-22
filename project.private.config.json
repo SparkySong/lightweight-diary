@@ -29,11 +29,18 @@
     "miniprogram": {
       "list": [
         {
-          "name": "pages/calorie-detail/calorie-detail",
-          "pathName": "pages/calorie-detail/calorie-detail",
+          "name": "pages/recipe/recipe",
+          "pathName": "pages/recipe/recipe",
           "query": "",
           "scene": null,
           "launchMode": "default"
+        },
+        {
+          "name": "pages/calorie-detail/calorie-detail",
+          "pathName": "pages/calorie-detail/calorie-detail",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
         }
       ]
     }
