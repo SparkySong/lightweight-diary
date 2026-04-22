@@ -282,8 +282,8 @@
   </view>
 </view>
 
-<!-- 编辑身高时的遮罩层 -->
-<view class="height-edit-mask {{showHeightInput ? 'show' : ''}} {{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}}" bindtap="onMaskTap"></view>
+<!-- 编辑身高时的遮罩层（仅在修改已有身高时显示，首次设置不显示） -->
+<view class="height-edit-mask {{showHeightInput && height ? 'show' : ''}} {{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}}" bindtap="onMaskTap"></view>
 
 <!-- 编辑体重弹窗 -->
 <view class="edit-panel-mask {{showEditPanel ? 'show' : ''}} {{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}}" bindtap="closeEditPanel"></view>
