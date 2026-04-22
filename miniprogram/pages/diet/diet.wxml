@@ -157,7 +157,7 @@
           </view>
         </view>
         <view class="food-tags">
-          <view class="food-tag" wx:for="{{meal.foods}}" wx:index="idx2" wx:for-item="food" wx:for-index2="fi">
+          <view class="food-tag" wx:for="{{meal.foods}}" wx:key="name" wx:index="idx2" wx:for-item="food" wx:for-index2="fi">
             <text>{{food.name}}</text>
             <text class="food-tag-cal" wx:if="{{food.calories}}">{{food.calories}}cal</text>
           </view>
