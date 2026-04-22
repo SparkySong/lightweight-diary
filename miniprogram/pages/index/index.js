@@ -1026,6 +1026,27 @@ Page({
     });
   },
 
+  // 分享给好友
+  onShareAppMessage() {
+    const { currentWeight, totalLost, daysCount } = this.data;
+    return {
+      title: daysCount > 0
+        ? `我已连续打卡${daysCount}天，当前体重${currentWeight}，已减${totalLost}`
+        : '📏 体重打卡记录 · 轻松管理每日体重',
+      path: '/pages/index/index',
+      imageUrl: ''
+    };
+  },
+
+  // 分享到朋友圈
+  onShareTimeline() {
+    return {
+      title: `📏 每日体重打卡 · 已坚持${this.data.daysCount || 0}天`,
+      query: '',
+      imageUrl: ''
+    };
+  },
+
   showToast(msg) {
     this.setData({ toastMsg: msg, toastShow: true });
     setTimeout(() => this.setData({ toastShow: false }), 2000);
