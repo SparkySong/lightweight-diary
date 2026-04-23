@@ -301,24 +301,41 @@ Page({
   // 格式化记录用于显示（根据体重单位转换）
   formatRecordsForDisplay(records, weightUnit) {
     const isJin = weightUnit === 'jin';
-    return records.map(record => {
+    const formatted = records.map(record => {
       // 确保转换为数字类型
       const originalWeight = parseFloat(record.weight);
       // 转换为显示用的单位
       const displayWeight = isJin ? originalWeight * KG_TO_JIN : originalWeight;
-      // diff 也需要转换单位
-      const displayDiff = (record.diff !== undefined && record.diff !== null)
-        ? (isJin ? record.diff * KG_TO_JIN : record.diff)
-        : undefined;
       return {
         ...record,
         originalWeight: originalWeight,  // 保留原始 kg 值
         weight: displayWeight,  // 数值类型，用于统计计算
         weightStr: displayWeight.toFixed(1),  // 字符串类型，用于显示
         displayWeight: displayWeight.toFixed(1),
-        displayDiff: displayDiff,  // 转换后的 diff
-        dateStr: record.date
+        dateStr: record.dateStr || record.date
       };
+    });
+
+    // 🔑 关键修复：使用转换后的重量值重新计算 diff，避免先四舍五入再放大误差
+    // 按日期升序排列，用转换后的值逐条计算差值
+    const sortedAsc = [...formatted].sort((a, b) => a.date.localeCompare(b.date));
+    const diffMap = {};
+    sortedAsc.forEach((r, i) => {
+      if (i > 0) {
+        // 用已转换的 displayWeight 计算，确保显示精度正确
+        diffMap[r._id || r.date] = parseFloat((r.weight - sortedAsc[i - 1].weight).toFixed(1));
+      }
+    });
+
+    // 将重新计算的 diff 写回结果
+    return formatted.map(r => {
+      const recalculatedDiff = diffMap[r._id || r.date];
+      const displayDiff = recalculatedDiff !== undefined ? recalculatedDiff : (
+        (r.diff !== undefined && r.diff !== null)
+          ? (isJin ? r.diff * KG_TO_JIN : r.diff)
+          : undefined
+      );
+      return { ...r, displayDiff };
     });
   },
   
