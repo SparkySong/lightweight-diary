@@ -90,7 +90,7 @@ Page({
     this.loadUserData();
   },
 
-  // 同步初始化基础数据（立即可用）
+  // 同步初始化基础数据（立即可用，优先从本地读取避免闪烁）
   initBasicData() {
     const nickname = wx.getStorageSync('nickname') || '轻体用户';
     const avatarUrl = wx.getStorageSync('avatarUrl') || DEFAULT_AVATAR;
@@ -104,8 +104,19 @@ Page({
     const goalWeight = goalWeightKg ? (weightUnit === 'jin' ? goalWeightKg * KG_TO_JIN : goalWeightKg) : null;
     const currentWeight = currentWeightKg ? (weightUnit === 'jin' ? currentWeightKg * KG_TO_JIN : currentWeightKg) : null;
     const height = wx.getStorageSync('userHeight') || null;
-    // 热量目标暂不设置，等云端返回后再更新
-    this.setData({ nickname, avatarUrl, height, goalWeight, currentWeight, weightUnit, calorieUnit, calorieGoal: 0, calorieGoalDisplay: '未设置' });
+
+    // 🔑 优化：优先从本地缓存读取热量目标，避免"未设置→有数字"的闪烁
+    const cachedCalorieGoal = wx.getStorageSync('localCalorieGoal') || 0;
+    let calorieGoalDisplay = '未设置';
+    if (cachedCalorieGoal > 0) {
+      if (calorieUnit === 'kj') {
+        calorieGoalDisplay = Math.round(cachedCalorieGoal * 4.184) + ' kJ';
+      } else {
+        calorieGoalDisplay = cachedCalorieGoal + ' kcal';
+      }
+    }
+
+    this.setData({ nickname, avatarUrl, height, goalWeight, currentWeight, weightUnit, calorieUnit, calorieGoal: cachedCalorieGoal, calorieGoalDisplay });
     this.loadStats(goalWeightKg);
   },
 
@@ -228,13 +239,19 @@ Page({
       currentWeight = weightUnit === 'jin' ? latestWeightKg * KG_TO_JIN : latestWeightKg;
     }
 
-    // 从云端获取热量目标
-    let calorieGoal = 0;
+    // 从云端获取热量目标，优先使用本地缓存
+    let calorieGoal = wx.getStorageSync('localCalorieGoal') || 0;
     try {
       const res = await wx.cloud.callFunction({ name: 'getUserSettings', data: {} });
-      calorieGoal = res.result.settings?.dailyCalorieTarget || 0;
+      const cloudCalorieGoal = res.result.settings?.dailyCalorieTarget || 0;
+      if (cloudCalorieGoal > 0) {
+        // 云端有数据：缓存到本地（下次直接读取）
+        calorieGoal = cloudCalorieGoal;
+        wx.setStorageSync('localCalorieGoal', cloudCalorieGoal);
+      }
+      // 如果云端返回 0 但本地有缓存值，保留本地缓存（避免闪烁回"未设置"）
     } catch (e) {
-      console.warn('获取云端热量目标失败', e);
+      console.warn('获取云端热量目标失败，使用本地缓存', e);
     }
 
     // 更新热量目标显示
@@ -635,6 +652,8 @@ loadStats(goalWeight) {
         name: 'saveUserSettings',
         data: { dailyCalorieTarget: val }
       });
+      // 🔑 保存成功后立即更新本地缓存
+      wx.setStorageSync('localCalorieGoal', val);
       this.showToast('热量目标已设置 🔥');
     } catch (e) {
       console.error('保存热量目标失败', e);
@@ -753,6 +772,7 @@ loadStats(goalWeight) {
             wx.removeStorageSync('nickname');
             wx.removeStorageSync('userHeight');
             wx.removeStorageSync('calorieGoal');
+            wx.removeStorageSync('localCalorieGoal');
             // 保留主题和单位设置
             const appTheme = wx.getStorageSync('appTheme');
             const weightUnit = wx.getStorageSync('weightUnit');
