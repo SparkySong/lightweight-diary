@@ -1,13 +1,13 @@
 <!--pages/diet/diet.wxml-->
-<page class="{{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}}">
-<!-- 页面元信息，用于动态设置背景色和下拉刷新样式 -->
-<page-meta 
-  background-text-style="{{currentTheme === 'light' ? 'dark' : 'light'}}" 
-  background-color="{{currentTheme === 'light' ? '#F8FAF9' : '#121212'}}" 
+<!-- 页面元信息，用于动态设置背景色和下拉刷新样式（必须作为页面第一个节点）-->
+<page-meta
+  background-text-style="{{currentTheme === 'light' ? 'dark' : 'light'}}"
+  background-color="{{currentTheme === 'light' ? '#F8FAF9' : '#121212'}}"
   background-color-top="{{currentTheme === 'light' ? '#F8FAF9' : '#121212'}}"
   background-color-bottom="{{currentTheme === 'light' ? '#F8FAF9' : '#121212'}}"
   navigation-bar-style="{{currentTheme === 'light' ? 'dark' : 'light'}}"
 />
+<page class="{{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}}">
 
 <!-- 自定义导航栏区域（完全隐藏原生状态栏，用背景色覆盖） -->
 <view class="custom-nav-area"></view>

@@ -268,7 +268,8 @@ Page({
     try {
       const res = await wx.cloud.callFunction({
         name: 'getRecords',
-        data: { range: this.data.chartRange }
+        data: { range: this.data.chartRange },
+        timeout: 15000
       });
       let allRecords = res.result.data || [];
       
@@ -386,7 +387,7 @@ Page({
       
       // 如果本地没有，尝试从云端获取
       if (!goal) {
-        const res = await wx.cloud.callFunction({ name: 'getGoal' });
+        const res = await wx.cloud.callFunction({ name: 'getGoal', timeout: 15000 });
         goal = res.result.goal;
       }
       
@@ -410,7 +411,7 @@ Page({
 
   async loadProfile() {
     try {
-      const res = await wx.cloud.callFunction({ name: 'getProfile' });
+      const res = await wx.cloud.callFunction({ name: 'getProfile', timeout: 15000 });
       const { height, reminder } = res.result;
       this.setData({
         height: height,
