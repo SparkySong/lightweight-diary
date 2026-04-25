@@ -4,15 +4,28 @@ cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 const db = cloud.database();
 const _ = db.command;
 
-// 使用用户提供的订阅消息模板ID
-const TEMPLATE_ID = '5X2tUq0NbycqoeFiymKj4FiKaLts5K5ZdSgzqHf4Lt4';
+// 使用环境变量优先，fallback到硬编码值（便于本地开发调试）
+const TEMPLATE_ID = process.env.TEMPLATE_ID || '5X2tUq0NbycqoeFiymKj4FiKaLts5K5ZdSgzqHf4Lt4';
+
+// 云函数执行限制
+const MAX_EXECUTION_TIME = 15000; // 最大执行时间 15s（云函数默认超时20s，预留余量）
+
+/**
+ * 获取 UTC+8 时区的日期字符串（正确处理跨天场景）
+ */
+function getUTC8DateStr(d) {
+  const utc8 = new Date(d.getTime() + (8 * 60 * 60 * 1000));
+  return `${utc8.getUTCFullYear()}-${String(utc8.getUTCMonth() + 1).padStart(2, '0')}-${String(utc8.getUTCDate()).padStart(2, '0')}`;
+}
 
 exports.main = async (event, context) => {
+  const startTime = Date.now();
   const now = new Date();
-  // 当前小时（UTC+8）
-  const currentHour = now.getUTCHours() + 8;
-  const adjustedHour = currentHour >= 24 ? currentHour - 24 : currentHour;
-  const currentMinute = now.getUTCMinutes();
+
+  // 使用 Intl API 或手动构造 UTC+8 时间，正确处理跨午夜场景
+  const utc8Now = new Date(now.getTime() + (8 * 60 * 60 * 1000));
+  const adjustedHour = utc8Now.getUTCHours();
+  const currentMinute = utc8Now.getUTCMinutes();
 
   // 获取所有开启提醒的用户
   // 分页获取，突破默认100条限制
@@ -31,7 +44,14 @@ exports.main = async (event, context) => {
 
   const results = [];
 
-  for (const user of allUsers) {
+  for (let i = 0; i < allUsers.length; i++) {
+    // 超时保护：接近云函数超时限制时停止处理
+    if (Date.now() - startTime > MAX_EXECUTION_TIME) {
+      console.warn(`[sendReminder] 接近超时限制，已处理 ${i}/${allUsers.length} 个用户，停止处理`);
+      break;
+    }
+
+    const user = allUsers[i];
     // 检查订阅是否过期（7天有效期）
     if (user.expireTime && new Date(user.expireTime) < now) {
       await db.collection('user_reminders').doc(user._id).update({
@@ -54,7 +74,7 @@ exports.main = async (event, context) => {
     }
 
     // 检查今日是否已发送过
-    const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    const todayStr = getUTC8DateStr(now);
     if (user.lastSentDate === todayStr) {
       results.push({ openid: user.openid, status: 'already_sent' });
       continue;
@@ -72,7 +92,7 @@ exports.main = async (event, context) => {
         ? `${latestWeight.data[0].weight} kg`
         : '暂无记录';
 
-      const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+      const today = getUTC8DateStr(now);
 
       await cloud.openapi.subscribeMessage.send({
         touser: user.openid,
@@ -104,5 +124,5 @@ exports.main = async (event, context) => {
     }
   }
 
-  return { total: allUsers.length, sent: results.filter(r => r.status === 'sent').length, results };
+  return { total: allUsers.length, processed: results.length, sent: results.filter(r => r.status === 'sent').length, results };
 };

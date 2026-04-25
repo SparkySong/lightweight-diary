@@ -121,6 +121,12 @@ Page({
     // 🔑 关键修复：立即同步刷新主题，再加载数据
     this.initWeightUnit();
     this.initTheme(); // 在数据加载前立即同步主题
+
+    // 防抖：避免频繁切换tab时重复加载（3秒内不重复加载）
+    const now = Date.now();
+    if (this._lastLoadTime && (now - this._lastLoadTime < 3000)) return;
+    this._lastLoadTime = now;
+
     this.loadAll();
   },
 
@@ -590,7 +596,8 @@ Page({
 
   // 请求订阅消息并保存设置到云端
   async requestSubscribeAndSave(remindTime) {
-    const templateId = '5X2tUq0NbycqoeFiymKj4FiKaLts5K5ZdSgzqHf4Lt4';
+    // 模板ID统一从配置获取，避免硬编码散落在多处
+    const templateId = app.globalData?.subscribeTemplateId || '5X2tUq0NbycqoeFiymKj4FiKaLts5K5ZdSgzqHf4Lt4';
     try {
       const res = await wx.requestSubscribeMessage({
         tmplIds: [templateId]

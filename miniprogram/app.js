@@ -344,6 +344,7 @@ App({
     userInfo: null,
     theme: 'dark', // 默认为深色模式
     tabBarConfig: null,
-    weightUnit: 'kg' // 体重单位
+    weightUnit: 'kg', // 体重单位
+    subscribeTemplateId: '5X2tUq0NbycqoeFiymKj4FiKaLts5K5ZdSgzqHf4Lt4' // 订阅消息模板ID（统一管理，避免硬编码散落）
   }
 });
