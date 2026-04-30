@@ -78,11 +78,18 @@ Page({
     toastShow: false,
     // 昵称编辑
     showNicknameEdit: false,
-    editNickname: ''
+    editNickname: '',
+    // 防闪炃：主题切换后第一次切 tab 时短暂隐藏页面
+    hidePage: false
   },
 
   onLoad() {
-    // 🔑 关键修复：立即同步设置主题，避免切换页面时闪烁
+    // 接力主题切换的 loading 遮罩，覆盖 reLaunch 瓦解瞬间的系统壳层过渡帧
+    if (wx.getStorageSync('pendingThemeToast')) {
+      wx.showLoading({ title: '切换中...', mask: true });
+      setTimeout(() => wx.hideLoading(), 250);
+    }
+    // 🔑 关键修复：立即同步设置主题，避免切换页面时闪炃
     this.initTheme();
     // 同步初始化基础数据（避免异步加载未完成时弹窗为空）
     this.initBasicData();
@@ -122,10 +129,19 @@ Page({
 
   onShow() {
     this.initTheme();
+    this.showPendingThemeToast(); // 显示 reLaunch 后的主题切换提示
     // 每次显示都同步刷新本地数据（确保其他页面修改后数据最新）
     this.initBasicData();
     // 异步从云端拉取最新数据更新
     this.loadUserData();
+  },
+
+  // 读取 reLaunch 前存入的主题切换提示并显示一次
+  showPendingThemeToast() {
+    const msg = wx.getStorageSync('pendingThemeToast');
+    if (!msg) return;
+    wx.removeStorageSync('pendingThemeToast');
+    this.showToast(msg);
   },
 
   onTabItemTap() {
@@ -143,12 +159,11 @@ Page({
       this.data.themeDesc !== themeDesc
     ) {
       this.setData({ currentTheme: effectiveTheme, themeSetting, themeDesc });
+      // 仅主题变化时才调用原生API
+      this.setNavigationBarColor(effectiveTheme);
+      this.setPullDownRefreshBg(effectiveTheme);
+      app.applyThemeToTabBar();
     }
-    // 设置状态栏颜色
-    this.setNavigationBarColor(effectiveTheme);
-    // 设置下拉刷新背景色
-    this.setPullDownRefreshBg(effectiveTheme);
-    app.applyThemeToTabBar();
   },
 
   onThemeChange() {
@@ -156,11 +171,9 @@ Page({
     const effectiveTheme = app.getEffectiveTheme();
     const themeDesc = this.calcThemeDesc(themeSetting);
     this.setData({ currentTheme: effectiveTheme, themeSetting, themeDesc });
-    // 设置状态栏颜色
     this.setNavigationBarColor(effectiveTheme);
-    // 设置下拉刷新背景色
     this.setPullDownRefreshBg(effectiveTheme);
-    app.applyThemeToTabBar();
+    // applyThemeToTabBar 由 applyThemeWithSystem 调用，此处不重复
   },
 
   // 设置状态栏颜色
@@ -169,13 +182,13 @@ Page({
       wx.setNavigationBarColor({
         frontColor: '#000000',
         backgroundColor: '#f8f9fa',
-        animation: { duration: 200, timingFunc: 'easeInOut' }
+        animation: { duration: 0, timingFunc: 'linear' }
       });
     } else {
       wx.setNavigationBarColor({
         frontColor: '#ffffff',
         backgroundColor: '#0f0f13',
-        animation: { duration: 200, timingFunc: 'easeInOut' }
+        animation: { duration: 0, timingFunc: 'linear' }
       });
     }
   },
@@ -734,11 +747,23 @@ loadStats(goalWeight) {
     app.applyThemeToTabBar();
     app.notifyThemeChange(effectiveTheme);
 
+    // 记录切换后的提示文案，reLaunch 后由新页面读取并显示
     let toastMsg = '';
     if (themeSetting === 'system') toastMsg = '已切换到跟随系统 📱';
     else if (themeSetting === 'dark') toastMsg = '切换到深色模式 🌙';
     else toastMsg = '切换到浅色模式 ☀️';
-    this.showToast(toastMsg);
+    wx.setStorageSync('pendingThemeToast', toastMsg);
+
+    // 显示 loading 遮罩 → reLaunch 到当前 tab，彻底重置所有 tab 的 WebView，消除闪炃
+    wx.showLoading({ title: '切换中...', mask: true });
+    setTimeout(() => {
+      wx.reLaunch({
+        url: '/pages/profile/profile',
+        complete: () => {
+          wx.hideLoading();
+        }
+      });
+    }, 250);
   },
 
   // ========== 数据管理 ==========

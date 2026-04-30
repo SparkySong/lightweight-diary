@@ -105,10 +105,17 @@ Page({
     // 导航栏胶囊按钮适配
     navBarRightPadding: 0,    // 胶囊按钮右侧安全距离
     statusBarHeight: 0,       // 状态栏高度
+    // 防闪炃：主题切换后第一次切 tab 时短暂隐藏页面
+    hidePage: false,
   },
 
   onLoad() {
-    // 🔑 关键修复：立即同步设置主题，避免切换页面时闪烁
+    // 接力主题切换的 loading 遮罩，覆盖 reLaunch 瓦解瞬间的系统壳层过渡帧
+    if (wx.getStorageSync('pendingThemeToast')) {
+      wx.showLoading({ title: '切换中...', mask: true });
+      setTimeout(() => wx.hideLoading(), 250);
+    }
+    // 🔑 关键修复：立即同步设置主题，避免切换页面时闪炃
     this.setTodayDate();
     this.initWeightUnit();
     this.initNavBarPadding();  // 计算胶囊按钮安全距离
@@ -121,6 +128,7 @@ Page({
     // 🔑 关键修复：立即同步刷新主题，再加载数据
     this.initWeightUnit();
     this.initTheme(); // 在数据加载前立即同步主题
+    this.showPendingThemeToast(); // 显示 reLaunch 后的主题切换提示
 
     // 防抖：避免频繁切换tab时重复加载（3秒内不重复加载）
     const now = Date.now();
@@ -128,6 +136,14 @@ Page({
     this._lastLoadTime = now;
 
     this.loadAll();
+  },
+
+  // 读取 reLaunch 前存入的主题切换提示并显示一次
+  showPendingThemeToast() {
+    const msg = wx.getStorageSync('pendingThemeToast');
+    if (!msg) return;
+    wx.removeStorageSync('pendingThemeToast');
+    this.showToast(msg);
   },
 
   onTabItemTap() {
@@ -196,7 +212,6 @@ Page({
   },
 
   async loadAll() {
-    wx.showLoading({ title: '加载中...' });
     try {
       // 重置状态
       this.setData({ cloudReady: false, cloudError: false, errorMsg: '' });
@@ -267,7 +282,6 @@ Page({
         errorMsg: '加载数据时发生错误'
       });
     }
-    wx.hideLoading();
   },
 
   async loadRecords() {
@@ -1082,19 +1096,17 @@ Page({
     const themeSetting = app.getThemeSetting();
     const effectiveTheme = app.getEffectiveTheme();
     if (this.data.currentTheme !== effectiveTheme || this.data.currentThemeSetting !== themeSetting) {
-      this.setData({ 
+      this.setData({
         currentTheme: effectiveTheme,
         currentThemeSetting: themeSetting
       });
+      // 仅主题变化时才调用原生API，避免切tab时无谓的重绘闪烁
+      this.setPullDownRefreshBg(effectiveTheme);
+      app.applyThemeToTabBar();
     }
-    
-    // 动态设置下拉刷新背景色
-    this.setPullDownRefreshBg(effectiveTheme);
-    
-    app.applyThemeToTabBar();
   },
-  
-  // 页面主题变化回调（跟随系统主题时调用）
+
+  // 页面主题变化回调（由 notifyThemeChange 触发）
   onThemeChange() {
     const themeSetting = app.getThemeSetting();
     const effectiveTheme = app.getEffectiveTheme();
@@ -1102,8 +1114,9 @@ Page({
       currentTheme: effectiveTheme,
       currentThemeSetting: themeSetting
     });
+    // notifyThemeChange 已更新 currentTheme，此处只需设置原生层
     this.setPullDownRefreshBg(effectiveTheme);
-    app.applyThemeToTabBar();
+    // applyThemeToTabBar 由 applyThemeWithSystem 调用，此处不重复
   },
   
   // 设置下拉刷新背景色
@@ -1128,7 +1141,7 @@ Page({
           wx.setNavigationBarColor({
             frontColor: '#000000',
             backgroundColor: '#F8FAF9',
-            animation: { duration: 200, timingFunc: 'easeInOut' }
+            animation: { duration: 0, timingFunc: 'linear' }
           });
         }
       } else {
@@ -1150,7 +1163,7 @@ Page({
           wx.setNavigationBarColor({
             frontColor: '#ffffff',
             backgroundColor: '#121212',
-            animation: { duration: 200, timingFunc: 'easeInOut' }
+            animation: { duration: 0, timingFunc: 'linear' }
           });
         }
       }
@@ -1210,11 +1223,11 @@ Page({
     
     // 更新tabBar主题
     app.applyThemeToTabBar();
-    
-    // 通知所有已加载页面同步更新主题（避免切换页面时闪烁）
+      
+    // 通知所有已加载页面同步更新主题（避免切换页面时闪炃）
     app.notifyThemeChange(effectiveTheme);
-    
-    // 显示提示
+      
+    // 记录切换后的提示文案，reLaunch 后由新页面读取并显示
     let toastMsg = '';
     if (themeSetting === 'system') {
       toastMsg = '已切换到跟随系统';
@@ -1223,7 +1236,18 @@ Page({
     } else {
       toastMsg = '切换到浅色模式';
     }
-    this.showToast(toastMsg);
+    wx.setStorageSync('pendingThemeToast', toastMsg);
+  
+    // 显示 loading 遮罩 → reLaunch 到当前 tab，彻底重置所有 tab 的 WebView，消除闪炃
+    wx.showLoading({ title: '切换中...', mask: true });
+    setTimeout(() => {
+      wx.reLaunch({
+        url: '/pages/index/index',
+        complete: () => {
+          wx.hideLoading();
+        }
+      });
+    }, 250);
   },
   
   // 显示/隐藏主题菜单

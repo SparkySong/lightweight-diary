@@ -5,9 +5,13 @@
   background-color="{{currentTheme === 'light' ? '#F8FAF9' : '#121212'}}"
   background-color-top="{{currentTheme === 'light' ? '#F8FAF9' : '#121212'}}"
   background-color-bottom="{{currentTheme === 'light' ? '#F8FAF9' : '#121212'}}"
+  root-background-color="{{currentTheme === 'light' ? '#F8FAF9' : '#121212'}}"
   page-style="position: relative;"
 />
-<page class="{{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}}">
+<page class="{{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}} {{hidePage ? 'page-hiding' : ''}}">
+
+<!-- 全屏固定背景遮罩层：覆盖 app.json 默认底色，消除 tab 切换闪烁 -->
+<view class="theme-bg-fixed {{currentTheme === 'light' ? 'theme-light' : ''}}"></view>
 
 <!-- 自定义导航栏区域 -->
 <view class="custom-nav-area"></view>

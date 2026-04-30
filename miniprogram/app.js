@@ -168,14 +168,24 @@ App({
   // 通知所有页面主题变化
   notifyThemeChange(effectiveTheme) {
     const themeSetting = this.getThemeSetting();
+    // 记录主题切换时间戳，供各 tab 页面 onShow 时判断是否需要防闪炃处理
+    this.globalData.themeChangedAt = Date.now();
     const pages = getCurrentPages();
+    // 当前激活页面（栈顶），不需要 hidePage。其他 tab 页面需要预设 hidePage: true
+    const activePage = pages[pages.length - 1];
     pages.forEach(page => {
+      const isActive = page === activePage;
       // 直接更新页面的 currentTheme 和 themeSetting 数据
       if (page.data && page.data.currentTheme !== undefined) {
         const updateData = { currentTheme: effectiveTheme };
         // 同步更新 themeSetting（profile 使用）
         if (page.data.themeSetting !== undefined) {
           updateData.themeSetting = themeSetting;
+        }
+        // 对隐藏 tab 页面预设 hidePage: true，等它们 onShow 时再恢复显示
+        // （解决隐藏页面 DOM 推迟渲染导致的旧主题残留帧闪炃）
+        if (!isActive && page.data.hidePage !== undefined) {
+          updateData.hidePage = true;
         }
         page.setData(updateData);
       }
@@ -345,6 +355,7 @@ App({
     theme: 'dark', // 默认为深色模式
     tabBarConfig: null,
     weightUnit: 'kg', // 体重单位
-    subscribeTemplateId: '5X2tUq0NbycqoeFiymKj4FiKaLts5K5ZdSgzqHf4Lt4' // 订阅消息模板ID（统一管理，避免硬编码散落）
+    subscribeTemplateId: '5X2tUq0NbycqoeFiymKj4FiKaLts5K5ZdSgzqHf4Lt4', // 订阅消息模板ID（统一管理，避免硬编码散落）
+    themeChangedAt: 0 // 主题切换时间戳，用于 tab 切换防闪炃
   }
 });

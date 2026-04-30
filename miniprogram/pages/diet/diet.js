@@ -356,11 +356,18 @@ Page({
     isLoadingMore: false,  // 是否正在加载更多
     pageSize: PAGE_SIZE,   // 每页加载数量
     // 云端自定义食物库
-    customFoods: []        // 存储云端自定义食物
+    customFoods: [],       // 存储云端自定义食物
+    // 防闪炃：主题切换后第一次切 tab 时短暂隐藏页面
+    hidePage: false
   },
 
   onLoad() {
-    // 🔑 关键修复：立即同步设置主题，避免切换页面时闪烁
+    // 接力主题切换的 loading 遮罩，覆盖 reLaunch 瓦解瞬间的系统壳层过渡帧
+    if (wx.getStorageSync('pendingThemeToast')) {
+      wx.showLoading({ title: '切换中...', mask: true });
+      setTimeout(() => wx.hideLoading(), 250);
+    }
+    // 🔑 关键修复：立即同步设置主题，避免切换页面时闪炃
     this.setTodayDate();
     this.initTheme();
     // 加载云端自定义食物（不阻塞主题渲染）
@@ -370,10 +377,19 @@ Page({
   onShow() {
     // 🔑 关键修复：立即同步刷新主题，再加载数据
     this.initTheme();
+    this.showPendingThemeToast(); // 显示 reLaunch 后的主题切换提示
     
     this.loadRecords();
     // 加载云端自定义食物
     this.loadCustomFoods();
+  },
+
+  // 读取 reLaunch 前存入的主题切换提示并显示一次
+  showPendingThemeToast() {
+    const msg = wx.getStorageSync('pendingThemeToast');
+    if (!msg) return;
+    wx.removeStorageSync('pendingThemeToast');
+    this.showToast(msg);
   },
 
   onTabItemTap() {
@@ -874,28 +890,24 @@ Page({
   // 主题相关方法
   initTheme() {
     const theme = app.getEffectiveTheme();
-    // 只有主题变化时才更新，避免不必要的 setData 导致闪烁
+    // 只有主题变化时才更新，避免不必要的 setData 和原生 API 调用导致闪烁
     if (this.data.currentTheme !== theme) {
-      this.setData({ 
+      this.setData({
         currentTheme: theme
       });
+      this.setPullDownRefreshBg(theme);
+      app.applyThemeToTabBar();
     }
-    
-    // 动态设置下拉刷新背景色
-    this.setPullDownRefreshBg(theme);
-    
-    // 同步刷新 tabBar 图标
-    app.applyThemeToTabBar();
   },
-  
-  // 页面主题变化回调（跟随系统主题时调用）
+
+  // 页面主题变化回调（由 notifyThemeChange 触发）
   onThemeChange() {
     const theme = app.getEffectiveTheme();
     this.setData({
       currentTheme: theme
     });
     this.setPullDownRefreshBg(theme);
-    app.applyThemeToTabBar();
+    // applyThemeToTabBar 由 applyThemeWithSystem 调用，此处不重复
   },
   
   // 设置下拉刷新背景色
@@ -914,7 +926,7 @@ Page({
       wx.setNavigationBarColor({
         frontColor: '#000000',
         backgroundColor: '#f8f9fa',
-        animation: { duration: 200, timingFunc: 'easeInOut' }
+        animation: { duration: 0, timingFunc: 'linear' }
       });
     } else {
       // 深色模式：设置深色背景
@@ -930,7 +942,7 @@ Page({
       wx.setNavigationBarColor({
         frontColor: '#ffffff',
         backgroundColor: '#0f0f13',
-        animation: { duration: 200, timingFunc: 'easeInOut' }
+        animation: { duration: 0, timingFunc: 'linear' }
       });
     }
   },

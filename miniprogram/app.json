@@ -7,6 +7,7 @@
     "pages/recipe/recipe"
   ],
   "darkmode": true,
+  "themeLocation": "theme.json",
   "window": {
     "navigationBarBackgroundColor": "#121212",
     "navigationBarTitleText": "",
@@ -14,12 +15,12 @@
     "backgroundColor": "#121212",
     "navigationStyle": "custom",
     "enablePullDownRefresh": true,
-    "backgroundTextStyle": "dark"
+    "backgroundTextStyle": "light"
   },
   "tabBar": {
     "color": "#6B7280",
     "selectedColor": "#5FA895",
-    "backgroundColor": "#121212",
+    "backgroundColor": "#0f0f13",
     "borderStyle": "black",
     "list": [
       {

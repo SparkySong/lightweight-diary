@@ -1,10 +1,13 @@
 <!--pages/calorie-detail/calorie-detail.wxml-->
-<page class="{{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}}">
-<page-meta 
-  background-text-style="{{currentTheme === 'light' ? 'dark' : 'light'}}" 
+<page-meta
+  background-text-style="{{currentTheme === 'light' ? 'dark' : 'light'}}"
   background-color="{{currentTheme === 'light' ? '#F8FAF9' : '#121212'}}"
   background-color-top="{{currentTheme === 'light' ? '#F8FAF9' : '#121212'}}"
-  background-color-bottom="{{currentTheme === 'light' ? '#F8FAF9' : '#121212'}}" />
+  background-color-bottom="{{currentTheme === 'light' ? '#F8FAF9' : '#121212'}}"
+  root-background-color="{{currentTheme === 'light' ? '#F8FAF9' : '#121212'}}"
+  navigation-bar-style="{{currentTheme === 'light' ? 'dark' : 'light'}}"
+/>
+<page class="{{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}}">
 
 <view class="container {{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}}">
   <!-- 今日热量总览卡片 -->

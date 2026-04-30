@@ -19,6 +19,7 @@
 /* 深色主题（默认） */
 page.theme-dark {
   background-color: var(--page-bg-dark, #121212);
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 /* 确保深色主题的下拉区域也是深色 */
@@ -37,6 +38,7 @@ page.theme-dark .page__bd {
 /* 浅色主题 */
 page.theme-light {
   background-color: var(--page-bg-light, #F8FAF9);
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 /* 确保浅色主题的下拉区域也是浅色 */
@@ -55,11 +57,13 @@ page.theme-light .page__bd {
 .container.theme-dark {
   background-color: var(--content-bg-dark, #121212);
   min-height: 100vh;
+  transition: background-color 0.25s ease;
 }
 
 .container.theme-light {
   background-color: var(--content-bg-light, #F8FAF9);
   min-height: 100vh;
+  transition: background-color 0.25s ease;
 }
 
 /* 卡片样式 - 深色主题 */
