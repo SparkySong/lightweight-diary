@@ -6,8 +6,6 @@
     "pages/calorie-detail/calorie-detail",
     "pages/recipe/recipe"
   ],
-  "darkmode": true,
-  "themeLocation": "theme.json",
   "window": {
     "navigationBarBackgroundColor": "#121212",
     "navigationBarTitleText": "",

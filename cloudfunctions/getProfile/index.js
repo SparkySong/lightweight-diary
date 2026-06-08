@@ -16,11 +16,25 @@ exports.main = async (event) => {
     .where({ openid: OPENID })
     .get();
 
+  const reminderDoc = reminder.data[0] || null;
+  const nextReminderDate = reminderDoc?.nextReminderDate || '';
+
   return {
     height: profile.data.length > 0 ? profile.data[0].height : null,
-    reminder: reminder.data.length > 0 ? {
-      enabled: reminder.data[0].enabled,
-      remindTime: reminder.data[0].remindTime || '08:00'
-    } : { enabled: false, remindTime: '08:00' }
+    reminder: reminderDoc ? {
+      enabled: Boolean(nextReminderDate),
+      remindTime: reminderDoc.remindTime || '08:00',
+      nextReminderDate,
+      displayDate: nextReminderDate,
+      lastStatus: reminderDoc.lastStatus || '',
+      lastErrorCode: reminderDoc.lastErrorCode || null
+    } : {
+      enabled: false,
+      remindTime: '08:00',
+      nextReminderDate: '',
+      displayDate: '',
+      lastStatus: '',
+      lastErrorCode: null
+    }
   };
 };

@@ -209,8 +209,8 @@
     </view>
     <view class="action-card" bindtap="onToggleReminder">
       <view class="action-icon {{reminderEnabled ? 'icon-bell' : 'icon-bell-off'}}"></view>
-      <text class="action-label">{{reminderEnabled ? '提醒已开启' : '开启提醒'}}</text>
-      <text class="action-desc" wx:if="{{reminderEnabled}}">每天 {{remindTime}}</text>
+      <text class="action-label">{{reminderEnabled ? '已订阅下次提醒' : '订阅下一次提醒'}}</text>
+      <text class="action-desc">{{reminderStatusText}}</text>
       <view class="time-picker-wrap" wx:if="{{reminderEnabled}}" catchtap="onTimePickerTap">
         <picker mode="time" value="{{remindTime}}" bindchange="onRemindTimeChange">
           <text class="action-link">修改时间</text>

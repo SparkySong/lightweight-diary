@@ -34,6 +34,16 @@ const getInitThemeSetting = () => {
   return wx.getStorageSync('appTheme') || 'dark';
 };
 
+const formatDateStr = (date) => {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+};
+
+const getTomorrowDateStr = () => {
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  return formatDateStr(tomorrow);
+};
+
 Page({
   data: {
     records: [],
@@ -72,6 +82,8 @@ Page({
     // Reminder
     reminderEnabled: false,
     remindTime: '08:00',
+    nextReminderDate: '',
+    reminderStatusText: '打卡后可自动续订下一次提醒',
     // 主题相关 - 🔑 关键：初始值从存储直接读取，避免闪烁
     currentTheme: getInitTheme(),
     currentThemeSetting: getInitThemeSetting(),
@@ -270,7 +282,9 @@ Page({
           height: localProfile.height,
           showHeightInput: !localProfile.height,
           reminderEnabled: localProfile.reminder.enabled,
-          remindTime: localProfile.reminder.remindTime
+          remindTime: localProfile.reminder.remindTime,
+          nextReminderDate: localProfile.reminder.nextReminderDate || '',
+          reminderStatusText: this.getReminderStatusText(localProfile.reminder)
         });
         this.calcBMI();
       }
@@ -437,7 +451,9 @@ Page({
         height: height,
         showHeightInput: !height,
         reminderEnabled: reminder.enabled,
-        remindTime: reminder.remindTime
+        remindTime: reminder.remindTime,
+        nextReminderDate: reminder.nextReminderDate || '',
+        reminderStatusText: this.getReminderStatusText(reminder)
       });
       this.calcBMI();
     } catch (e) {
@@ -561,31 +577,105 @@ Page({
     }
   },
 
+  getReminderStatusText(reminder = {}) {
+    if (reminder.enabled && reminder.nextReminderDate) {
+      return `已订阅 ${reminder.nextReminderDate} ${reminder.remindTime || '08:00'} 提醒`;
+    }
+    if (reminder.lastStatus === 'consumed') {
+      return '上次提醒已发送，请打卡后续订下一次';
+    }
+    if (reminder.lastStatus === 'failed') {
+      return '上次提醒发送失败，请重新订阅下一次';
+    }
+    return '打卡后可自动续订下一次提醒';
+  },
+
+  applyReminderResult(reminder = {}) {
+    const mergedReminder = {
+      enabled: Boolean(reminder.enabled),
+      remindTime: reminder.remindTime || this.data.remindTime || '08:00',
+      nextReminderDate: reminder.nextReminderDate || '',
+      lastStatus: reminder.lastStatus || (reminder.enabled ? 'pending' : '')
+    };
+
+    this.setData({
+      reminderEnabled: mergedReminder.enabled,
+      remindTime: mergedReminder.remindTime,
+      nextReminderDate: mergedReminder.nextReminderDate,
+      reminderStatusText: this.getReminderStatusText(mergedReminder)
+    });
+  },
+
+  async renewNextReminder(options = {}) {
+    const {
+      remindTime = this.data.remindTime,
+      targetDate,
+      silent = false,
+      source = 'manual'
+    } = options;
+    const templateId = app.globalData?.subscribeTemplateId || '5X2tUq0NbycqoeFiymKj4FiKaLts5K5ZdSgzqHf4Lt4';
+
+    try {
+      const res = await wx.requestSubscribeMessage({
+        tmplIds: [templateId]
+      });
+      if (res[templateId] !== 'accept') {
+        console.warn('用户未接受下一次提醒订阅', res[templateId]);
+        if (!silent) {
+          this.showToast('未授权下一次提醒');
+        }
+        return false;
+      }
+
+      const cloudRes = await wx.cloud.callFunction({
+        name: 'subscribeReminder',
+        data: {
+          enabled: true,
+          remindTime,
+          targetDate,
+          source
+        }
+      });
+      this.applyReminderResult(cloudRes.result?.reminder || {
+        enabled: true,
+        remindTime,
+        nextReminderDate: targetDate || ''
+      });
+      return true;
+    } catch (e) {
+      console.error('续订下一次提醒失败:', e);
+      if (!silent) {
+        this.showToast('订阅下一次提醒失败');
+      }
+      return false;
+    }
+  },
+
   // --- Reminder ---
   async onToggleReminder() {
     if (!this.data.reminderEnabled) {
-      // 开启提醒 - 请求订阅消息权限
-      const success = await this.requestSubscribeAndSave(this.data.remindTime);
+      const success = await this.renewNextReminder({
+        remindTime: this.data.remindTime,
+        targetDate: getTomorrowDateStr(),
+        silent: true,
+        source: 'manual'
+      });
       if (success) {
-        this.setData({ reminderEnabled: true });
-        this.showToast('提醒已开启');
-        // 记录今天已请求
-        const today = new Date();
-        const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-        wx.setStorageSync('lastSubscribeDate', todayStr);
+        this.showToast('已订阅下一次提醒');
       } else {
-        this.showToast('需要授权通知权限');
+        this.showToast('需要授权下一次提醒');
       }
     } else {
-      // 关闭提醒
       await wx.cloud.callFunction({
         name: 'subscribeReminder',
         data: { enabled: false }
       });
-      this.setData({ reminderEnabled: false });
-      // 清除订阅日期记录
-      wx.removeStorageSync('lastSubscribeDate');
-      this.showToast('提醒已关闭');
+      this.applyReminderResult({
+        enabled: false,
+        remindTime: this.data.remindTime,
+        nextReminderDate: ''
+      });
+      this.showToast('已取消下一次提醒');
     }
   },
 
@@ -599,36 +689,25 @@ Page({
     const newTime = e.detail.value;
     this.setData({ remindTime: newTime });
     if (this.data.reminderEnabled) {
-      // 直接保存时间到云端
       wx.cloud.callFunction({
         name: 'subscribeReminder',
-        data: { enabled: true, remindTime: newTime }
-      });
-      this.showToast('提醒时间已更新');
-    }
-  },
-
-  // 请求订阅消息并保存设置到云端
-  async requestSubscribeAndSave(remindTime) {
-    // 模板ID统一从配置获取，避免硬编码散落在多处
-    const templateId = app.globalData?.subscribeTemplateId || '5X2tUq0NbycqoeFiymKj4FiKaLts5K5ZdSgzqHf4Lt4';
-    try {
-      const res = await wx.requestSubscribeMessage({
-        tmplIds: [templateId]
-      });
-      if (res[templateId] === 'accept') {
-        await wx.cloud.callFunction({
-          name: 'subscribeReminder',
-          data: { enabled: true, remindTime: remindTime || this.data.remindTime }
+        data: {
+          enabled: true,
+          remindTime: newTime,
+          targetDate: this.data.nextReminderDate || getTomorrowDateStr(),
+          source: 'manual'
+        }
+      }).then((res) => {
+        this.applyReminderResult(res.result?.reminder || {
+          enabled: true,
+          remindTime: newTime,
+          nextReminderDate: this.data.nextReminderDate || getTomorrowDateStr()
         });
-        return true;
-      } else {
-        console.warn('用户拒绝订阅消息授权');
-        return false;
-      }
-    } catch (e) {
-      console.error('请求订阅消息失败:', e);
-      return false;
+        this.showToast('下次提醒时间已更新');
+      }).catch((err) => {
+        console.error('更新提醒时间失败:', err);
+        this.showToast('更新时间失败');
+      });
     }
   },
 
@@ -919,6 +998,25 @@ Page({
   onDateChange(e) { this.setData({ inputDate: e.detail.value }); },
   onWeightInput(e) { this.setData({ inputWeight: e.detail.value }); },
 
+  async afterCheckinSuccess(recordDate) {
+    await this.loadAll();
+
+    if (recordDate !== formatDateStr(new Date())) {
+      return;
+    }
+
+    const renewed = await this.renewNextReminder({
+      remindTime: this.data.remindTime,
+      targetDate: getTomorrowDateStr(),
+      silent: true,
+      source: 'checkin'
+    });
+
+    if (renewed) {
+      this.showToast('已为你订阅明天提醒');
+    }
+  },
+
   async onCheckin() {
     const { inputDate, inputWeight, weightUnit } = this.data;
     if (!inputDate) { this.showToast('请选择日期'); return; }
@@ -946,7 +1044,7 @@ Page({
       if (res.result.success) {
         this.showToast(res.result.updated ? '记录已更新' : '打卡成功');
         this.setData({ inputWeight: '' });
-        this.loadAll();
+        await this.afterCheckinSuccess(inputDate);
       }
     } catch (e) { this.showToast('打卡失败'); }
     wx.hideLoading();
@@ -1313,7 +1411,7 @@ Page({
       if (res.result.success) {
         this.showToast('体重已更新');
         this.closeEditPanel();
-        this.loadAll();
+        await this.afterCheckinSuccess(this.data.editDate);
       }
     } catch (e) {
       this.showToast('保存失败');
@@ -1413,7 +1511,7 @@ Page({
         if (res.result && res.result.success) {
           this.showToast('体重已记录');
           this.closeWeightPopup();
-          this.loadAll();
+          await this.afterCheckinSuccess(today);
         } else {
           this.showToast('保存失败');
         }

@@ -4,7 +4,7 @@
       "subscribeMessage.send"
     ],
     "database": {
-      "user_reminders": "read",
+      "user_reminders": "write",
       "weight_records": "read"
     }
   },

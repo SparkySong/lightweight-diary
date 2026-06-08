@@ -2,7 +2,6 @@
 const cloud = require('wx-server-sdk');
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 const db = cloud.database();
-const _ = db.command;
 
 // 使用环境变量优先，fallback到硬编码值（便于本地开发调试）
 const TEMPLATE_ID = process.env.TEMPLATE_ID || '5X2tUq0NbycqoeFiymKj4FiKaLts5K5ZdSgzqHf4Lt4';
@@ -18,9 +17,15 @@ function getUTC8DateStr(d) {
   return `${utc8.getUTCFullYear()}-${String(utc8.getUTCMonth() + 1).padStart(2, '0')}-${String(utc8.getUTCDate()).padStart(2, '0')}`;
 }
 
+function formatWeightValue(weight) {
+  const value = parseFloat(weight);
+  return Number.isFinite(value) ? `${value.toFixed(1)}kg` : '暂无记录';
+}
+
 exports.main = async (event, context) => {
   const startTime = Date.now();
   const now = new Date();
+  const todayStr = getUTC8DateStr(now);
 
   // 使用 Intl API 或手动构造 UTC+8 时间，正确处理跨午夜场景
   const utc8Now = new Date(now.getTime() + (8 * 60 * 60 * 1000));
@@ -35,7 +40,7 @@ exports.main = async (event, context) => {
   
   do {
     queryResult = await db.collection('user_reminders')
-      .where({ enabled: true })
+      .where({ nextReminderDate: todayStr })
       .skip(allUsers.length)
       .limit(MAX_LIMIT)
       .get();
@@ -52,14 +57,6 @@ exports.main = async (event, context) => {
     }
 
     const user = allUsers[i];
-    // 检查订阅是否过期（7天有效期）
-    if (user.expireTime && new Date(user.expireTime) < now) {
-      await db.collection('user_reminders').doc(user._id).update({
-        data: { enabled: false }
-      });
-      results.push({ openid: user.openid, status: 'expired' });
-      continue;
-    }
 
     // 检查是否到了用户的提醒时间
     const remindTime = user.remindTime || '08:00';
@@ -73,9 +70,7 @@ exports.main = async (event, context) => {
       continue;
     }
 
-    // 检查今日是否已发送过
-    const todayStr = getUTC8DateStr(now);
-    if (user.lastSentDate === todayStr) {
+    if (user.lastSentDate === todayStr && user.lastStatus === 'sent') {
       results.push({ openid: user.openid, status: 'already_sent' });
       continue;
     }
@@ -89,37 +84,47 @@ exports.main = async (event, context) => {
         .get();
 
       const weightStr = latestWeight.data.length > 0
-        ? `${latestWeight.data[0].weight} kg`
+        ? formatWeightValue(latestWeight.data[0].weight)
         : '暂无记录';
-
-      const today = getUTC8DateStr(now);
 
       await cloud.openapi.subscribeMessage.send({
         touser: user.openid,
         templateId: TEMPLATE_ID,
         page: 'pages/index/index',
         data: {
-          thing1: { value: '体重打卡提醒' },
-          thing2: { value: '记得称体重并记录' },
-          thing3: { value: `上次: ${weightStr}` },
-          time4: { value: `${String(adjustedHour).padStart(2, '0')}:${String(currentMinute).padStart(2, '0')}` }
+          character_string9: { value: weightStr },
+          thing3: { value: '今天还未记录体重，点击立即打卡' }
         }
       });
 
-      // 发送成功后，标记该用户今日已发送，避免重复
       await db.collection('user_reminders').doc(user._id).update({
-        data: { lastSentDate: today }
+        data: {
+          nextReminderDate: '',
+          lastSentDate: todayStr,
+          lastStatus: 'sent',
+          lastErrorCode: null,
+          lastErrorMessage: '',
+          updateTime: db.serverDate()
+        }
       });
 
       results.push({ openid: user.openid, status: 'sent' });
     } catch (err) {
       console.error(`发送失败: ${user.openid}`, err);
-      // 如果是订阅次数用完的错误，关闭提醒
-      if (err.errCode === 43101 || err.errCode === 47003) {
-        await db.collection('user_reminders').doc(user._id).update({
-          data: { enabled: false }
-        });
-      }
+      const isQuotaError = err.errCode === 43101;
+      const failureStatus = isQuotaError ? 'consumed' : 'failed';
+
+      await db.collection('user_reminders').doc(user._id).update({
+        data: {
+          nextReminderDate: '',
+          lastSentDate: todayStr,
+          lastStatus: failureStatus,
+          lastErrorCode: err.errCode || null,
+          lastErrorMessage: err.message || '',
+          updateTime: db.serverDate()
+        }
+      });
+
       results.push({ openid: user.openid, status: 'failed', error: err.message, errCode: err.errCode });
     }
   }
