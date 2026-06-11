@@ -1420,6 +1420,87 @@
   color: #4B5563;
 }
 
+/* ========== AI 营养师浮动入口 ========== */
+.ai-fab {
+  position: fixed;
+  left: 0;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 100;
+  transition: left 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.ai-fab.dragging {
+  transition: none;
+}
+
+.ai-fab-inner {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #5FA895, #6B8E9F);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8rpx 28rpx rgba(95, 168, 149, 0.35);
+  animation: fabBreathe 3s ease-in-out infinite;
+  transition: transform 0.2s;
+}
+
+.ai-fab:active .ai-fab-inner {
+  transform: scale(0.9);
+  animation: none;
+}
+
+@keyframes fabBreathe {
+  0%, 100% {
+    box-shadow: 0 8rpx 28rpx rgba(95, 168, 149, 0.35);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 12rpx 40rpx rgba(95, 168, 149, 0.5);
+    transform: scale(1.06);
+  }
+}
+
+.ai-fab-emoji {
+  font-size: 44rpx;
+}
+
+.ai-fab-label {
+  font-size: 20rpx;
+  color: #5FA895;
+  margin-top: 6rpx;
+  font-weight: 500;
+}
+
+/* 浅色主题 */
+.ai-fab.theme-light .ai-fab-inner {
+  background: linear-gradient(135deg, #4A9B8A, #5A7D8C);
+  box-shadow: 0 8rpx 28rpx rgba(74, 155, 138, 0.25);
+}
+
+.ai-fab.theme-light .ai-fab-label {
+  color: #4A9B8A;
+}
+
+@keyframes fabBreatheLight {
+  0%, 100% {
+    box-shadow: 0 8rpx 28rpx rgba(74, 155, 138, 0.25);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 12rpx 40rpx rgba(74, 155, 138, 0.4);
+    transform: scale(1.06);
+  }
+}
+
+.ai-fab.theme-light .ai-fab-inner {
+  animation: fabBreatheLight 3s ease-in-out infinite;
+}
+
 /* Toast */
 .toast {
   position: fixed;

@@ -283,6 +283,18 @@
   </view>
 </view>
 
+<!-- AI 营养师浮动入口（可拖动） -->
+<view class="ai-fab {{currentTheme === 'light' ? 'theme-light' : ''}} {{fabDragging ? 'dragging' : ''}}" 
+      style="left: {{fabLeft}}px; top: {{fabTop}}px;"
+      catchtouchstart="onFabTouchStart" 
+      catchtouchmove="onFabTouchMove" 
+      catchtouchend="onFabTouchEnd">
+  <view class="ai-fab-inner">
+    <text class="ai-fab-emoji">🤖</text>
+  </view>
+  <text class="ai-fab-label">问问AI</text>
+</view>
+
 <!-- 身高编辑已改为内联模式，不再需要全屏遮罩层 -->
 
 <!-- 编辑体重弹窗 -->

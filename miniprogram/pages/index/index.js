@@ -119,6 +119,10 @@ Page({
     statusBarHeight: 0,       // 状态栏高度
     // 防闪炃：主题切换后第一次切 tab 时短暂隐藏页面
     hidePage: false,
+    // AI 浮窗拖动
+    fabLeft: 0,
+    fabTop: 0,
+    fabDragging: false,
   },
 
   onLoad() {
@@ -132,6 +136,7 @@ Page({
     this.initWeightUnit();
     this.initNavBarPadding();  // 计算胶囊按钮安全距离
     this.initTheme(); // 在数据加载前立即初始化主题
+    this.initFabPosition(); // 初始化 AI 浮窗位置
     // 数据加载放在主题初始化之后，不阻塞主题渲染
     this.loadAll();
   },
@@ -714,6 +719,80 @@ Page({
   // --- Navigation ---
   goToDiet() {
     wx.switchTab({ url: '/pages/diet/diet' });
+  },
+
+  goToAiChat() {
+    wx.navigateTo({ url: '/pages/ai-chat/ai-chat' });
+  },
+
+  // --- AI 浮窗拖动 ---
+  initFabPosition() {
+    const saved = wx.getStorageSync('fabPosition');
+    if (saved && typeof saved.left === 'number' && typeof saved.top === 'number') {
+      this.setData({ fabLeft: saved.left, fabTop: saved.top });
+      return;
+    }
+    const sys = wx.getSystemInfoSync();
+    const ratio = sys.windowWidth / 750;
+    const fabW = 100 * ratio;
+    const fabH = 126 * ratio;
+    const safeBottom = sys.safeArea ? (sys.windowHeight - sys.safeArea.bottom) : 0;
+    this.setData({
+      fabLeft: sys.windowWidth - 32 * ratio - fabW,
+      fabTop: sys.windowHeight - safeBottom - 180 * ratio - fabH
+    });
+  },
+
+  onFabTouchStart(e) {
+    if (e.touches.length !== 1) return;
+    const touch = e.touches[0];
+    this._fabStartTouch = { x: touch.clientX, y: touch.clientY };
+    this._fabOriginPos = { left: this.data.fabLeft, top: this.data.fabTop };
+    this._fabMoved = false;
+    this.setData({ fabDragging: true });
+  },
+
+  onFabTouchMove(e) {
+    if (!this._fabStartTouch || e.touches.length !== 1) return;
+    const touch = e.touches[0];
+    const dx = touch.clientX - this._fabStartTouch.x;
+    const dy = touch.clientY - this._fabStartTouch.y;
+
+    if (!this._fabMoved && (Math.abs(dx) > 5 || Math.abs(dy) > 5)) {
+      this._fabMoved = true;
+    }
+    if (!this._fabMoved) return;
+
+    const sys = wx.getSystemInfoSync();
+    const ratio = sys.windowWidth / 750;
+    const fabW = 100 * ratio;
+    const fabH = 126 * ratio;
+    let newLeft = this._fabOriginPos.left + dx;
+    let newTop = this._fabOriginPos.top + dy;
+
+    newLeft = Math.max(0, Math.min(newLeft, sys.windowWidth - fabW));
+    newTop = Math.max(sys.statusBarHeight + 44, Math.min(newTop, sys.windowHeight - fabH - 20));
+
+    this.setData({ fabLeft: newLeft, fabTop: newTop });
+  },
+
+  onFabTouchEnd() {
+    this.setData({ fabDragging: false });
+
+    if (!this._fabMoved) {
+      this.goToAiChat();
+      return;
+    }
+
+    // 松手自动贴边
+    const sys = wx.getSystemInfoSync();
+    const ratio = sys.windowWidth / 750;
+    const fabW = 100 * ratio;
+    const margin = 16;
+    const newLeft = this.data.fabLeft + fabW / 2 < sys.windowWidth / 2 ? margin : sys.windowWidth - fabW - margin;
+
+    this.setData({ fabLeft: newLeft });
+    wx.setStorageSync('fabPosition', { left: newLeft, top: this.data.fabTop });
   },
 
   // --- Stats ---

@@ -21,7 +21,7 @@
       >
         <!-- AI 头像 -->
         <view class="avatar avatar-ai" wx:if="{{item.role === 'assistant'}}">
-          <text class="avatar-emoji">🥗</text>
+          <text class="avatar-emoji">🤖</text>
         </view>
 
         <!-- 消息气泡 -->
@@ -42,7 +42,7 @@
       <!-- AI 正在回复指示器 -->
       <view class="msg-row msg-ai" wx:if="{{isLoading}}">
         <view class="avatar avatar-ai">
-          <text class="avatar-emoji">🥗</text>
+          <text class="avatar-emoji">🤖</text>
         </view>
         <view class="bubble bubble-ai typing-bubble">
           <view class="typing-indicator">
