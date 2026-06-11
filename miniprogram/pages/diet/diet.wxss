@@ -1236,3 +1236,73 @@
 .theme-light .cal-unit {
   color: #C49A6C;
 }
+
+/* ========== AI 营养师入口卡片 ========== */
+.ai-chat-entry-card {
+  display: flex;
+  align-items: center;
+  background: linear-gradient(135deg, rgba(107, 142, 159, 0.12), rgba(95, 168, 149, 0.08));
+  border: 1rpx solid rgba(107, 142, 159, 0.2);
+  border-radius: 16rpx;
+  padding: 24rpx 28rpx;
+  margin-bottom: 28rpx;
+  transition: all 0.2s;
+}
+
+.ai-chat-entry-card:active {
+  background: linear-gradient(135deg, rgba(107, 142, 159, 0.18), rgba(95, 168, 149, 0.12));
+  transform: scale(0.98);
+}
+
+.ai-entry-icon {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6B8E9F, #5FA895);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 24rpx;
+  flex-shrink: 0;
+}
+
+.ai-entry-emoji {
+  font-size: 32rpx;
+}
+
+.ai-entry-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.ai-entry-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #F5F5F5;
+  display: block;
+  margin-bottom: 4rpx;
+}
+
+.ai-entry-desc {
+  font-size: 22rpx;
+  color: #9CA3AF;
+  display: block;
+}
+
+/* 浅色主题 AI 卡片 */
+.theme-light .ai-chat-entry-card {
+  background: linear-gradient(135deg, rgba(90, 125, 140, 0.08), rgba(74, 155, 138, 0.06));
+  border-color: rgba(90, 125, 140, 0.15);
+}
+
+.theme-light .ai-chat-entry-card:active {
+  background: linear-gradient(135deg, rgba(90, 125, 140, 0.12), rgba(74, 155, 138, 0.1));
+}
+
+.theme-light .ai-entry-title {
+  color: #1F2937;
+}
+
+.theme-light .ai-entry-desc {
+  color: #6B7280;
+}

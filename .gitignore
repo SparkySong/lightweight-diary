@@ -1,0 +1,7 @@
+cloudfunctions/*/node_modules/
+cloudfunctions/*/package-lock.json
+.cloudbase/
+.qoder/
+.codebuddy/
+.lingma/
+.claude/

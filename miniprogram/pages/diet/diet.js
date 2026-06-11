@@ -886,6 +886,22 @@ Page({
       url: '/pages/calorie-detail/calorie-detail'
     });
   },
+
+  // 跳转到 AI 营养师聊天页面
+  goToAiChat() {
+    // 携带最近 3 天的饮食记录数据
+    const recentDays = this.data.allDays.slice(0, 3);
+    if (recentDays.length > 0) {
+      const dietData = encodeURIComponent(JSON.stringify(recentDays));
+      wx.navigateTo({
+        url: `/pages/ai-chat/ai-chat?dietData=${dietData}`
+      });
+    } else {
+      wx.navigateTo({
+        url: '/pages/ai-chat/ai-chat'
+      });
+    }
+  },
   
   // 主题相关方法
   initTheme() {

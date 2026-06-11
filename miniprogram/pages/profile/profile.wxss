@@ -311,6 +311,15 @@ page.theme-dark {
   box-shadow: inset -6rpx -2rpx 0 0 currentColor;
 }
 
+.menu-icon-ai {
+  font-size: 32rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(95, 168, 149, 0.15), rgba(107, 142, 159, 0.1));
+  border-radius: 8rpx;
+}
+
 .menu-icon-data::before {
   content: '';
   width: 20rpx;

@@ -513,6 +513,9 @@ loadStats(goalWeight) {
       case 'theme':
         this.setData({ showThemeSetting: true });
         break;
+      case 'aiChat':
+        wx.navigateTo({ url: '/pages/ai-chat/ai-chat' });
+        break;
       case 'dataManage':
         this.setData({ showDataManage: true });
         break;

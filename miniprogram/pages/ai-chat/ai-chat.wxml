@@ -1,0 +1,101 @@
+<!--pages/ai-chat/ai-chat.wxml-->
+<page class="{{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}}">
+
+<view class="chat-page {{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}}">
+
+  <!-- 消息列表区域 -->
+  <scroll-view
+    class="chat-messages"
+    scroll-y
+    scroll-into-view="{{scrollToView}}"
+    scroll-with-animation
+    enhanced
+    show-scrollbar="{{false}}"
+  >
+    <view class="chat-list">
+      <view
+        class="msg-row {{item.role === 'user' ? 'msg-user' : 'msg-ai'}}"
+        wx:for="{{messages}}"
+        wx:key="index"
+        id="msg-{{index}}"
+      >
+        <!-- AI 头像 -->
+        <view class="avatar avatar-ai" wx:if="{{item.role === 'assistant'}}">
+          <text class="avatar-emoji">🥗</text>
+        </view>
+
+        <!-- 消息气泡 -->
+        <view class="bubble {{item.role === 'user' ? 'bubble-user' : 'bubble-ai'}}">
+          <text class="bubble-text" user-select>{{item.content}}</text>
+        </view>
+
+        <!-- 用户头像 -->
+        <view class="avatar avatar-user" wx:if="{{item.role === 'user'}}">
+          <text class="avatar-emoji">😊</text>
+        </view>
+      </view>
+
+      <!-- AI 正在回复指示器 -->
+      <view class="msg-row msg-ai" wx:if="{{isLoading}}">
+        <view class="avatar avatar-ai">
+          <text class="avatar-emoji">🥗</text>
+        </view>
+        <view class="bubble bubble-ai typing-bubble">
+          <view class="typing-indicator">
+            <view class="typing-dot"></view>
+            <view class="typing-dot"></view>
+            <view class="typing-dot"></view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+
+  <!-- 快捷提问区域 -->
+  <view class="quick-bar" wx:if="{{!isLoading && messages.length <= 2}}">
+    <scroll-view scroll-x class="quick-scroll" enhanced show-scrollbar="{{false}}">
+      <view class="quick-list">
+        <view
+          class="quick-chip"
+          wx:for="{{quickQuestions}}"
+          wx:key="*this"
+          data-q="{{item}}"
+          bindtap="onQuickQuestion"
+        >{{item}}</view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- AI 生成内容免责提示（审核必需） -->
+  <view class="ai-disclaimer">
+    <text>内容由AI生成，仅供参考</text>
+  </view>
+
+  <!-- 底部输入区域 -->
+  <view class="input-bar">
+    <view class="input-bar-inner">
+      <view class="clear-btn" bindtap="onClearChat">
+        <text class="clear-icon">🗑️</text>
+      </view>
+      <view class="input-wrap">
+        <input
+          class="chat-input"
+          value="{{inputValue}}"
+          placeholder="问我任何饮食问题..."
+          confirm-type="send"
+          bindinput="onInput"
+          bindconfirm="onSend"
+          disabled="{{isLoading}}"
+          adjust-position="{{true}}"
+          cursor-spacing="20"
+        />
+      </view>
+      <view class="send-btn {{inputValue.trim() && !isLoading ? 'send-active' : ''}}" bindtap="onSend">
+        <text class="send-icon">➤</text>
+      </view>
+    </view>
+  </view>
+
+</view>
+
+</page>

@@ -4,7 +4,8 @@
     "pages/diet/diet",
     "pages/profile/profile",
     "pages/calorie-detail/calorie-detail",
-    "pages/recipe/recipe"
+    "pages/recipe/recipe",
+    "pages/ai-chat/ai-chat"
   ],
   "window": {
     "navigationBarBackgroundColor": "#121212",

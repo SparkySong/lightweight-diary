@@ -39,6 +39,18 @@
     <view class="analysis-arrow">›</view>
   </view>
 
+  <!-- AI 营养师入口卡片 -->
+  <view class="ai-chat-entry-card" bindtap="goToAiChat">
+    <view class="ai-entry-icon">
+      <text class="ai-entry-emoji">🤖</text>
+    </view>
+    <view class="ai-entry-content">
+      <text class="ai-entry-title">AI 营养师</text>
+      <text class="ai-entry-desc">智能分析饮食，给出营养建议</text>
+    </view>
+    <view class="analysis-arrow">›</view>
+  </view>
+
   <!-- Add Button / Panel -->
   <view class="add-section" wx:if="{{!showAddPanel}}">
     <button class="btn-add" bindtap="toggleAddPanel">
