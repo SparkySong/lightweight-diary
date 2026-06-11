@@ -57,7 +57,7 @@ exports.main = async (event) => {
     model: 'Qwen/Qwen2.5-7B-Instruct',
     messages: fullMessages,
     temperature: 0.5,
-    max_tokens: 800
+    max_tokens: 2048
   });
 
   try {

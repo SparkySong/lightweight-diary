@@ -300,6 +300,28 @@ Page({
     });
   },
 
+  // 分享给朋友
+  onShareAppMessage() {
+    const lastAiMsg = [...this.data.messages].reverse().find(m => m.role === 'assistant');
+    const title = lastAiMsg
+      ? lastAiMsg.content.slice(0, 30) + (lastAiMsg.content.length > 30 ? '...' : '')
+      : 'AI 营养师为你解答饮食健康问题';
+    return {
+      title,
+      path: '/pages/ai-chat/ai-chat',
+      imageUrl: '/images/share-ai-chat.png'
+    };
+  },
+
+  // 分享到朋友圈
+  onShareTimeline() {
+    return {
+      title: 'AI 营养师 - 你的专属健康饮食顾问',
+      query: '',
+      imageUrl: '/images/share-ai-chat.png'
+    };
+  },
+
   // 清空对话
   onClearChat() {
     wx.showModal({

@@ -29,11 +29,18 @@
     "miniprogram": {
       "list": [
         {
-          "name": "pages/recipe/recipe",
-          "pathName": "pages/recipe/recipe",
+          "name": "pages/ai-chat/ai-chat",
+          "pathName": "pages/ai-chat/ai-chat",
           "query": "",
           "scene": null,
           "launchMode": "default"
+        },
+        {
+          "name": "pages/recipe/recipe",
+          "pathName": "pages/recipe/recipe",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
         },
         {
           "name": "pages/calorie-detail/calorie-detail",
