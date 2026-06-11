@@ -27,11 +27,15 @@
         <!-- 消息气泡 -->
         <view class="bubble {{item.role === 'user' ? 'bubble-user' : 'bubble-ai'}}">
           <text class="bubble-text" user-select>{{item.content}}</text>
+          <view class="copy-btn {{copiedIndex === index ? 'copied' : ''}}" wx:if="{{item.role === 'assistant'}}" data-text="{{item.content}}" data-index="{{index}}" bindtap="onCopyMessage">
+            <view class="copy-icon-lines" wx:if="{{copiedIndex !== index}}"></view>
+            <view class="copy-icon-check" wx:if="{{copiedIndex === index}}"></view>
+          </view>
         </view>
 
         <!-- 用户头像 -->
         <view class="avatar avatar-user" wx:if="{{item.role === 'user'}}">
-          <text class="avatar-emoji">😊</text>
+          <image class="user-avatar-img" src="{{userAvatar}}" mode="aspectFill" />
         </view>
       </view>
 

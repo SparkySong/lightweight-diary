@@ -3,6 +3,14 @@
 @import "/styles/theme.wxss";
 
 /* ========== 页面容器 ========== */
+page {
+  background-color: #121212;
+}
+
+page.theme-light {
+  background-color: #F8FAF9;
+}
+
 .chat-page {
   display: flex;
   flex-direction: column;
@@ -84,8 +92,15 @@
   font-size: 36rpx;
 }
 
+.user-avatar-img {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 50%;
+}
+
 /* ========== 消息气泡 ========== */
 .bubble {
+  position: relative;
   max-width: 68%;
   padding: 22rpx 28rpx;
   border-radius: 24rpx;
@@ -96,6 +111,7 @@
   background: #1E1E1E;
   border-radius: 4rpx 24rpx 24rpx 24rpx;
   border: 1rpx solid rgba(255, 255, 255, 0.06);
+  padding-bottom: 40rpx;
 }
 
 .theme-light .bubble-ai {
@@ -122,6 +138,58 @@
 
 .bubble-user .bubble-text {
   color: #FFFFFF;
+}
+
+/* ========== 复制按钮 ========== */
+.copy-btn {
+  position: absolute;
+  bottom: 8rpx;
+  right: 8rpx;
+  width: 36rpx;
+  height: 36rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8rpx;
+  opacity: 0.35;
+  transition: opacity 0.2s;
+}
+
+.copy-btn:active {
+  opacity: 0.8;
+}
+
+.copy-icon-lines {
+  width: 16rpx;
+  height: 18rpx;
+  border: 2rpx solid #8C8C9A;
+  border-radius: 3rpx;
+  position: relative;
+}
+
+.copy-icon-lines::before {
+  content: '';
+  position: absolute;
+  top: -5rpx;
+  left: 5rpx;
+  width: 16rpx;
+  height: 18rpx;
+  border: 2rpx solid #8C8C9A;
+  border-radius: 3rpx;
+  border-left: none;
+  border-bottom: none;
+}
+
+.copy-icon-check {
+  width: 16rpx;
+  height: 10rpx;
+  border-left: 3rpx solid #5FA895;
+  border-bottom: 3rpx solid #5FA895;
+  transform: rotate(-45deg);
+}
+
+.copy-btn.copied {
+  opacity: 0.8;
 }
 
 /* ========== 打字指示器 ========== */
