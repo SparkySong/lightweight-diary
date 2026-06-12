@@ -116,7 +116,7 @@ Page({
     try {
       const res = await wx.cloud.callFunction({ name: 'getDietRecords', data: {} });
       const days = res.result.days || [];
-      this._dietRawData = days.length > 0 ? days.slice(0, 5) : null;
+      this._dietRawData = days.length > 0 ? days.slice(0, 2) : null;
     } catch (e) {
       console.warn('加载饮食记录失败', e);
     }
@@ -341,33 +341,18 @@ Page({
   },
 
   _buildProfileSection() {
-    const lines = ['【用户健康档案】'];
+    const parts = [];
     const height = wx.getStorageSync('userHeight');
     const weightData = wx.getStorageSync('weightData') || {};
-    const cw = weightData.currentWeight || null;
-    const tw = weightData.targetWeight || null;
-    const goalCal = wx.getStorageSync('localCalorieGoal') || null;
-    if (!height && !cw) return '【用户健康档案】（暂未填写）';
-    let hasData = false;
-    if (height) { lines.push(`身高：${height}cm`); hasData = true; }
-    if (cw) { lines.push(`当前体重：${cw.toFixed(1)}kg`); hasData = true; }
-    if (tw) { lines.push(`目标体重：${tw.toFixed(1)}kg`); hasData = true; }
-    if (cw && tw) {
-      const diff = cw - tw;
-      if (diff > 0.05) lines.push(`距目标还差：${diff.toFixed(1)}kg`);
-      else if (diff < -0.05) lines.push(`已超出目标：${Math.abs(diff).toFixed(1)}kg`);
-      else lines.push(`距目标：已达！`);
-    }
-    if (height && cw) {
-      const bmiVal = cw / Math.pow(height / 100, 2);
-      let level = '正常';
-      if (bmiVal < 18.5) level = '偏瘦';
-      else if (bmiVal >= 28) level = '肥胖';
-      else if (bmiVal >= 24) level = '偏胖';
-      lines.push(`BMI：${bmiVal.toFixed(1)}（${level}）`);
-    }
-    if (goalCal) { lines.push(`每日热量目标：${goalCal}kcal`); hasData = true; }
-    return hasData ? lines.join('\n') : '【用户健康档案】（暂未填写）';
+    const cw = weightData.currentWeight;
+    const tw = weightData.targetWeight;
+    const goalCal = wx.getStorageSync('localCalorieGoal');
+    if (!height && !cw) return '【档案】暂无';
+    if (height) parts.push(`身高${height}cm`);
+    if (cw) { parts.push(`体重${cw.toFixed(1)}kg`); if (tw) { const d=cw-tw; parts.push(`目标差${d.toFixed(1)}kg`); } }
+    if (height && cw) { const bmi=cw/Math.pow(height/100,2); parts.push(`BMI ${bmi.toFixed(1)}`); }
+    if (goalCal) parts.push(`日目标${goalCal}kcal`);
+    return '【档案】' + parts.join('，') || '【档案】暂无';
   },
 
   _buildDietSection() {
@@ -375,31 +360,25 @@ Page({
     if (!dietData || !dietData.length) return null;
     const now = new Date();
     const todayStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
-    const yesterday = new Date(now); yesterday.setDate(yesterday.getDate()-1);
-    const yStr = `${yesterday.getFullYear()}-${String(yesterday.getMonth()+1).padStart(2,'0')}-${String(yesterday.getDate()).padStart(2,'0')}`;
-    const cleanName = (name) => name.replace(/[""''<>{}[\]\\|\/]/g, '').replace(/\s+/g, ' ').trim();
-    const sections = [];
+    const cleanName = (name) => name.replace(/["'<>{}[\]\\|\/]/g, '').trim();
+    const lines = [];
     for (const day of dietData) {
       const ds = this.formatDate(day.date);
       const meals = day.records || [];
-      let calcTotal = 0;
-      const mealLines = [];
-      for (let i = 0; i < meals.length; i++) {
-        const r = meals[i];
-        const foodNames = (r.foods || []).map(f => cleanName(f.name)).filter(Boolean);
-        if (foodNames.length === 0) continue;
-        const cal = r.foods.reduce((s, f) => s + (parseInt(f.calories) || 0), 0);
-        calcTotal += cal;
-        // 用更清晰的格式：[餐次] 食物列表 = XXX kcal
-        mealLines.push(`${i+1}.【${r.mealLabel || '?'}】食物：${foodNames.join('、')} | 热量：${cal}kcal`);
+      let total = 0;
+      const items = [];
+      for (const r of meals) {
+        const foods = (r.foods || []).map(f => cleanName(f.name)).filter(Boolean);
+        if (!foods.length) continue;
+        const cal = r.foods.reduce((s, f) => s + (parseInt(f.calories)||0), 0);
+        total += cal;
+        items.push(`${r.mealLabel||'?'}:${foods.join('+')}=${cal}kcal`);
       }
-      if (mealLines.length === 0) continue;
-      const tag = ds === todayStr ? '【今天】' : ds === yStr ? '【昨天】' : ds;
-      sections.push(`${tag}总热量：${calcTotal}kcal`);
-      sections.push(...mealLines);
+      if (!items.length) continue;
+      const tag = ds === todayStr ? '今天' : ds;
+      lines.push(`${tag} ${total}kcal | ${items.join('；')}`);
     }
-    if (sections.length === 0) return null;
-    return '【近期饮食记录（精确数据）】\n' + sections.join('\n');
+    return '【饮食】\n' + lines.join('\n');
   },
 
   formatDate(dateStr) {
@@ -547,10 +526,9 @@ Page({
     if (this._typingTimer) clearInterval(this._typingTimer);
 
     let charPos = 0;
-    // 长文每次推进多几个字，短文慢一点更有"打字感"
-    const stepSize = fullText.length > 200 ? 3 : 2;
-    // 长文间隔短，加速；短文间隔长，更有质感
-    const intervalMs = fullText.length > 200 ? 10 : 16;
+    // 加速打字机：每次多推几个字，间隔更短
+    const stepSize = fullText.length > 100 ? 4 : 2;
+    const intervalMs = fullText.length > 100 ? 8 : 14;
 
     this._typingTimer = setInterval(() => {
       charPos += stepSize;

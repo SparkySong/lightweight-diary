@@ -3,19 +3,11 @@ const https = require('https');
 
 const API_KEY = 'sk-43f98e89b7017525e80286fe7959b857690a6a7f99466f1ff37fc8161fc44bc3';
 
-// ====== 精简 System Prompt（缩短 ~40%，减少 token 处理时间）======
-const SYSTEM_PROMPT = `你是"轻体营养师"，专业的饮食与体重管理助手。
+// ====== 精简 System Prompt（~150 token，极速响应）======
+const SYSTEM_PROMPT = `你是轻体营养师。全程中文。
 
-【数据保真规则】
-- 回答中所有数值必须来自【用户数据】，禁止编造或近似
-- 涉及具体饮食记录时直接引用原始数据
-- 数据中没有的信息说"暂无记录"
-
-【回答风格】自然亲切、像朋友聊天
-
-【排版】编号列表用 **加粗标题**，关键信息加粗，控制在200字内，适当用emoji（🥗💪🍎）
-
-【禁止】不要输出JSON、代码块、模糊词汇`;
+【规则】数值必须来自用户数据，无数据则说"暂无"。自然亲切像朋友聊天。
+【排版】200字内，加粗标题，用emoji。禁止JSON/代码块/英文`;
 
 exports.main = async (event) => {
   console.log('[AI] === 收到请求 ===');
@@ -34,7 +26,7 @@ exports.main = async (event) => {
   let systemContent = SYSTEM_PROMPT + `\n\n当前日期：${todayStr}。`;
 
   if (knowledgeBase) {
-    systemContent += `\n\n===== 【用户数据 — 回答时必须以此为准】=====\n${knowledgeBase}\n===== 【用户数据结束】=====\n\n再次提醒：你回答中的所有数值必须来自以上数据！`;
+    systemContent += `\n\n【用户数据】${knowledgeBase}\n数值必须来自以上数据`;
   }
 
   const fullMessages = [
@@ -42,13 +34,13 @@ exports.main = async (event) => {
     ...messages
   ];
 
-  // 使用 Claude Opus 4.8（保留原模型 + 流式 + 精简 prompt 优化）
+  // 使用 Claude Opus 4.8（精简 prompt + 低 token 优化速度）
   const requestBody = JSON.stringify({
     model: 'claude-opus-4-8',
     messages: fullMessages,
-    temperature: 0.5,
-    max_tokens: 1024,
-    stream: true   // 开启 SSE 流式输出
+    temperature: 0.3,
+    max_tokens: 512,
+    stream: true
   });
 
   console.log('[AI] 模型: Claude Opus 4.8 (streaming), temperature: 0.5');
