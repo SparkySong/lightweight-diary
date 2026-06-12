@@ -104,14 +104,20 @@
         </view>
       </view>
 
-      <!-- AI 营养师 -->
+      <!-- 健康问答 -->
       <view class="menu-item" bindtap="onMenuItemTap" data-action="aiChat">
         <view class="menu-item-left">
-          <view class="menu-icon menu-icon-ai">🤖</view>
-          <text class="menu-text">AI 营养师</text>
+          <view class="menu-icon menu-icon-ai">
+            <view class="ai-icon-mini">
+              <view class="ai-icon-m-circle"></view>
+              <view class="ai-icon-m-line1"></view>
+              <view class="ai-icon-m-line2"></view>
+            </view>
+          </view>
+          <text class="menu-text">健康问答</text>
         </view>
         <view class="menu-item-right">
-          <text class="menu-desc">智能饮食分析</text>
+          <text class="menu-desc">饮食健康分析</text>
           <text class="menu-arrow">›</text>
         </view>
       </view>

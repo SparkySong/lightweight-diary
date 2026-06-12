@@ -1264,8 +1264,32 @@
   flex-shrink: 0;
 }
 
-.ai-entry-emoji {
-  font-size: 32rpx;
+/* 简约线条 AI 图标 */
+.ai-entry-icon-line {
+  position: relative;
+  width: 44rpx; height: 44rpx;
+  display: flex; align-items: center; justify-content: center;
+}
+.ai-entry-circle {
+  position: absolute;
+  width: 40rpx; height: 40rpx;
+  border-radius: 50%;
+  border: 2rpx solid #5FA895;
+  box-sizing: border-box;
+}
+.ai-entry-l1, .ai-entry-l2 {
+  position: absolute;
+  width: 16rpx; height: 1.5rpx;
+  background: #5FA895; border-radius: 1rpx;
+}
+.ai-entry-l1 { top: 18rpx; left: 11rpx; transform: rotate(-20deg); }
+.ai-entry-l2 { bottom: 16rpx; right: 12rpx; transform: rotate(-15deg); width: 13rpx; }
+.ai-entry-d {
+  position: absolute;
+  width: 5rpx; height: 5rpx;
+  border-radius: 50%;
+  background: #5FA895;
+  bottom: 14rpx; left: 21rpx;
 }
 
 .ai-entry-content {

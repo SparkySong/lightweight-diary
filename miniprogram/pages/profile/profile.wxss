@@ -312,13 +312,35 @@ page.theme-dark {
 }
 
 .menu-icon-ai {
-  font-size: 32rpx;
+  width: 48rpx;
+  height: 48rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, rgba(95, 168, 149, 0.15), rgba(107, 142, 159, 0.1));
-  border-radius: 8rpx;
+  background: transparent;
 }
+
+/* 简约线条 AI 图标 */
+.ai-icon-mini {
+  position: relative;
+  width: 44rpx; height: 44rpx;
+  display: flex; align-items: center; justify-content: center;
+}
+.ai-icon-m-circle {
+  position: absolute;
+  width: 40rpx; height: 40rpx;
+  border-radius: 50%;
+  border: 2rpx solid #5FA895;
+  box-sizing: border-box;
+}
+.ai-icon-m-line1,
+.ai-icon-m-line2 {
+  position: absolute;
+  width: 16rpx; height: 1.5rpx;
+  background: #5FA895; border-radius: 1rpx;
+}
+.ai-icon-m-line1 { top: 18rpx; left: 11rpx; transform: rotate(-20deg); }
+.ai-icon-m-line2 { bottom: 16rpx; right: 12rpx; transform: rotate(-15deg); width: 13rpx; }
 
 .menu-icon-data::before {
   content: '';

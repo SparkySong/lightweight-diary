@@ -1420,7 +1420,7 @@
   color: #4B5563;
 }
 
-/* ========== AI 营养师浮动入口 ========== */
+/* ========== AI 浮动入口 — 精致星光设计 ========== */
 .ai-fab {
   position: fixed;
   left: 0;
@@ -1432,73 +1432,180 @@
   transition: left 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-.ai-fab.dragging {
-  transition: none;
+.ai-fab.dragging { transition: none; }
+
+/* ====== 外层脉冲光晕 ====== */
+.ai-fab-glow {
+  position: absolute;
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(95, 168, 149, 0.4) 0%, rgba(95, 168, 149, 0) 70%);
+  animation: glowPulse 2.5s ease-in-out infinite;
+  pointer-events: none;
 }
 
+@keyframes glowPulse {
+  0%, 100% { transform: scale(1); opacity: 0.6; }
+  50% { transform: scale(1.4); opacity: 0.3; }
+}
+
+/* ====== 主按钮底座 — 带呼吸动效 ====== */
 .ai-fab-inner {
+  position: relative;
   width: 100rpx;
   height: 100rpx;
   border-radius: 50%;
-  background: linear-gradient(135deg, #5FA895, #6B8E9F);
+  background: linear-gradient(135deg, #6FBFA8 0%, #5FA895 45%, #4A8C7A 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 8rpx 28rpx rgba(95, 168, 149, 0.35);
+  box-shadow:
+    0 8rpx 32rpx rgba(95, 168, 149, 0.45),
+    0 2rpx 8rpx rgba(0, 0, 0, 0.15),
+    inset 0 2rpx 4rpx rgba(255, 255, 255, 0.3);
   animation: fabBreathe 3s ease-in-out infinite;
-  transition: transform 0.2s;
+  transition: transform 0.2s ease;
+}
+
+/* 呼吸动画：缩放 + 阴影扩散 */
+@keyframes fabBreathe {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow:
+      0 8rpx 32rpx rgba(95, 168, 149, 0.45),
+      0 2rpx 8rpx rgba(0, 0, 0, 0.15),
+      inset 0 2rpx 4rpx rgba(255, 255, 255, 0.3);
+  }
+  50% {
+    transform: scale(1.08);
+    box-shadow:
+      0 14rpx 44rpx rgba(95, 168, 149, 0.55),
+      0 4rpx 12rpx rgba(0, 0, 0, 0.18),
+      inset 0 2rpx 6rpx rgba(255, 255, 255, 0.35);
+  }
 }
 
 .ai-fab:active .ai-fab-inner {
-  transform: scale(0.9);
+  transform: scale(0.9) !important;
   animation: none;
+  box-shadow:
+    0 4rpx 16rpx rgba(95, 168, 149, 0.35),
+    inset 0 2rpx 6rpx rgba(0, 0, 0, 0.15);
 }
 
-@keyframes fabBreathe {
-  0%, 100% {
-    box-shadow: 0 8rpx 28rpx rgba(95, 168, 149, 0.35);
-    transform: scale(1);
-  }
-  50% {
-    box-shadow: 0 12rpx 40rpx rgba(95, 168, 149, 0.5);
-    transform: scale(1.06);
-  }
+/* ====== AI 营养碗图标 ====== */
+.ai-bowl-icon {
+  position: relative;
+  width: 56rpx;
+  height: 52rpx;
 }
 
-.ai-fab-emoji {
-  font-size: 44rpx;
+/* 碗身：下半圆 */
+.bowl-body {
+  position: absolute;
+  left: 50%;
+  bottom: 4rpx;
+  transform: translateX(-50%);
+  width: 48rpx;
+  height: 24rpx;
+  background: #FFFFFF;
+  border-radius: 0 0 28rpx 28rpx;
+  box-shadow: inset 0 -3rpx 5rpx rgba(74, 140, 122, 0.18);
+  z-index: 3;
 }
 
-.ai-fab-label {
-  font-size: 20rpx;
-  color: #5FA895;
-  margin-top: 6rpx;
-  font-weight: 500;
+/* 碗口椭圆高光 */
+.bowl-rim {
+  position: absolute;
+  left: 50%;
+  bottom: 24rpx;
+  transform: translateX(-50%);
+  width: 48rpx;
+  height: 12rpx;
+  background: rgba(255, 255, 255, 0.55);
+  border: 2rpx solid #FFFFFF;
+  border-radius: 50%;
+  box-sizing: border-box;
+  z-index: 4;
 }
 
-/* 浅色主题 */
+/* 碗内食物点 */
+.food-dot {
+  position: absolute;
+  border-radius: 50%;
+  z-index: 2;
+}
+
+.food-dot-1 {
+  width: 14rpx; height: 14rpx;
+  bottom: 22rpx; left: 50%;
+  transform: translateX(-50%);
+  background: #FFC857;
+  box-shadow: 0 0 6rpx rgba(255, 200, 87, 0.6);
+}
+
+.food-dot-2 {
+  width: 11rpx; height: 11rpx;
+  bottom: 24rpx; left: 12rpx;
+  background: #FF8A65;
+}
+
+.food-dot-3 {
+  width: 11rpx; height: 11rpx;
+  bottom: 24rpx; right: 12rpx;
+  background: #A5D6A7;
+}
+
+/* 智能闪光（四角星） */
+.bowl-spark {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 16rpx;
+  height: 16rpx;
+  z-index: 5;
+  animation: sparkTwinkle 2.4s ease-in-out infinite;
+}
+
+.bowl-spark::before,
+.bowl-spark::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  background: #FFFFFF;
+  box-shadow: 0 0 6rpx rgba(255, 255, 255, 0.9);
+}
+
+.bowl-spark::before {
+  width: 16rpx; height: 4rpx;
+  transform: translate(-50%, -50%);
+  border-radius: 4rpx;
+}
+
+.bowl-spark::after {
+  width: 4rpx; height: 16rpx;
+  transform: translate(-50%, -50%);
+  border-radius: 4rpx;
+}
+
+@keyframes sparkTwinkle {
+  0%, 100% { opacity: 0.4; transform: scale(0.7) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1) rotate(90deg); }
+}
+
+/* 浅色主题适配 */
+.ai-fab.theme-light .ai-fab-glow {
+  background: radial-gradient(circle, rgba(95, 168, 149, 0.3) 0%, rgba(95, 168, 149, 0) 70%);
+}
+
 .ai-fab.theme-light .ai-fab-inner {
-  background: linear-gradient(135deg, #4A9B8A, #5A7D8C);
-  box-shadow: 0 8rpx 28rpx rgba(74, 155, 138, 0.25);
-}
-
-.ai-fab.theme-light .ai-fab-label {
-  color: #4A9B8A;
-}
-
-@keyframes fabBreatheLight {
-  0%, 100% {
-    box-shadow: 0 8rpx 28rpx rgba(74, 155, 138, 0.25);
-    transform: scale(1);
-  }
-  50% {
-    box-shadow: 0 12rpx 40rpx rgba(74, 155, 138, 0.4);
-    transform: scale(1.06);
-  }
-}
-
-.ai-fab.theme-light .ai-fab-inner {
-  animation: fabBreatheLight 3s ease-in-out infinite;
+  background: linear-gradient(135deg, #7CCBB4 0%, #5FA895 60%, #4A8C7A 100%);
+  box-shadow:
+    0 8rpx 32rpx rgba(95, 168, 149, 0.38),
+    0 2rpx 8rpx rgba(0, 0, 0, 0.1),
+    inset 0 2rpx 4rpx rgba(255, 255, 255, 0.35);
 }
 
 /* Toast */

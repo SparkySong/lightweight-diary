@@ -1,71 +1,88 @@
-// cloudfunctions/aiChat/index.js
+// cloudfunctions/aiChat/index.js —— 混合模式：AI 只处理开放性问题
 const https = require('https');
 
-// ===== 请在此处填入你的 SiliconFlow API Key =====
-// 注册地址：https://cloud.siliconflow.cn  （注册即送免费额度，多种模型免费使用）
-const API_KEY = 'sk-phzwenfpehlvrlmcquwpefqmcwepcnyqqwvbqfoqtgtqjncn';
+const API_KEY = 'sk-43f98e89b7017525e80286fe7959b857690a6a7f99466f1ff37fc8161fc44bc3';
 
-const SYSTEM_PROMPT = `你是"轻体营养师"，一位专业的营养师助手。
-请用纯文本回复，绝对不要用 ##、**、* 等Markdown符号。用emoji做标题即可。
+// ====== 核心原则：数据保真第一 ======
+const SYSTEM_PROMPT = `你是"轻体营养师"，一位专业的饮食与体重管理 AI 助手。
 
-当系统提供了用户健康档案或饮食记录时，直接分析，不要反问用户要数据。档案中的数值是准确的，直接引用不要重算。
+【最高优先级 — 数据保真】⚠️ 以下规则违反任何一条都属于严重错误：
 
-分析饮食时，按这个简洁格式回复（只输出一次，不要重复）：
-🍽️ 饮食记录
-逐餐列出食物和热量
+1. 用户数据区域中的所有数值（热量、重量、身高、日期）是唯一事实来源。
+   你回答中提到的任何数字，必须与【用户数据】中的数值一致或基于其计算得出。
+   绝对禁止编造、猜测、近似任何不在数据中的数值！
 
-📊 营养估算
-总热量、蛋白质、碳水、脂肪（蛋白质/碳水/脂肪单位必须是g）
+2. 如果用户问的是"今天吃了什么""午餐多少热量"等涉及具体数据的，
+   你必须直接引用【用户数据】中的原始记录来回答。
+   例如：数据写"早餐：鸡蛋、牛奶（346kcal）"，你就说早餐是这些食物共346kcal。
+   不可以说"早餐大概300kcal左右"或编造不存在的食物。
 
-📈 体重分析（如有档案数据）
-简短评估
+3. 如果数据中没有某项信息（如某餐没有记录），明确说"暂无记录"，不要编造。
 
-⭐ 健康评分：X/10
-💡 建议（3条以内，简洁可执行）
+4. 【今天】和【昨天】的记录严格区分。不要把昨天的数据当成今天的说。
 
-自由问答直接回答即可，不需要上述格式。
-不要编造数据，不要重复输出相同内容。`;
+【回答风格】
+- 像朋友聊天一样自然、亲切、有温度
+- 如果用户在调侃/开玩笑，可以幽默回应
+
+【排版格式】
+- 多个要点用编号：**1. 标题**：内容
+- 小要点用 - 开头：- 要点内容  
+- 关键信息用 **加粗**
+- 每条建议单独一行
+- 控制在 250 字以内
+- 用 emoji 适当点缀（🥗💪🍎 等）
+
+【禁止事项】
+❌ 不要输出 JSON / 代码块 / 系统标记
+❌ 不要编造数据中没有的数值
+❌ 不要用模糊词汇（大概、大约、可能）替代精确数据`;
 
 exports.main = async (event) => {
-  const { messages, dietContext, userContext } = event;
+  console.log('[AI] === 收到请求 ===');
+  
+  const { messages, knowledgeBase } = event;
+  console.log('[AI] messages 数量:', Array.isArray(messages) ? messages.length : '非数组');
+  console.log('[AI] knowledgeBase 长度:', (knowledgeBase || '').length);
+  console.log('[AI] knowledgeBase 内容预览:', (knowledgeBase || '').substring(0, 500));
 
   if (!messages || !Array.isArray(messages) || messages.length === 0) {
     return { success: false, error: '请输入消息内容' };
   }
 
-  // 构建带系统 prompt 的完整消息列表
-  let systemContent = SYSTEM_PROMPT;
-  // 追加用户健康档案
-  if (userContext) {
-    systemContent += `\n\n${userContext}`;
-  }
-  // 追加饮食记录上下文
-  if (dietContext) {
-    systemContent += `\n\n${dietContext}`;
-  }
+  const today = new Date();
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+  let systemContent = SYSTEM_PROMPT + `\n\n当前日期：${todayStr}。`;
 
-  // 调试日志：查看实际发送给 AI 的上下文
-  console.log('userContext:', userContext || '（空）');
-  console.log('dietContext:', dietContext ? dietContext.substring(0, 200) : '（空）');
+  if (knowledgeBase) {
+    systemContent += `\n\n===== 【用户数据 — 回答时必须以此为准】=====\n${knowledgeBase}\n===== 【用户数据结束】=====\n\n再次提醒：你回答中的所有数值必须来自以上数据！`;
+  }
 
   const fullMessages = [
     { role: 'system', content: systemContent },
     ...messages
   ];
 
+  // 使用 Claude Opus 4.8：顶级智能模型
   const requestBody = JSON.stringify({
-    model: 'Qwen/Qwen2.5-7B-Instruct',
+    model: 'claude-opus-4-8',
     messages: fullMessages,
     temperature: 0.5,
     max_tokens: 2048
   });
 
+  console.log('[AI] 模型: Claude Opus 4.8, temperature: 0.5');
+  console.log('[AI] 请求体大小:', requestBody.length, 'bytes');
+  console.log('[AI] 开始调用 API...');
+
   try {
     const reply = await callAPI(requestBody);
+    console.log('[AI] API 返回成功，长度:', reply.length);
+    console.log('[AI] 回复内容:', reply.substring(0, 300));
     const cleanReply = stripMarkdown(reply);
     return { success: true, reply: cleanReply };
   } catch (err) {
-    console.error('调用 AI API 失败:', err);
+    console.error('[AI] 调用 AI API 失败:', err.message);
     return {
       success: false,
       error: err.message || 'AI 服务暂时不可用，请稍后重试'
@@ -73,20 +90,20 @@ exports.main = async (event) => {
   }
 };
 
-// 去除 AI 回复中的 Markdown 格式符号和重复内容
+// 清理 AI 回复（保留加粗和编号格式用于前端渲染）
 function stripMarkdown(text) {
   let clean = text
-    .replace(/^#{1,6}\s*/gm, '')           // 去掉 # ## ### 等标题符号
-    .replace(/\*\*(.+?)\*\*/g, '$1')        // 去掉 **加粗**
-    .replace(/\*(.+?)\*/g, '$1')            // 去掉 *斜体*
-    .replace(/`(.+?)`/g, '$1')              // 去掉 `行内代码`
-    .replace(/```[\s\S]*?```/g, '')          // 去掉 ```代码块```
-    .replace(/^[-*_]{3,}\s*$/gm, '')        // 去掉分割线
-    .replace(/\uFFFD/g, '')                 // 去掉替换字符
-    .replace(/\s*t(\d)/g, ' $1')            // 修复 "t11g" → "11g" 类乱码
-    .trim();
+    .replace(/^#{1,6}\s*/gm, '')
+    .replace(/\*(.+?)\*/g, '$1')
+    .replace(/`(.+?)`/g, '$1')
+    .replace(/```[\s\S]*?```/g, '')
+    .replace(/^[-*_]{3,}\s*$/gm, '')
+    .replace(/\uFFFD/g, '');
 
-  // 去除重复段落：如果同一段落出现多次，只保留第一次
+  clean = clean.replace(/^\s*(assistant|system|user|function|tool)\s*$/gim, '');
+  clean = clean.replace(/^\s*(assistant|system|user|function|tool)\s*\n/gim, '');
+  clean = clean.trim();
+
   const lines = clean.split('\n');
   const seen = new Set();
   const deduped = [];
@@ -100,11 +117,11 @@ function stripMarkdown(text) {
   return deduped.join('\n').trim();
 }
 
-// 调用 SiliconFlow API（使用 Node.js 内置 https 模块）
+// 调用 API 中转站
 function callAPI(body) {
   return new Promise((resolve, reject) => {
     const options = {
-      hostname: 'api.siliconflow.cn',
+      hostname: 'ai.loserbai.cn',
       path: '/v1/chat/completions',
       method: 'POST',
       headers: {
@@ -118,13 +135,10 @@ function callAPI(body) {
       let data = '';
       res.on('data', (chunk) => { data += chunk; });
       res.on('end', () => {
-        console.log('API 状态码:', res.statusCode);
-        console.log('API 返回:', data.substring(0, 500));
         try {
           const result = JSON.parse(data);
           if (result.error) {
-            const errMsg = result.error.message || result.error.code || JSON.stringify(result.error);
-            reject(new Error(errMsg));
+            reject(new Error(result.error.message || result.error.code || JSON.stringify(result.error)));
             return;
           }
           if (res.statusCode !== 200) {
@@ -132,26 +146,16 @@ function callAPI(body) {
             return;
           }
           const reply = result.choices?.[0]?.message?.content;
-          if (!reply) {
-            reject(new Error('AI 未返回有效回复'));
-            return;
-          }
-          resolve(reply);
+          if (!reply) reject(new Error('AI 未返回有效回复'));
+          else resolve(reply);
         } catch (e) {
           reject(new Error(`解析失败: ${data.substring(0, 200)}`));
         }
       });
     });
 
-    req.on('error', (err) => {
-      reject(new Error(`网络错误: ${err.message}`));
-    });
-
-    req.setTimeout(30000, () => {
-      req.destroy();
-      reject(new Error('请求超时，请稍后重试'));
-    });
-
+    req.on('error', (err) => reject(new Error(`网络错误: ${err.message}`)));
+    req.setTimeout(55000, () => { req.destroy(); reject(new Error('请求超时，请稍后重试')); });
     req.write(body);
     req.end();
   });

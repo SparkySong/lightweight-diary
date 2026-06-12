@@ -283,16 +283,30 @@
   </view>
 </view>
 
-<!-- AI 营养师浮动入口（可拖动） -->
-<view class="ai-fab {{currentTheme === 'light' ? 'theme-light' : ''}} {{fabDragging ? 'dragging' : ''}}" 
+<!-- 健康问答浮动入口（可拖动） -->
+<view class="ai-fab {{currentTheme === 'light' ? 'theme-light' : ''}} {{fabDragging ? 'dragging' : ''}}"
       style="left: {{fabLeft}}px; top: {{fabTop}}px;"
-      catchtouchstart="onFabTouchStart" 
-      catchtouchmove="onFabTouchMove" 
+      catchtouchstart="onFabTouchStart"
+      catchtouchmove="onFabTouchMove"
       catchtouchend="onFabTouchEnd">
+  <!-- 外层脉冲光晕 -->
+  <view class="ai-fab-glow"></view>
+  <!-- 主按钮 -->
   <view class="ai-fab-inner">
-    <text class="ai-fab-emoji">🤖</text>
+    <!-- AI 营养碗图标 -->
+    <view class="ai-bowl-icon">
+      <!-- 碗内食物 -->
+      <view class="food-dot food-dot-1"></view>
+      <view class="food-dot food-dot-2"></view>
+      <view class="food-dot food-dot-3"></view>
+      <!-- 碗口高光椭圆 -->
+      <view class="bowl-rim"></view>
+      <!-- 碗身 -->
+      <view class="bowl-body"></view>
+      <!-- 智能闪光 -->
+      <view class="bowl-spark"></view>
+    </view>
   </view>
-  <text class="ai-fab-label">问问AI</text>
 </view>
 
 <!-- 身高编辑已改为内联模式，不再需要全屏遮罩层 -->

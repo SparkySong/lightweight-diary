@@ -19,30 +19,68 @@
         wx:key="index"
         id="msg-{{index}}"
       >
-        <!-- AI 头像 -->
+        <!-- AI 头像 — 简约线条 -->
         <view class="avatar avatar-ai" wx:if="{{item.role === 'assistant'}}">
-          <text class="avatar-emoji">🤖</text>
-        </view>
-
-        <!-- 消息气泡 -->
-        <view class="bubble {{item.role === 'user' ? 'bubble-user' : 'bubble-ai'}}">
-          <text class="bubble-text" user-select>{{item.content}}</text>
-          <view class="copy-btn {{copiedIndex === index ? 'copied' : ''}}" wx:if="{{item.role === 'assistant'}}" data-text="{{item.content}}" data-index="{{index}}" bindtap="onCopyMessage">
-            <view class="copy-icon-lines" wx:if="{{copiedIndex !== index}}"></view>
-            <view class="copy-icon-check" wx:if="{{copiedIndex === index}}"></view>
+          <view class="ai-icon">
+            <view class="ai-icon-circle"></view>
+            <view class="ai-icon-line ai-icon-line-1"></view>
+            <view class="ai-icon-line ai-icon-line-2"></view>
+            <view class="ai-icon-dot"></view>
           </view>
         </view>
 
-        <!-- 用户头像 -->
+        <!-- 消息气泡 -->
+        <view class="bubble {{item.role === 'user' ? 'bubble-user' : 'bubble-ai'}} {{item.streaming ? 'bubble-streaming' : ''}}" bindlongpress="{{item.role === 'user' ? 'onMsgLongPress' : ''}}" bindtap="{{item.role === 'user' ? 'onMsgTap' : ''}}" data-index="{{index}}" data-content="{{item.content}}">
+          <!-- 编辑模式 -->
+          <block wx:if="{{editIndex === index}}">
+            <view class="edit-box">
+              <view class="edit-input-wrap">
+                <input class="edit-input" value="{{editValue}}" focus="{{true}}" bindinput="onEditInput" bindconfirm="onResendEdit" confirm-type="send" adjust-position="{{false}}" maxlength="200"/>
+              </view>
+              <view class="edit-btns">
+                <view class="edit-b edit-cancel" catchtap="onCancelEdit">取消</view>
+                <view class="edit-b edit-send" catchtap="onResendEdit">发送</view>
+              </view>
+            </view>
+          </block>
+
+          <!-- 正常显示 -->
+          <block wx:else>
+            <!-- 用户消息：纯文本 -->
+            <text class="bubble-text" user-select wx:if="{{item.role === 'user'}}">{{item.displayContent || item.content}}</text>
+            <!-- AI消息：富文本排版 -->
+            <rich-text wx:if="{{item.role === 'assistant'}}" nodes="{{item.richNodes || (item.displayContent || item.content)}}" class="bubble-rich" user-select></rich-text>
+            <!-- 流式光标 -->
+            <text class="stream-cursor" wx:if="{{item.streaming}}">|</text>
+            <!-- 复制按钮 -->
+            <view class="copy-btn {{copiedIndex === index ? 'copied' : ''}}" wx:if="{{item.role === 'assistant' && !item.streaming}}" data-text="{{item.content}}" data-index="{{index}}" catchtap="onCopyMessage">
+              <view class="copy-icon-lines" wx:if="{{copiedIndex !== index}}"></view>
+              <view class="copy-icon-check" wx:if="{{copiedIndex === index}}"></view>
+            </view>
+          </block>
+        </view>
+
+        <!-- 用户头像（无头像时显示精美默认图案） -->
         <view class="avatar avatar-user" wx:if="{{item.role === 'user'}}">
-          <image class="user-avatar-img" src="{{userAvatar}}" mode="aspectFill" />
+          <image class="user-avatar-img" wx:if="{{userAvatar}}" src="{{userAvatar}}" mode="aspectFill" />
+          <view class="default-avatar" wx:else>
+            <view class="default-avatar-icon">
+              <view class="da-head"></view>
+              <view class="da-body"></view>
+            </view>
+          </view>
         </view>
       </view>
 
       <!-- AI 正在回复指示器 -->
-      <view class="msg-row msg-ai" wx:if="{{isLoading}}">
+      <view class="msg-row msg-ai" wx:if="{{isLoading && !isStreaming}}">
         <view class="avatar avatar-ai">
-          <text class="avatar-emoji">🤖</text>
+          <view class="ai-icon">
+            <view class="ai-icon-circle"></view>
+            <view class="ai-icon-line ai-icon-line-1"></view>
+            <view class="ai-icon-line ai-icon-line-2"></view>
+            <view class="ai-icon-dot"></view>
+          </view>
         </view>
         <view class="bubble bubble-ai typing-bubble">
           <view class="typing-indicator">
@@ -70,7 +108,7 @@
     </scroll-view>
   </view>
 
-  <!-- AI 生成内容免责提示（审核必需） -->
+  <!-- AI 生成内容免责提示 -->
   <view class="ai-disclaimer">
     <text>内容由AI生成，仅供参考</text>
   </view>

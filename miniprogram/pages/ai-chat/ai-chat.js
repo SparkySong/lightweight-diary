@@ -1,10 +1,10 @@
-// pages/ai-chat/ai-chat.js
+// pages/ai-chat/ai-chat.js —— 混合模式：数据问题用模板，开放问题用 AI + 流式输出
 const app = getApp();
 
 // 欢迎消息
-const WELCOME_MSG = '你好呀！我是你的 AI 营养师 🥗\n\n我已经读取了你的健康档案和饮食记录，你可以直接问我：\n- 分析一下我的情况\n- 我的BMI正常吗\n- 今天吃得怎么样\n\n当然也可以问我任何饮食、减脂的问题～';
+const WELCOME_MSG = '你好呀！我是你的专属营养师 🤖\n\n你可以直接问我：\n- 分析一下我的情况\n- 我的BMI正常吗\n- 今天吃得怎么样\n\n也可以问我任何饮食、减脂的问题～';
 
-// 默认头像（灰色圆形占位图）
+// 默认头像
 const DEFAULT_AVATAR = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MCIgaGVpZ2h0PSI4MCIgdmlld0JveD0iMCAwIDgwIDgwIj48Y2lyY2xlIGN4PSI0MCIgY3k9IjQwIiByPSI0MCIgZmlsbD0iIzNhM2E0YSIvPjxjaXJjbGUgY3g9IjQwIiBjeT0iMzIiIHI9IjE2IiBmaWxsPSIjNmE2YTdhIi8+PGVsbGlwc2UgY3g9IjQwIiBjeT0iNjgiIHJ4PSIyNCIgcnk9IjE2IiBmaWxsPSIjNmE2YTdhIi8+PC9zdmc+';
 
 Page({
@@ -12,9 +12,9 @@ Page({
     messages: [],
     inputValue: '',
     isLoading: false,
+    isStreaming: false,       // 流式输出进行中
     scrollToView: '',
-    dietContext: '',
-    userContext: '',
+    knowledgeBase: '',
     userAvatar: DEFAULT_AVATAR,
     copiedIndex: -1,
     currentTheme: app.getEffectiveTheme(),
@@ -23,11 +23,16 @@ Page({
       '我的BMI正常吗',
       '今天吃得怎么样',
       '给我一条健康建议'
-    ]
+    ],
+    // 编辑模式状态
+    editIndex: -1,
+    editValue: ''
   },
 
-  onLoad(options) {
-    // 从本地恢复聊天记录
+  // 流式输出定时器引用
+  _typingTimer: null,
+
+  async onLoad(options) {
     const savedMessages = wx.getStorageSync('aiChatMessages');
     const welcomeMsg = { role: 'assistant', content: WELCOME_MSG };
     if (savedMessages && savedMessages.length > 0) {
@@ -36,32 +41,29 @@ Page({
       this.setData({ messages: [welcomeMsg] });
     }
 
-    // 构建用户健康档案
-    this.setData({ userContext: this.buildUserContext() });
-
-    // 加载用户头像
     const savedAvatar = wx.getStorageSync('avatarUrl');
     if (savedAvatar) {
       this.setData({ userAvatar: savedAvatar });
     }
 
-    // 自动从云端加载饮食记录
-    this.loadDietData();
+    try {
+      await Promise.all([this.loadDietData(), this.refreshWeightFromCloud()]);
+    } catch (e) {
+      console.warn('预加载数据失败，使用缓存:', e);
+    }
+    this.buildKnowledgeBase();
 
-    // 如果从饮食页面跳转并携带了饮食数据，覆盖云端数据
     if (options.dietData) {
       try {
         const dietData = JSON.parse(decodeURIComponent(options.dietData));
-        const context = this.buildDietContext(dietData);
-        this.setData({ dietContext: context });
+        this._externalDietData = dietData;
+        this.buildKnowledgeBase();
       } catch (e) {
         console.warn('解析饮食数据失败', e);
       }
     }
 
-    // 设置导航栏颜色
     this.setNavColor();
-    // 滚动到底部
     setTimeout(() => this.scrollToBottom(), 100);
   },
 
@@ -79,262 +81,595 @@ Page({
 
   setNavColor() {
     const theme = this.data.currentTheme;
-    if (theme === 'light') {
-      wx.setNavigationBarColor({
-        frontColor: '#000000',
-        backgroundColor: '#F8FAF9',
-        animation: { duration: 0, timingFunc: 'linear' }
-      });
-    } else {
-      wx.setNavigationBarColor({
-        frontColor: '#ffffff',
-        backgroundColor: '#121212',
-        animation: { duration: 0, timingFunc: 'linear' }
-      });
-    }
+    wx.setNavigationBarColor({
+      frontColor: theme === 'light' ? '#000000' : '#ffffff',
+      backgroundColor: theme === 'light' ? '#F8FAF9' : '#121212'
+    });
   },
 
-  // 从云端加载饮食记录
+  // ===== 数据加载 =====
+
+  _dietRawData: null,
+
   async loadDietData() {
     try {
       const res = await wx.cloud.callFunction({ name: 'getDietRecords', data: {} });
       const days = res.result.days || [];
-      if (days.length > 0) {
-        const recentDays = days.slice(0, 3);
-        const context = this.buildDietContext(recentDays);
-        this.setData({ dietContext: context });
-      }
+      this._dietRawData = days.length > 0 ? days.slice(0, 5) : null;
     } catch (e) {
       console.warn('加载饮食记录失败', e);
     }
   },
 
-  // 构建用户健康档案上下文
-  buildUserContext() {
+  async refreshWeightFromCloud() {
+    try {
+      const res = await wx.cloud.callFunction({
+        name: 'getRecords', data: { range: 1 }, timeout: 10000
+      });
+      const records = res.result.data || [];
+      if (records.length > 0) {
+        const latestKg = parseFloat(records[0].weight);
+        if (latestKg) {
+          const weightData = wx.getStorageSync('weightData') || {};
+          weightData.currentWeight = latestKg;
+          wx.setStorageSync('weightData', weightData);
+        }
+      }
+    } catch (e) {
+      console.warn('刷新体重数据失败', e);
+    }
+  },
+
+  // ===== 意图识别 =====
+
+  _detectIntent(text) {
+    const t = text.toLowerCase().trim();
+    if (/bmi|体质指数|体重指数/.test(t)) return 'bmi';
+    if (/体重|多重|多重了|目前多重|当前多重|减了|瘦了|胖了/.test(t) && !/饮食|吃|食谱|建议|怎么/.test(t)) return 'weight';
+    if (/今天.*吃|今日.*吃|今天.*饮食|今日.*饮食|今天.*热量|吃.*怎么|今天吃/.test(t)) return 'today_diet';
+    if (/分析.*情况|整体.*情况|我的情况|综合.*分析|全面.*分析/.test(t)) return 'overview';
+    if (/饮食记录|吃了什么|最近.*吃|昨天.*吃|前天.*吃/.test(t)) return 'diet_history';
+    if (/目标|还差多少|距目标|还要减|还.*减/.test(t) && !/怎么|如何|建议/.test(t)) return 'goal';
+    return 'general';
+  },
+
+  // ===== 模板回答 =====
+
+  _templateReply(intent) {
+    const height = wx.getStorageSync('userHeight');
+    const weightData = wx.getStorageSync('weightData') || {};
+    const cw = weightData.currentWeight || null;
+    const tw = weightData.targetWeight || null;
+    const goalCal = wx.getStorageSync('localCalorieGoal') || null;
+
+    if (intent === 'bmi') {
+      if (!height || !cw) return '你还没有填写身高和体重信息哦，去个人资料页补充一下吧～';
+      const bmi = cw / Math.pow(height / 100, 2);
+      let level, advice;
+      if (bmi < 18.5) { level = '偏瘦'; advice = '建议适当增加热量摄入，多补充优质蛋白和碳水。'; }
+      else if (bmi < 24) { level = '正常'; advice = '继续保持良好的饮食和运动习惯！'; }
+      else if (bmi < 28) { level = '偏胖'; advice = '建议控制饮食总热量，增加有氧运动。'; }
+      else { level = '肥胖'; advice = '建议制定科学的减脂计划，必要时咨询医生。'; }
+      const cwJin = (cw * 2).toFixed(1);
+      return `你目前的 BMI 是 ${bmi.toFixed(1)}，属于「${level}」范围。\n\n身高 ${height}cm，体重 ${cwJin}斤（${cw.toFixed(1)}kg）。\n\n${advice}`;
+    }
+
+    if (intent === 'weight') {
+      if (!cw) return '还没有体重记录哦，去首页记录一下吧～';
+      const cwJin = (cw * 2).toFixed(1);
+      let reply = `你当前的体重是 ${cwJin}斤（${cw.toFixed(1)}kg）`;
+      if (tw) {
+        const diff = cw - tw;
+        const diffJin = (Math.abs(diff) * 2).toFixed(1);
+        if (diff > 0.05) reply += `\n距离目标 ${diffJin}斤（${diff.toFixed(1)}kg），继续加油！`;
+        else if (diff < -0.05) reply += `\n已经超过目标 ${diffJin}斤了，注意维持就好～`;
+        else reply += `\n已经达到目标体重了，太棒了！🎉`;
+      }
+      return reply;
+    }
+
+    if (intent === 'goal') {
+      if (!cw || !tw) return '你还没有设置目标体重哦，去个人资料页设置一下吧～';
+      const diff = cw - tw;
+      const diffJin = (Math.abs(diff) * 2).toFixed(1);
+      if (diff > 0.05)
+        return `当前体重 ${(cw * 2).toFixed(1)}斤，目标 ${(tw * 2).toFixed(1)}斤，还差 ${diffJin}斤（${diff.toFixed(1)}kg）。\n\n按每周减 0.5kg 的健康速度，大约还需要 ${(diff / 0.5).toFixed(0)} 周左右。加油！`;
+      else if (diff < -0.05)
+        return `你已经达标啦！当前 ${(cw * 2).toFixed(1)}斤，目标 ${(tw * 2).toFixed(1)}斤，还低了 ${diffJin}斤。保持住就好～`;
+      else
+        return `你已经达到目标体重了！当前 ${(cw * 2).toFixed(1)}斤，继续保持！🎉`;
+    }
+
+    if (intent === 'today_diet') {
+      const todayInfo = this._getTodayDietInfo();
+      if (!todayInfo) return '今天还没有饮食记录哦，去饮食页面记录一下吧～';
+      const { totalCal, mealDetails } = todayInfo;
+      let reply = `今天的饮食情况：\n\n${mealDetails}\n\n总共摄入 ${totalCal}kcal`;
+      if (goalCal) {
+        const remaining = goalCal - totalCal;
+        if (remaining > 0) {
+          reply += `，距目标还剩 ${remaining}kcal。`;
+          if (remaining > goalCal * 0.5) reply += '\n\n今天吃得比较少，注意营养均衡哦～';
+        } else {
+          reply += `，已超过目标 ${Math.abs(remaining)}kcal，注意控制一下。`;
+        }
+      }
+      return reply;
+    }
+
+    if (intent === 'diet_history') {
+      return this._getDietHistoryText() || '最近还没有饮食记录哦～';
+    }
+
+    if (intent === 'overview') {
+      return this._buildOverviewReply();
+    }
+
+    return null;
+  },
+
+  _getTodayDietInfo() {
+    const dietData = this._externalDietData || this._dietRawData;
+    if (!dietData || !dietData.length) return null;
+    const now = new Date();
+    const todayStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+    const todayData = dietData.find(d => this.formatDate(d.date) === todayStr);
+    if (!todayData || !todayData.records || todayData.records.length === 0) return null;
+    const cleanName = (name) => name.replace(/[""''<>{}[\]\\|\/]/g, '').replace(/\s+/g, ' ').trim();
+    let totalCal = 0;
+    const mealParts = [];
+    for (const r of todayData.records) {
+      const foodNames = (r.foods || []).map(f => cleanName(f.name)).filter(Boolean);
+      if (foodNames.length === 0) continue;
+      const cal = r.foods.reduce((s, f) => s + (parseInt(f.calories) || 0), 0);
+      totalCal += cal;
+      mealParts.push(`${r.mealLabel || '?'}：${foodNames.join('、')}（${cal}kcal）`);
+    }
+    if (totalCal === 0) return null;
+    return { totalCal, mealDetails: mealParts.join('\n') };
+  },
+
+  _getDietHistoryText() {
+    const dietData = this._externalDietData || this._dietRawData;
+    if (!dietData || !dietData.length) return null;
+    const now = new Date();
+    const todayStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+    const yesterday = new Date(now); yesterday.setDate(yesterday.getDate()-1);
+    const yStr = `${yesterday.getFullYear()}-${String(yesterday.getMonth()+1).padStart(2,'0')}-${String(yesterday.getDate()).padStart(2,'0')}`;
+    const cleanName = (name) => name.replace(/[""''<>{}[\]\\|\/]/g, '').replace(/\s+/g, ' ').trim();
+    const lines = [];
+    for (const day of dietData) {
+      const ds = this.formatDate(day.date);
+      const meals = day.records || [];
+      let calcTotal = 0;
+      const mealLines = [];
+      for (const r of meals) {
+        const foodNames = (r.foods || []).map(f => cleanName(f.name)).filter(Boolean);
+        if (foodNames.length === 0) continue;
+        const cal = r.foods.reduce((s, f) => s + (parseInt(f.calories) || 0), 0);
+        calcTotal += cal;
+        mealLines.push(`  ${r.mealLabel || '?'}：${foodNames.join('、')}（${cal}kcal）`);
+      }
+      if (mealLines.length === 0) continue;
+      const tag = ds === todayStr ? '今天' : ds === yStr ? '昨天' : ds;
+      lines.push(`${tag} 共 ${calcTotal}kcal`);
+      lines.push(...mealLines);
+    }
+    return lines.length > 0 ? lines.join('\n') : null;
+  },
+
+  _buildOverviewReply() {
+    const height = wx.getStorageSync('userHeight');
+    const weightData = wx.getStorageSync('weightData') || {};
+    const cw = weightData.currentWeight || null;
+    const tw = weightData.targetWeight || null;
+    const goalCal = wx.getStorageSync('localCalorieGoal') || null;
     const parts = [];
 
-    const height = wx.getStorageSync('userHeight');
-    if (height) parts.push(`身高：${height}cm`);
-
-    const weightData = wx.getStorageSync('weightData') || {};
-    const weightUnit = wx.getStorageSync('weightUnit') || 'kg';
-    const toJin = weightUnit === 'jin' ? 2 : 1;
-    const unitLabel = weightUnit === 'jin' ? '斤' : 'kg';
-
-    if (weightData.currentWeight) {
-      const cwKg = weightData.currentWeight;
-      const cwJin = (cwKg * 2).toFixed(1);
-      parts.push(`当前体重：${cwJin}斤（${cwKg.toFixed(1)}kg）`);
-    }
-    if (weightData.targetWeight) {
-      const twKg = weightData.targetWeight;
-      const twJin = (twKg * 2).toFixed(1);
-      parts.push(`目标体重：${twJin}斤（${twKg.toFixed(1)}kg）`);
-      if (weightData.currentWeight) {
-        const diffJin = ((weightData.currentWeight - weightData.targetWeight) * 2).toFixed(1);
-        const diffKg = (weightData.currentWeight - weightData.targetWeight).toFixed(1);
-        if (diffJin > 0) {
-          parts.push(`距目标：还差${diffJin}斤（${diffKg}kg），这是已计算好的准确数值`);
-        } else {
-          parts.push(`距目标：已达标！超出${Math.abs(diffJin)}斤`);
-        }
+    if (cw) {
+      const cwJin = (cw * 2).toFixed(1);
+      parts.push(`📏 体重：${cwJin}斤（${cw.toFixed(1)}kg）`);
+      if (tw) {
+        const diff = cw - tw;
+        if (diff > 0.05) parts.push(`🎯 目标差距：还差 ${(diff * 2).toFixed(1)}斤（${diff.toFixed(1)}kg）`);
+        else if (diff < -0.05) parts.push(`🎯 目标：已达标！超出 ${(Math.abs(diff) * 2).toFixed(1)}斤`);
+        else parts.push(`🎯 目标：已达标！🎉`);
       }
     }
 
-    if (height && weightData.currentWeight) {
-      const bmi = (weightData.currentWeight / Math.pow(height / 100, 2)).toFixed(1);
-      let bmiLevel = '';
-      if (bmi < 18.5) bmiLevel = '偏瘦';
-      else if (bmi < 24) bmiLevel = '正常';
-      else if (bmi < 28) bmiLevel = '偏胖';
-      else bmiLevel = '肥胖';
-      parts.push(`BMI：${bmi}（${bmiLevel}）`);
+    if (height && cw) {
+      const bmi = cw / Math.pow(height / 100, 2);
+      let level = bmi < 18.5 ? '偏瘦' : bmi < 24 ? '正常' : bmi < 28 ? '偏胖' : '肥胖';
+      parts.push(`📊 BMI：${bmi.toFixed(1)}（${level}）`);
     }
 
-    const calorieGoal = wx.getStorageSync('localCalorieGoal');
-    if (calorieGoal) parts.push(`每日热量目标：${calorieGoal}kcal`);
-
-    const localRecords = wx.getStorageSync('localRecords') || [];
-    if (localRecords.length >= 2) {
-      const sorted = [...localRecords].sort((a, b) => a.date.localeCompare(b.date));
-      const first = sorted[0];
-      const last = sorted[sorted.length - 1];
-      const diff = ((first.weight - last.weight) * toJin).toFixed(1);
-      parts.push(`打卡${sorted.length}次，体重变化：${diff > 0 ? '减了' : '涨了'}${Math.abs(diff)}${unitLabel}`);
+    const todayInfo = this._getTodayDietInfo();
+    if (todayInfo) {
+      const calLine = `🍽 今日摄入：${todayInfo.totalCal}kcal`;
+      if (goalCal) {
+        const remaining = goalCal - todayInfo.totalCal;
+        parts.push(remaining > 0 ? `${calLine} / 目标 ${goalCal}kcal（还剩 ${remaining}kcal）` : `${calLine} / 目标 ${goalCal}kcal（已超标 ${Math.abs(remaining)}kcal）`);
+      } else {
+        parts.push(calLine);
+      }
+    } else {
+      parts.push('🍽 今日饮食：暂无记录');
     }
 
-    if (parts.length === 0) return '（用户暂未填写健康档案）';
-    return '【用户健康档案】\n' + parts.join('\n');
+    if (cw && tw && (cw - tw) > 0.05) parts.push('\n💪 继续保持，你离目标越来越近了！');
+    else if (height && cw) {
+      const bmi = cw / Math.pow(height / 100, 2);
+      if (bmi >= 24 && bmi < 28) parts.push('\n💪 建议每天少吃 200-300kcal，加上 30 分钟有氧运动，会看到明显变化！');
+    }
+
+    if (parts.length === 0) return '你还没有填写健康档案哦，去个人资料页补充一下吧～';
+    return parts.join('\n');
   },
 
-  // 构建饮食上下文文本
-  buildDietContext(dietData) {
-    if (!dietData || !dietData.length) return '';
-    const lines = dietData.map(day => {
-      const records = day.records.map(r => {
-        const foods = r.foods.map(f => `${f.name}(${f.calories || 0}kcal)`).join('、');
-        return `  ${r.mealLabel}：${foods}`;
-      }).join('\n');
-      return `【${day.date}】共 ${day.totalCal} kcal\n${records}`;
-    }).join('\n\n');
-    return '【近期饮食记录】\n' + lines;
+  // ===== 知识库构建 =====
+
+  buildKnowledgeBase() {
+    const sections = [];
+    sections.push(this._buildProfileSection());
+    const dietSection = this._buildDietSection();
+    if (dietSection) sections.push(dietSection);
+    const kb = sections.join('\n\n');
+    console.log('[KB] 知识库长度:', kb.length, '内容预览:', kb.substring(0, 300));
+    this.setData({ knowledgeBase: kb });
+    return kb;
   },
 
-  // 快捷提问
+  _buildProfileSection() {
+    const lines = ['【用户健康档案】'];
+    const height = wx.getStorageSync('userHeight');
+    const weightData = wx.getStorageSync('weightData') || {};
+    const cw = weightData.currentWeight || null;
+    const tw = weightData.targetWeight || null;
+    const goalCal = wx.getStorageSync('localCalorieGoal') || null;
+    if (!height && !cw) return '【用户健康档案】（暂未填写）';
+    let hasData = false;
+    if (height) { lines.push(`身高：${height}cm`); hasData = true; }
+    if (cw) { lines.push(`当前体重：${cw.toFixed(1)}kg`); hasData = true; }
+    if (tw) { lines.push(`目标体重：${tw.toFixed(1)}kg`); hasData = true; }
+    if (cw && tw) {
+      const diff = cw - tw;
+      if (diff > 0.05) lines.push(`距目标还差：${diff.toFixed(1)}kg`);
+      else if (diff < -0.05) lines.push(`已超出目标：${Math.abs(diff).toFixed(1)}kg`);
+      else lines.push(`距目标：已达！`);
+    }
+    if (height && cw) {
+      const bmiVal = cw / Math.pow(height / 100, 2);
+      let level = '正常';
+      if (bmiVal < 18.5) level = '偏瘦';
+      else if (bmiVal >= 28) level = '肥胖';
+      else if (bmiVal >= 24) level = '偏胖';
+      lines.push(`BMI：${bmiVal.toFixed(1)}（${level}）`);
+    }
+    if (goalCal) { lines.push(`每日热量目标：${goalCal}kcal`); hasData = true; }
+    return hasData ? lines.join('\n') : '【用户健康档案】（暂未填写）';
+  },
+
+  _buildDietSection() {
+    const dietData = this._externalDietData || this._dietRawData;
+    if (!dietData || !dietData.length) return null;
+    const now = new Date();
+    const todayStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+    const yesterday = new Date(now); yesterday.setDate(yesterday.getDate()-1);
+    const yStr = `${yesterday.getFullYear()}-${String(yesterday.getMonth()+1).padStart(2,'0')}-${String(yesterday.getDate()).padStart(2,'0')}`;
+    const cleanName = (name) => name.replace(/[""''<>{}[\]\\|\/]/g, '').replace(/\s+/g, ' ').trim();
+    const sections = [];
+    for (const day of dietData) {
+      const ds = this.formatDate(day.date);
+      const meals = day.records || [];
+      let calcTotal = 0;
+      const mealLines = [];
+      for (let i = 0; i < meals.length; i++) {
+        const r = meals[i];
+        const foodNames = (r.foods || []).map(f => cleanName(f.name)).filter(Boolean);
+        if (foodNames.length === 0) continue;
+        const cal = r.foods.reduce((s, f) => s + (parseInt(f.calories) || 0), 0);
+        calcTotal += cal;
+        // 用更清晰的格式：[餐次] 食物列表 = XXX kcal
+        mealLines.push(`${i+1}.【${r.mealLabel || '?'}】食物：${foodNames.join('、')} | 热量：${cal}kcal`);
+      }
+      if (mealLines.length === 0) continue;
+      const tag = ds === todayStr ? '【今天】' : ds === yStr ? '【昨天】' : ds;
+      sections.push(`${tag}总热量：${calcTotal}kcal`);
+      sections.push(...mealLines);
+    }
+    if (sections.length === 0) return null;
+    return '【近期饮食记录（精确数据）】\n' + sections.join('\n');
+  },
+
+  formatDate(dateStr) {
+    if (!dateStr) return '未知';
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr;
+    const d = new Date(dateStr);
+    if (!isNaN(d.getTime())) return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    return dateStr;
+  },
+
+  // ===== 交互：快捷提问 / 输入 =====
+
   onQuickQuestion(e) {
-    const question = e.currentTarget.dataset.q;
+    const q = e.currentTarget.dataset.q;
     if (this.data.isLoading) return;
-    this.sendMessage(question);
+    this.sendMessage(q);
   },
 
-  // 输入框输入
   onInput(e) {
     this.setData({ inputValue: e.detail.value });
   },
 
-  // 发送消息
   async onSend() {
     const text = this.data.inputValue.trim();
     if (!text || this.data.isLoading) return;
     this.sendMessage(text);
   },
 
-  // 核心：发送消息并获取 AI 回复
-  async sendMessage(text) {
-    // 添加用户消息
+  // ===== 发送消息（混合模式 + 流式输出）=====
+
+  async sendMessage(text, isResend = false) {
     const userMsg = { role: 'user', content: text };
-    const messages = [...this.data.messages, userMsg];
-    this.setData({
-      messages,
-      inputValue: '',
-      isLoading: true,
-      userContext: this.buildUserContext()
-    });
+
+    let messages;
+    if (isResend && this.data.editIndex >= 0) {
+      // 重发模式：替换编辑中的那条用户消息
+      messages = [...this.data.messages];
+      messages[this.data.editIndex] = userMsg;
+      this.setData({ messages, inputValue: '', isLoading: true, editIndex: -1, editValue: '' });
+    } else {
+      messages = [...this.data.messages, userMsg];
+      this.setData({ messages, inputValue: '', isLoading: true });
+    }
+
     this.saveMessages(messages);
     this.scrollToBottom();
 
-    // 构建发送给云函数的消息（只保留最近的 10 条，避免 token 超限）
-    const recentMessages = messages.slice(-10).map(m => ({
-      role: m.role,
-      content: m.content
-    }));
+    // 意图识别 → 模板优先
+    const intent = this._detectIntent(text);
+    console.log('[Chat] 意图:', intent, '问题:', text.substring(0, 30));
+
+    const templateReply = this._templateReply(intent);
+    if (templateReply) {
+      // 模板命中 → 用打字机效果展示
+      console.log('[Chat] 模板命中，流式展示');
+      this._startStreamEffect(templateReply, messages);
+      return;
+    }
+
+    // 走 AI
+    console.log('[Chat] 模板未命中，走 AI');
+    try {
+      await Promise.all([this.loadDietData(), this.refreshWeightFromCloud()]);
+    } catch(e) {}
+    const kb = this.buildKnowledgeBase();
+    const recentMsgs = messages.slice(-10).map(m => ({ role: m.role, content: m.content }));
 
     try {
       const res = await wx.cloud.callFunction({
         name: 'aiChat',
-        data: {
-          messages: recentMessages,
-          userContext: this.data.userContext || '',
-          dietContext: this.data.dietContext || ''
-        }
+        data: { messages: recentMsgs, knowledgeBase: kb }
       });
 
       const result = res.result || {};
       if (result.success && result.reply) {
-        const aiMsg = { role: 'assistant', content: result.reply };
-        const updatedMessages = [...this.data.messages, aiMsg];
-        this.setData({
-          messages: updatedMessages,
-          isLoading: false
-        });
-        this.saveMessages(updatedMessages);
+        this._startStreamEffect(result.reply, messages);
       } else {
-        const errMsg = {
-          role: 'assistant',
-          content: `抱歉，出了点小问题：${result.error || '未知错误'}\n请稍后再试试～`
-        };
-        const errMessages = [...this.data.messages, errMsg];
-        this.setData({
-          messages: errMessages,
-          isLoading: false
-        });
-        this.saveMessages(errMessages);
+        this._showError(result.error || '未知错误');
       }
     } catch (err) {
-      console.error('调用 AI 云函数失败:', err);
-      const errMsg = {
-        role: 'assistant',
-        content: `服务异常：${err.message || '未知错误'}\n请稍后再试试～`
-      };
-      const netMessages = [...this.data.messages, errMsg];
-      this.setData({
-        messages: netMessages,
-        isLoading: false
-      });
-      this.saveMessages(netMessages);
+      console.error('调用 AI 失败:', err);
+      this._showError(err.message || '网络异常');
+    }
+  },
+
+  // ===== 核心功能：打字机流式输出效果 =====
+
+  /**
+   * 将 AI 文本转换为 rich-text nodes（规范排版）
+   * 处理：**加粗** / 数字列表 / 项目符号
+   */
+  _formatRichText(text) {
+    if (!text) return '';
+    let html = text;
+    // 转义 HTML
+    html = html.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    // **加粗** → <strong>
+    html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    // 有序列表：1. xxx → <ol><li>xxx</li></ol> (连续行合并)
+    const lines = html.split('\n');
+    let result = [];
+    let inOl = false;
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+      const olMatch = line.match(/^(\d+)[\.\、\s](.+)$/);
+      if (olMatch) {
+        if (!inOl) { inOl = true; result.push('<ol>'); }
+        result.push(`<li>${olMatch[2]}</li>`);
+      } else {
+        if (inOl) { inOl = false; result.push('</ol>'); }
+        // 无序列表：- 或 • 开头
+        const ulMatch = line.match(/^[-•·]\s+(.+)$/);
+        if (ulMatch) {
+          result.push(`<ul><li>${ulMatch[1]}</li></ul>`);
+        } else if (line) {
+          result.push(`<p>${line}</p>`);
+        } else {
+          result.push('<br/>');
+        }
+      }
+    }
+    if (inOl) result.push('</ol>');
+    return result.join('');
+  },
+
+  /**
+   * 打字机效果：收到完整文本后逐字显示，模拟流式体验
+   */
+  _startStreamEffect(fullText, baseMessages) {
+    const aiIndex = baseMessages.length;
+
+    // 插入 streaming 状态的空消息
+    const streamMsg = { role: 'assistant', content: fullText, displayContent: '', streaming: true };
+    const updated = [...baseMessages, streamMsg];
+
+    this.setData({
+      messages: updated,
+      isStreaming: true,
+      isLoading: false   // 关闭点点点，改用光标闪烁
+    });
+
+    this.saveMessages(updated);
+
+    // 清除旧定时器
+    if (this._typingTimer) clearInterval(this._typingTimer);
+
+    let charPos = 0;
+    // 长文每次推进多几个字，短文慢一点更有"打字感"
+    const stepSize = fullText.length > 200 ? 3 : 2;
+    // 长文间隔短，加速；短文间隔长，更有质感
+    const intervalMs = fullText.length > 200 ? 10 : 16;
+
+    this._typingTimer = setInterval(() => {
+      charPos += stepSize;
+
+      if (charPos >= fullText.length) {
+        // 流式完成
+        clearInterval(this._typingTimer);
+        this._typingTimer = null;
+
+        // 最终态：关闭 streaming 标记和光标，生成富文本
+        const finalMsgs = this.data.messages.map((m, i) =>
+          i === aiIndex
+            ? { ...m, displayContent: fullText, richNodes: this._formatRichText(fullText), streaming: false }
+            : m
+        );
+        this.setData({ messages: finalMsgs, isStreaming: false });
+        this.saveMessages(finalMsgs);
+        this.scrollToBottom();
+        return;
+      }
+
+      // 推进显示内容
+      const partial = fullText.substring(0, charPos);
+
+      // 高效更新：只修改特定索引的 displayContent
+      const keyPath = `messages[${aiIndex}].displayContent`;
+      this.setData({ [keyPath]: partial });
+      this.scrollToBottom();
+    }, intervalMs);
+  },
+
+  // ===== 消息操作：编辑重发 & 长按复制 =====
+
+  /**
+   * 用户气泡单击 → 直接进入编辑模式
+   */
+  onMsgTap(e) {
+    const { index, content } = e.currentTarget.dataset;
+    if (!content) return;
+    this.setData({
+      editIndex: index,
+      editValue: content
+    });
+  },
+
+  /**
+   * 用户气泡长按 → 复制到剪贴板
+   */
+  onMsgLongPress(e) {
+    const { content } = e.currentTarget.dataset;
+    if (content) {
+      wx.setClipboardData({ data: content });
+    }
+  },
+
+  onEditInput(e) {
+    this.setData({ editValue: e.detail.value });
+  },
+
+  onCancelEdit() {
+    this.setData({ editIndex: -1, editValue: '' });
+  },
+
+  onResendEdit() {
+    const newText = this.data.editValue.trim();
+    if (!newText) {
+      this.setData({ editIndex: -1, editValue: '' });
+      return;
     }
 
+    // 裁剪：保留到被编辑的消息为止（删掉后续的AI回复等）
+    const cutAt = this.data.editIndex + 1;
+    const trimmed = this.data.messages.slice(0, cutAt);
+    this.saveMessages(trimmed);
+    this.setData({ editIndex: -1, editValue: '' });
+
+    // 用新内容重新发送
+    this.sendMessage(newText, true);
+  },
+
+  // ===== 辅助方法 =====
+
+  _showError(errMsg) {
+    const msg = { role: 'assistant', content: `抱歉出了点问题：${errMsg}\n请稍后再试试～` };
+    const updated = [...this.data.messages, msg];
+    this.setData({ messages: updated, isLoading: false, isStreaming: false });
+    this.saveMessages(updated);
     this.scrollToBottom();
   },
 
-  // 滚动到底部
   scrollToBottom() {
-    const messages = this.data.messages;
-    if (messages.length > 0) {
-      this.setData({
-        scrollToView: `msg-${messages.length - 1}`
-      });
-    }
+    const msgs = this.data.messages;
+    if (msgs.length > 0) this.setData({ scrollToView: `msg-${msgs.length - 1}` });
   },
 
-  // 保存聊天记录到本地（最多保留 50 条）
-  saveMessages(messages) {
-    const toSave = messages.slice(-50);
-    wx.setStorageSync('aiChatMessages', toSave);
+  saveMessages(msgs) {
+    wx.setStorageSync('aiChatMessages', msgs.slice(-50));
   },
 
-  // 复制消息内容
   onCopyMessage(e) {
-    const text = e.currentTarget.dataset.text;
-    const index = e.currentTarget.dataset.index;
+    const { text, index } = e.currentTarget.dataset;
     if (!text) return;
     wx.setClipboardData({
       data: text,
       success: () => {
         wx.hideToast();
         this.setData({ copiedIndex: index });
-        setTimeout(() => {
-          this.setData({ copiedIndex: -1 });
-        }, 3000);
+        setTimeout(() => this.setData({ copiedIndex: -1 }), 3000);
       }
     });
   },
 
-  // 分享给朋友
   onShareAppMessage() {
-    const lastAiMsg = [...this.data.messages].reverse().find(m => m.role === 'assistant');
-    const title = lastAiMsg
-      ? lastAiMsg.content.slice(0, 30) + (lastAiMsg.content.length > 30 ? '...' : '')
-      : 'AI 营养师为你解答饮食健康问题';
+    const lastAi = [...this.data.messages].reverse().find(m => m.role === 'assistant');
     return {
-      title,
+      title: lastAi ? lastAi.content.slice(0,30) + (lastAi.content.length>30?'...':'') : '营养师为你解答饮食健康问题',
       path: '/pages/ai-chat/ai-chat',
       imageUrl: '/images/share-ai-chat.png'
     };
   },
 
-  // 分享到朋友圈
   onShareTimeline() {
-    return {
-      title: 'AI 营养师 - 你的专属健康饮食顾问',
-      query: '',
-      imageUrl: '/images/share-ai-chat.png'
-    };
+    return { title: '健康问答 - 你的专属营养师', query: '', imageUrl: '/images/share-ai-chat.png' };
   },
 
-  // 清空对话
   onClearChat() {
+    // 流式输出时禁止清空
+    if (this.data.isStreaming) return;
+
     wx.showModal({
-      title: '清空对话',
-      content: '确定要清空当前聊天记录吗？',
+      title: '清空对话', content: '确定要清空吗？',
       success: (res) => {
         if (res.confirm) {
-          const welcomeMsg = { role: 'assistant', content: WELCOME_MSG };
-          const msgs = [welcomeMsg];
-          this.setData({
-            messages: msgs,
-            dietContext: ''
-          });
+          // 停止正在进行的打字效果
+          if (this._typingTimer) {
+            clearInterval(this._typingTimer);
+            this._typingTimer = null;
+          }
+          const msgs = [{ role: 'assistant', content: WELCOME_MSG }];
+          this.setData({ messages: msgs, knowledgeBase: '', isStreaming: false });
           this.saveMessages(msgs);
         }
       }
