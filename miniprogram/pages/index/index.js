@@ -1272,13 +1272,13 @@ Page({
   initTheme() {
     const themeSetting = app.getThemeSetting();
     const effectiveTheme = app.getEffectiveTheme();
+    // 状态栏颜色必须每次都设置，否则首次进入/切Tab时状态栏文字看不清
+    this.setPullDownRefreshBg(effectiveTheme);
     if (this.data.currentTheme !== effectiveTheme || this.data.currentThemeSetting !== themeSetting) {
       this.setData({
         currentTheme: effectiveTheme,
         currentThemeSetting: themeSetting
       });
-      // 仅主题变化时才调用原生API，避免切tab时无谓的重绘闪烁
-      this.setPullDownRefreshBg(effectiveTheme);
       app.applyThemeToTabBar();
     }
   },

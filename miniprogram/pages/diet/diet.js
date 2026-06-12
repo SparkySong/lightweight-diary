@@ -897,12 +897,12 @@ Page({
   // 主题相关方法
   initTheme() {
     const theme = app.getEffectiveTheme();
-    // 只有主题变化时才更新，避免不必要的 setData 和原生 API 调用导致闪烁
+    // 状态栏颜色必须每次都设置，否则首次进入/切Tab时状态栏文字看不清
+    this.setPullDownRefreshBg(theme);
     if (this.data.currentTheme !== theme) {
       this.setData({
         currentTheme: theme
       });
-      this.setPullDownRefreshBg(theme);
       app.applyThemeToTabBar();
     }
   },

@@ -153,15 +153,15 @@ Page({
     const themeSetting = wx.getStorageSync('appTheme') || 'dark';
     const effectiveTheme = app.getEffectiveTheme();
     const themeDesc = this.calcThemeDesc(themeSetting);
+    // 状态栏颜色必须每次都设置，否则首次进入/切Tab时状态栏文字看不清
+    this.setNavigationBarColor(effectiveTheme);
+    this.setPullDownRefreshBg(effectiveTheme);
     if (
       this.data.currentTheme !== effectiveTheme ||
       this.data.themeSetting !== themeSetting ||
       this.data.themeDesc !== themeDesc
     ) {
       this.setData({ currentTheme: effectiveTheme, themeSetting, themeDesc });
-      // 仅主题变化时才调用原生API
-      this.setNavigationBarColor(effectiveTheme);
-      this.setPullDownRefreshBg(effectiveTheme);
       app.applyThemeToTabBar();
     }
   },

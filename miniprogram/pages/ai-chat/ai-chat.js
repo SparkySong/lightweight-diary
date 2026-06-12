@@ -18,6 +18,7 @@ Page({
     userAvatar: DEFAULT_AVATAR,
     copiedIndex: -1,
     currentTheme: app.getEffectiveTheme(),
+    hidePage: false,
     quickQuestions: [
       '分析我的整体情况',
       '我的BMI正常吗',
@@ -63,28 +64,48 @@ Page({
       }
     }
 
-    this.setNavColor();
+    this.initTheme();
     setTimeout(() => this.scrollToBottom(), 100);
   },
 
   onShow() {
+    // 每次进入页面都重新初始化主题
     this.initTheme();
   },
 
   initTheme() {
     const theme = app.getEffectiveTheme();
+    // 只有主题变化时才更新
     if (this.data.currentTheme !== theme) {
       this.setData({ currentTheme: theme });
-      this.setNavColor();
     }
-  },
-
-  setNavColor() {
-    const theme = this.data.currentTheme;
+    
+    // 动态设置导航栏颜色
     wx.setNavigationBarColor({
       frontColor: theme === 'light' ? '#000000' : '#ffffff',
-      backgroundColor: theme === 'light' ? '#F8FAF9' : '#121212'
+      backgroundColor: theme === 'light' ? '#F8FAF9' : '#121212',
+      animation: { duration: 0, timingFunc: 'linear' }
     });
+    
+    if (wx.setBackgroundTextStyle) {
+      wx.setBackgroundTextStyle({
+        textStyle: theme === 'light' ? 'dark' : 'light'
+      });
+    }
+
+    if (theme === 'light') {
+      wx.setBackgroundColor({
+        backgroundColor: '#F8FAF9',
+        backgroundColorTop: '#F8FAF9',
+        backgroundColorBottom: '#F8FAF9',
+      });
+    } else {
+      wx.setBackgroundColor({
+        backgroundColor: '#121212',
+        backgroundColorTop: '#121212',
+        backgroundColorBottom: '#121212',
+      });
+    }
   },
 
   // ===== 数据加载 =====

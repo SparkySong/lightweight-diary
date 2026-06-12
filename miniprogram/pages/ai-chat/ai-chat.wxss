@@ -2,25 +2,18 @@
 @import "/styles/simple-theme.wxss";
 @import "/styles/theme.wxss";
 
-/* ========== 页面容器 ========== */
-page {
-  background-color: #121212;
-}
-
-page.theme-light {
-  background-color: #F8FAF9;
-}
+/* ========== 页面容器（不硬编码背景色，跟随全局主题） ========== */
 
 .chat-page {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background-color: #121212;
+  background-color: transparent;   /* 透出 page-meta 设置的背景色 */
   overflow: hidden;
 }
 
-.chat-page.theme-light {
-  background-color: #F8FAF9;
+.theme-light .chat-page {
+  background-color: transparent;
 }
 
 /* ========== 消息列表 ========== */

@@ -1,5 +1,14 @@
 <!--pages/ai-chat/ai-chat.wxml-->
-<page class="{{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}}">
+<!-- 页面元信息，在 JS 中动态设置背景色和状态栏（必须作为页面第一个节点）-->
+<page-meta
+  background-text-style="{{currentTheme === 'light' ? 'dark' : 'light'}}"
+  background-color="{{currentTheme === 'light' ? '#F8FAF9' : '#121212'}}"
+  background-color-top="{{currentTheme === 'light' ? '#F8FAF9' : '#121212'}}"
+  background-color-bottom="{{currentTheme === 'light' ? '#F8FAF9' : '#121212'}}"
+  root-background-color="{{currentTheme === 'light' ? '#F8FAF9' : '#121212'}}"
+  navigation-bar-style="{{currentTheme === 'light' ? 'dark' : 'light'}}"
+/>
+<page class="{{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}} {{hidePage ? 'page-hiding' : ''}}">
 
 <view class="chat-page {{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}}">
 

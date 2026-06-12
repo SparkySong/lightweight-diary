@@ -1,10 +1,1 @@
-{
-  "usingComponents": {},
-  "navigationBarTitleText": "健康问答",
-  "navigationBarBackgroundColor": "#121212",
-  "navigationBarTextStyle": "white",
-  "navigationStyle": "default",
-  "enablePullDownRefresh": false,
-  "enableShareAppMessage": true,
-  "enableShareTimeline": true
-}
+{"usingComponents": {}, "navigationStyle": "default", "navigationBarTitleText": "健康问答", "navigationBarBackgroundColor": "#121212", "navigationBarTextStyle": "white", "enablePullDownRefresh": false}
