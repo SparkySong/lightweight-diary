@@ -2,7 +2,7 @@
 const app = getApp();
 
 const getInitTheme = () => {
-  const themeSetting = wx.getStorageSync('appTheme') || 'dark';
+  const themeSetting = wx.getStorageSync('appTheme') || 'system';
   if (themeSetting === 'system') {
     try {
       if (wx.getDeviceInfo && wx.getDeviceInfo().theme) {

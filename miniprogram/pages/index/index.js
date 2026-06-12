@@ -12,7 +12,7 @@ const KG_TO_JIN = 2; // 1kg = 2斤
 
 // 🔑 关键修复：从存储获取当前生效的主题（用于 data 初始值，避免闪烁）
 const getInitTheme = () => {
-  const themeSetting = wx.getStorageSync('appTheme') || 'dark';
+  const themeSetting = wx.getStorageSync('appTheme') || 'system';
   if (themeSetting === 'system') {
     // 跟随系统模式时，尝试获取系统主题
     try {
@@ -31,7 +31,7 @@ const getInitTheme = () => {
 };
 
 const getInitThemeSetting = () => {
-  return wx.getStorageSync('appTheme') || 'dark';
+  return wx.getStorageSync('appTheme') || 'system';
 };
 
 const formatDateStr = (date) => {

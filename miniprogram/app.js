@@ -50,11 +50,11 @@ App({
     });
   },
   
-  // 初始化主题
+  // 初始化主题（默认跟随系统）
   initTheme() {
     let theme = wx.getStorageSync('appTheme');
     if (!theme) {
-      theme = 'dark'; // 默认深色模式
+      theme = 'system'; // 默认跟随系统，避免 darkmode 切换闪烁
       wx.setStorageSync('appTheme', theme);
     }
     this.globalData.theme = theme;
@@ -80,7 +80,7 @@ App({
     if (themeSetting === 'system') {
       return this.getSystemTheme();
     }
-    return themeSetting || 'dark';
+    return themeSetting || 'system';
   },
   
   // 获取微信客户端主题
@@ -198,7 +198,7 @@ App({
   
   // 获取主题设置（区分手动设置和跟随系统）
   getThemeSetting() {
-    return wx.getStorageSync('appTheme') || 'dark';
+    return wx.getStorageSync('appTheme') || 'system';
   },
   
   // 获取显示用主题（实际生效的主题）

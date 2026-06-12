@@ -7,7 +7,7 @@ const DEFAULT_AVATAR = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy
 
 // 🔑 关键修复：从存储获取当前生效的主题（用于 data 初始值，避免闪烁）
 const getInitTheme = () => {
-  const themeSetting = wx.getStorageSync('appTheme') || 'dark';
+  const themeSetting = wx.getStorageSync('appTheme') || 'system';
   if (themeSetting === 'system') {
     try {
       if (wx.getDeviceInfo && wx.getDeviceInfo().theme) {
@@ -25,7 +25,7 @@ const getInitTheme = () => {
 };
 
 const getInitThemeSetting = () => {
-  return wx.getStorageSync('appTheme') || 'dark';
+  return wx.getStorageSync('appTheme') || 'system';
 };
 
 const getInitThemeDesc = () => {
@@ -150,7 +150,7 @@ Page({
 
   // ========== 主题相关 ==========
   initTheme() {
-    const themeSetting = wx.getStorageSync('appTheme') || 'dark';
+    const themeSetting = wx.getStorageSync('appTheme') || 'system';
     const effectiveTheme = app.getEffectiveTheme();
     const themeDesc = this.calcThemeDesc(themeSetting);
     // 状态栏颜色必须每次都设置，否则首次进入/切Tab时状态栏文字看不清
@@ -167,7 +167,7 @@ Page({
   },
 
   onThemeChange() {
-    const themeSetting = wx.getStorageSync('appTheme') || 'dark';
+    const themeSetting = wx.getStorageSync('appTheme') || 'system';
     const effectiveTheme = app.getEffectiveTheme();
     const themeDesc = this.calcThemeDesc(themeSetting);
     this.setData({ currentTheme: effectiveTheme, themeSetting, themeDesc });

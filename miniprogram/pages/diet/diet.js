@@ -6,7 +6,7 @@ const PAGE_SIZE = 10;
 
 // 🔑 关键修复：从存储获取当前生效的主题（用于 data 初始值，避免闪烁）
 const getInitTheme = () => {
-  const themeSetting = wx.getStorageSync('appTheme') || 'dark';
+  const themeSetting = wx.getStorageSync('appTheme') || 'system';
   if (themeSetting === 'system') {
     try {
       if (wx.getDeviceInfo && wx.getDeviceInfo().theme) {
