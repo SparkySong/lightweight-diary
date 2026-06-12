@@ -145,9 +145,12 @@ Page({
 
   _detectIntent(text) {
     const t = text.toLowerCase().trim();
+    // 食品安全/健康咨询类问题 → 走 AI，不要用模板
+    if (/隔夜|放冰箱|冷藏|加热.*吃|微波炉|变质|坏了|能.*吃|可以.*吃|安全吗|有没有毒|细菌|保质期|过期|剩菜|剩饭|外卖|路边摊|卫生|食物中毒/.test(t)) return 'general';
     if (/bmi|体质指数|体重指数/.test(t)) return 'bmi';
     if (/体重|多重|多重了|目前多重|当前多重|减了|瘦了|胖了/.test(t) && !/饮食|吃|食谱|建议|怎么/.test(t)) return 'weight';
-    if (/今天.*吃|今日.*吃|今天.*饮食|今日.*饮食|今天.*热量|吃.*怎么|今天吃/.test(t)) return 'today_diet';
+    // today_diet 排除：不是在问"我今天吃了什么/记录"，而是其他涉及"吃"的问题
+    if (/(今天|今日).*(饮食|吃了什么|摄入|热量)/.test(t) || /今天吃.*怎么样|今天吃得/.test(t)) return 'today_diet';
     if (/分析.*情况|整体.*情况|我的情况|综合.*分析|全面.*分析/.test(t)) return 'overview';
     if (/饮食记录|吃了什么|最近.*吃|昨天.*吃|前天.*吃/.test(t)) return 'diet_history';
     if (/目标|还差多少|距目标|还要减|还.*减/.test(t) && !/怎么|如何|建议/.test(t)) return 'goal';
@@ -468,39 +471,97 @@ Page({
 
   /**
    * 将 AI 文本转换为 rich-text nodes（规范排版）
-   * 处理：**加粗** / 数字列表 / 项目符号
+   * 处理：**加粗** / *小标题* / 数字列表 / 项目符号（合并连续项）
+   * 兜底：纯文本自动识别隐含结构并美化
    */
   _formatRichText(text) {
     if (!text) return '';
     let html = text;
-    // 转义 HTML
+    // 转义 HTML（在格式标记处理之前）
     html = html.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
     // **加粗** → <strong>
     html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-    // 有序列表：1. xxx → <ol><li>xxx</li></ol> (连续行合并)
+    // *小标题* → <h3>（单星号包裹的短文本，独占一行）
+    html = html.replace(/^\*(.+?)\*$/gm, '<h3>$1</h3>');
+    // 行内 *文字* 去掉星号（避免显示为原始符号）
+    html = html.replace(/(?<!\n)\*(?!\*)(.+?)\*(?!\*)/g, '$1');
+
     const lines = html.split('\n');
-    let result = [];
+    const result = [];
     let inOl = false;
+    let inUl = false;
+
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i].trim();
-      const olMatch = line.match(/^(\d+)[\.\、\s](.+)$/);
-      if (olMatch) {
-        if (!inOl) { inOl = true; result.push('<ol>'); }
-        result.push(`<li>${olMatch[2]}</li>`);
-      } else {
-        if (inOl) { inOl = false; result.push('</ol>'); }
-        // 无序列表：- 或 • 开头
-        const ulMatch = line.match(/^[-•·]\s+(.+)$/);
-        if (ulMatch) {
-          result.push(`<ul><li>${ulMatch[1]}</li></ul>`);
-        } else if (line) {
-          result.push(`<p>${line}</p>`);
-        } else {
-          result.push('<br/>');
-        }
+
+      // 空行 → 关闭当前列表环境
+      if (!line) {
+        if (inOl) { result.push('</ol>'); inOl = false; }
+        if (inUl) { result.push('</ul>'); inUl = false; }
+        continue;
       }
+
+      // 已是 HTML 标签（<h3>, <strong> 包裹等）
+      if (line.startsWith('<')) {
+        if (inOl) { result.push('</ol>'); inOl = false; }
+        if (inUl) { result.push('</ul>'); inUl = false; }
+        if (line.startsWith('<h3>')) {
+          result.push(line);
+        } else {
+          result.push(`<p>${line}</p>`);
+        }
+        continue;
+      }
+
+      // 有序列表：1. 2. 3. 或 1）2）或 (1)(2)
+      const olMatch = line.match(/^(\d+)[\.\）、\s]\s*(.+)$/);
+      if (olMatch) {
+        if (inUl) { result.push('</ul>'); inUl = false; }
+        if (!inOl) { inOl = true; result.push('<ol class="ai-ol">'); }
+        result.push(`<li>${olMatch[2]}</li>`);
+        continue;
+      }
+
+      // 无序列表：- • · 👉 ✅ ⚠️ 💡 🔸 ▸ ► 等开头
+      const ulMatch = line.match(/^[-•·👉✅⚠️💡🔸▸►]\s*(.+)$/);
+      if (ulMatch) {
+        if (inOl) { result.push('</ol>'); inOl = false; }
+        if (!inUl) { inUl = true; result.push('<ul class="ai-ul">'); }
+        result.push(`<li>${ulMatch[1]}</li>`);
+        continue;
+      }
+
+      // === 兜底：纯文本智能结构识别 ===
+
+      // 识别隐含小标题：以 "总结|建议|注意|总体|总之|所以|但是|不过|另外" 等开头的短行
+      const headingMatch = line.match(/^(总结|建议|注意|总体|总之|所以|不过|另外|分析|结论|提醒|小贴士|温馨提示)[：:]\s*(.*)$/);
+      if (headingMatch && line.length < 30) {
+        if (inOl) { result.push('</ol>'); inOl = false; }
+        if (inUl) { result.push('</ul>'); inUl = false; }
+        result.push(`<h3>${headingMatch[1]}${headingMatch[2] ? '：' + headingMatch[2] : ''}</h3>`);
+        continue;
+      }
+
+      // 识别隐含列表项：以 "首先|其次|然后|最后|一是|二是|三是|另外|还有" 开头
+      const implicitLi = line.match(/^(首先|其次|然后|最后|其一|其二|其三|一是|二是|三是|另外|还有|此外|而且)[，,：:]\s*(.+)$/);
+      if (implicitLi) {
+        if (inOl) { result.push('</ol>'); inOl = false; }
+        if (!inUl) { inUl = true; result.push('<ul class="ai-ul">'); }
+        result.push(`<li>${implicitLi[2]}</li>`);
+        continue;
+      }
+
+      // 普通文本段落
+      if (inOl) { result.push('</ol>'); inOl = false; }
+      if (inUl) { result.push('</ul>'); inUl = false; }
+      result.push(`<p>${line}</p>`);
     }
+
+    // 收尾关闭未关闭的标签
     if (inOl) result.push('</ol>');
+    if (inUl) result.push('</ul>');
+
     return result.join('');
   },
 

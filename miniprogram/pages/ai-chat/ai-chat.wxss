@@ -241,8 +241,24 @@
 }
 
 /* rich-text 内部排版样式 */
-.bubble-rich p { margin: 0 0 10rpx 0; }
+.bubble-rich p { margin: 0 0 12rpx 0; }
 .bubble-rich p:last-child { margin-bottom: 0; }
+
+/* 小标题（*标题* 渲染为 h3） */
+.bubble-rich h3 {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #5FA895;
+  margin: 20rpx 0 12rpx 0;
+  padding-left: 16rpx;
+  border-left: 5rpx solid #5FA895;
+  line-height: 1.4;
+}
+
+.theme-light .bubble-rich h3 {
+  color: #3A8A76;
+  border-left-color: #4A9B8A;
+}
 
 /* 加粗 */
 .bubble-rich strong {
@@ -253,28 +269,72 @@
   color: #3A8A76;
 }
 
-/* 有序列表 */
-.bubble-rich ol {
-  margin: 8rpx 0;
-  padding-left: 36rpx;
-  list-style-type: decimal;
-}
-
-.bubble-rich ol li {
-  padding: 4rpx 0 4rpx 12rpx;
-  line-height: 1.7;
-}
-
-/* 无序列表 */
-.bubble-rich ul {
-  margin: 8rpx 0;
+/* 有序列表 — 精致编号风格 */
+.bubble-rich .ai-ol {
+  margin: 12rpx 0;
   padding-left: 40rpx;
-  list-style-type: disc;
+  list-style-type: none;
+  counter: ai-ol-counter;
 }
 
-.bubble-rich ul li {
-  padding: 4rpx 0 4rpx 8rpx;
+.bubble-rich .ai-ol li {
+  padding: 8rpx 0 8rpx 24rpx;
   line-height: 1.7;
+  position: relative;
+  counter-increment: ai-ol-counter;
+}
+
+.bubble-rich .ai-ol li::before {
+  content: counter(ai-ol-counter);
+  position: absolute;
+  left: -28rpx;
+  top: 8rpx;
+  width: 36rpx;
+  height: 36rpx;
+  background: rgba(95,168,149,0.15);
+  color: #5FA895;
+  font-size: 22rpx;
+  font-weight: 700;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 36rpx;
+  text-align: center;
+}
+
+.theme-light .bubble-rich .ai-ol li::before {
+  background: rgba(74,155,138,0.12);
+  color: #3A8A76;
+}
+
+/* 无序列表 — 圆点 + 缩进 */
+.bubble-rich .ai-ul {
+  margin: 10rpx 0;
+  padding-left: 40rpx;
+  list-style-type: none;
+}
+
+.bubble-rich .ai-ul li {
+  padding: 6rpx 0 6rpx 20rpx;
+  line-height: 1.75;
+  position: relative;
+}
+
+.bubble-rich .ai-ul li::before {
+  content: '';
+  position: absolute;
+  left: -20rpx;
+  top: 18rpx;
+  width: 12rpx;
+  height: 12rpx;
+  background: #5FA895;
+  border-radius: 50%;
+  opacity: 0.7;
+}
+
+.theme-light .bubble-rich .ai-ul li::before {
+  background: #4A9B8A;
 }
 
 /* ========== 编辑模式 — 清晰可读 ========== */

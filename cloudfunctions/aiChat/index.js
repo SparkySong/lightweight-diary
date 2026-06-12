@@ -3,11 +3,26 @@ const https = require('https');
 
 const API_KEY = 'sk-43f98e89b7017525e80286fe7959b857690a6a7f99466f1ff37fc8161fc44bc3';
 
-// ====== 精简 System Prompt（~150 token，极速响应）======
+// ====== System Prompt（强制结构化输出）======
 const SYSTEM_PROMPT = `你是轻体营养师。全程中文。
 
 【规则】数值必须来自用户数据，无数据则说"暂无"。自然亲切像朋友聊天。
-【排版】200字内，加粗标题，用emoji。禁止JSON/代码块/英文`;
+【必须遵守的排版格式】每次回复都必须用以下 Markdown 结构，禁止输出纯段落：
+- 用 *小标题* 作为每个部分的标题（单星号独占一行）
+- 要点用 - 开头的列表项（每条一项）
+- 重点词用 **加粗**
+- emoji 每段最多1个，放在句尾
+
+示例输出格式：
+*分析结果*
+- 今天摄入 **1180kcal**
+- 距目标还剩 620kcal
+
+*建议*
+- 晚上可以吃蔬菜和瘦肉
+- 少油少盐更健康 😊
+
+禁止JSON、代码块、英文`;
 
 exports.main = async (event) => {
   console.log('[AI] === 收到请求 ===');
@@ -62,16 +77,16 @@ exports.main = async (event) => {
   }
 };
 
-// 清理 AI 回复（保留加粗和编号格式用于前端渲染）
+// 清理 AI 回复（保留前端渲染需要的格式标记：*标题*、**加粗**、-列表）
 function stripMarkdown(text) {
   let clean = text
-    .replace(/^#{1,6}\s*/gm, '')
-    .replace(/\*(.+?)\*/g, '$1')
-    .replace(/`(.+?)`/g, '$1')
-    .replace(/```[\s\S]*?```/g, '')
-    .replace(/^[-*_]{3,}\s*$/gm, '')
-    .replace(/\uFFFD/g, '');
+    .replace(/^#{1,6}\s*/gm, '')           // 去掉 # 标题标记（用 * 替代）
+    .replace(/`(.+?)`/g, '$1')              // 去掉行内代码
+    .replace(/```[\s\S]*?```/g, '')          // 去掉代码块
+    .replace(/^[-*_]{3,}\s*$/gm, '')        // 去掉分割线
+    .replace(/\uFFFD/g, '');                 // 去掉乱码
 
+  // 保留：*标题*、**加粗**、- 列表（这些给前端渲染器用）
   clean = clean.replace(/^\s*(assistant|system|user|function|tool)\s*$/gim, '');
   clean = clean.replace(/^\s*(assistant|system|user|function|tool)\s*\n/gim, '');
   clean = clean.trim();
