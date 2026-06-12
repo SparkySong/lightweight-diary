@@ -1,106 +1,154 @@
 # Lightweight Diary
 
-A lightweight diary application based on WeChat Mini Program Cloud Development, supporting cloud storage and management of diet tracking and life logs.
+A **weight management and diet tracking** Mini Program built on WeChat Cloud Development, featuring AI nutritionist chat, calorie analysis, and low-calorie recipe recommendations.
 
 ## Features
 
-- 📝 **Diary Entry** - Quickly record daily life moments  
-- 🍽️ **Diet Tracking** - Log daily food intake  
-- ☁️ **Cloud Storage** - Data securely stored in cloud database  
-- 📱 **Mini Program Support** - Seamless integration with WeChat Mini Program  
+### Weight Management
+- Daily weight check-in (supports kg / jin dual units)
+- Weight trend line chart (smooth Catmull-Rom spline with area fill)
+- Real-time BMI calculation & classification
+- Goal setting & progress tracking
+- Consecutive check-in streak counter
+- WeChat subscription message reminders
 
-## Technology Stack
+### Diet Tracking
+- 4 meal categories: Breakfast, Lunch, Dinner, Snack
+- Built-in **280+** food items with calorie data
+- Cloud-based custom food library (user-added foods auto-sync)
+- Real-time fuzzy search (local + cloud merged & deduplicated)
+- Per-meal / daily calorie totals
 
-- **Frontend Framework**: WeChat Mini Program  
-- **Backend**: WeChat Cloud Development (CloudBase)  
-- **Database SDK**: @cloudbase/database  
-- **Node.js SDK**: @cloudbase/node-sdk  
+### Calorie Analysis
+- Daily total vs target comparison
+- Meal distribution donut chart
+- 7-day calorie trend line chart
+- Actual vs recommended intake bar chart comparison
+- Smart suggestion engine (context-aware recommendations based on status)
+
+### AI Nutritionist
+- **Hybrid architecture**: Template responses for structured queries (instant), AI LLM for open questions
+- 7 intent categories (BMI, weight, today's diet, overview, etc.)
+- Powered by Claude Opus 4.8 via SSE streaming
+- Typewriter effect + rich text rendering
+- Auto-injects user profile & diet data as context
+
+### Low-Cal Recipe Library
+- **110+** healthy recipes (Breakfast / Lunch / Dinner / Snack)
+- 6 nutrition tags (high-protein, low-fat, high-fiber, low-GI, low-cal, balanced)
+- Date-seeded pseudo-random recommendation (stable per day, changes next day)
+- One-tap daily meal plan generation
+
+### Theme System
+- 3 modes: Dark / Light / Follow System (default: follow system)
+- Global CSS variable management
+- Dynamic TabBar icon & color switching
+- Adaptive status bar color
+
+## Tech Stack
+
+| Technology | Description |
+|------------|-------------|
+| Frontend | Native WeChat Mini Program |
+| Backend | WeChat Cloud Development (CloudBase) |
+| Database | WeCloud Database (7 collections) |
+| AI | Claude Opus 4.8 (SSE streaming) |
+| UI Design | Modern minimalist, dark/light dual theme |
 
 ## Project Structure
 
 ```
+├── miniprogram/
+│   ├── pages/
+│   │   ├── index/              # Check-in - Weight records & trend chart
+│   │   ├── diet/               # Diet - Daily meal logging
+│   │   ├── profile/            # Profile - Settings & user info
+│   │   ├── calorie-detail/     # Calorie analysis detail page
+│   │   ├── recipe/             # Low-cal recipe recommendations
+│   │   └── ai-chat/            # AI nutritionist chat
+│   ├── styles/
+│   │   ├── theme.wxss          # CSS variable definitions (dual theme)
+│   │   └── simple-theme.wxss   # Common component theme styles
+│   ├── app.js                  # App entry (theme management core)
+│   └── app.wxss                # Global styles
 ├── cloudfunctions/
-│   ├── addDietRecord/     # Diet record cloud function
-│   │   ├── index.js
-│   │   ├── config.json
-│   │   └── package.json
-│   └── addRecord/         # Diary record cloud function
-│       ├── index.js
-│       ├── config.json
-│       └── package.json
-└── .cloudbase/
-    └── container/
-        └── debug.json
+│   ├── addRecord               # Add/update weight record
+│   ├── deleteRecord            # Delete weight record
+│   ├── getRecords              # Get weight record list
+│   ├── getGoal                 # Get goal weight
+│   ├── setGoal                 # Set goal weight
+│   ├── setHeight               # Set user height
+│   ├── addDietRecord           # New diet record
+│   ├── deleteDietRecord        # Delete diet record
+│   ├── getDietRecords          # Get diet records (grouped by date)
+│   ├── addToFoodLibrary        # Batch add/update food to cloud library
+│   ├── getFoodLibrary          # Get user custom food list
+│   ├── searchFoodLibrary       # Fuzzy search cloud food library
+│   ├── getUserSettings         # Get user settings
+│   ├── saveUserSettings        # Save user settings
+│   ├── subscribeReminder       # Manage/cancel reminder subscription
+│   ├── sendReminder            # Cron trigger: batch send reminders
+│   ├── aiChat                  # AI model call (Claude)
+│   ├── customerService         # WeChat CS auto-reply
+│   └── getProfile              # Get user profile
+└── images/                      # Icons (TabBar etc.)
 ```
-
-## Cloud Functions Description
-
-### addDietRecord
-Cloud function for adding user diet data.
-
-### addRecord
-Cloud function for adding daily diary entries.
-
-## Quick Start
-
-### 1. Prerequisites
-
-- Node.js 14.0+
-- WeChat Developer Tool
-
-### 2. Install Dependencies
-
-Install dependencies in the cloud function directories:
-
-```bash
-cd cloudfunctions/addRecord
-npm install
-```
-
-### 3. Configure Cloud Development Environment
-
-Create a Cloud Development environment in the WeChat Developer Tool, and configure the environment ID in `cloudfunctions/addRecord/config.json`.
-
-### 4. Deploy Cloud Functions
-
-Upload and deploy the cloud functions using the WeChat Developer Tool.
 
 ## Data Schema
 
-### Diary Records (records)
+### Weight Records (`weight_records`)
 | Field | Type | Description |
 |-------|------|-------------|
-| _id | ObjectId | Record ID |
-| content | String | Diary content |
-| createTime | Date | Creation time |
-| tags | Array | Tags |
+| _id | String | Document ID |
+| openid | String | User OpenID |
+| date | String | Date YYYY-MM-DD |
+| weight | Number | Weight (kg) |
+| createTime / updateTime | Date | Create/update timestamp |
 
-### Diet Records (diet)
+### Diet Records (`diet_records`)
 | Field | Type | Description |
 |-------|------|-------------|
-| _id | ObjectId | Record ID |
-| foodName | String | Food name |
-| calories | Number | Calories |
-| mealType | String | Meal type (breakfast/lunch/dinner) |
-| createTime | Date | Creation time |
+| _id | String | Document ID |
+| openid | String | User OpenID |
+| date | String | Date |
+| mealType | String | Meal type: breakfast/lunch/dinner/snack |
+| foods | Array | Food list `[{name, calories}]` |
+| calories | Number | Total calories for this meal |
 
-## Usage Instructions
+### Other Collections
+| Collection | Purpose |
+|------------|---------|
+| `weight_goals` | Goal weight |
+| `user_profiles` | User profile (height etc.) |
+| `food_library` | Custom food library |
+| `user_settings` | User settings (daily calorie target) |
+| `user_reminders` | Subscription reminder config |
 
-1. Initialize the Cloud Development environment  
-2. Call cloud functions to add records  
-3. Query historical records  
-4. Perform data analytics  
+## Quick Start
+
+### Prerequisites
+- Node.js 14.0+
+- WeChat Developer Tools
+- Active WeCloud environment
+
+### Setup
+
+1. Clone the repo and open in WeChat Developer Tools
+2. Create these collections in CloudBase console:
+   - `weight_records`, `weight_goals`, `user_profiles`
+   - `diet_records`, `food_library`
+   - `user_settings`, `user_reminders`
+3. Run `npm install` in each cloud function directory
+4. Upload & deploy all functions (choose "cloud install dependencies")
+5. Verify cloud env config in `app.js`
 
 ## Notes
 
-- Ensure the corresponding collections are created in the cloud database  
-- Cloud functions have a maximum execution time limit of 60 seconds  
-- Protect user privacy data appropriately  
+- Max cloud function execution time: 60 seconds
+- All data operations verified by OpenID ownership
+- AI chat requires external API key configuration (`cloudfunctions/aiChat/index.js`)
+- Reminder subscriptions require approved message templates from WeChat platform
 
 ## License
 
 MIT License
-
-## Contribution Guidelines
-
-Issues and Pull Requests are welcome!
