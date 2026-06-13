@@ -24,29 +24,34 @@
 
   <!-- 个人信息卡片 -->
   <view class="profile-card">
-    <button class="avatar-btn" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
-      <image class="profile-avatar" src="{{avatarUrl}}" mode="aspectFill" />
-    </button>
-    <view class="profile-info">
-      <view class="nickname-row" bindtap="onNicknameTap">
-        <text class="profile-nickname">{{nickname}}</text>
-        <view class="nickname-edit-icon"></view>
+    <!-- 上半部分：头像 + 昵称 + 箭头 -->
+    <view class="profile-top" bindtap="onMenuItemTap" data-action="profile">
+      <button class="avatar-btn" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar" catchtap="stopPropagation">
+        <image class="profile-avatar" src="{{avatarUrl}}" mode="aspectFill" />
+      </button>
+      <view class="profile-info">
+        <view class="nickname-row" catchtap="onNicknameTap">
+          <text class="profile-nickname">{{nickname}}</text>
+        </view>
+        <text class="profile-subtitle">点击管理个人信息</text>
       </view>
-      <view class="profile-stats">
-        <view class="profile-stat-item">
-          <text class="profile-stat-value">{{daysCount}}</text>
-          <text class="profile-stat-label">打卡天数</text>
-        </view>
-        <view class="profile-stat-divider"></view>
-        <view class="profile-stat-item">
-          <text class="profile-stat-value">{{totalLost}}</text>
-          <text class="profile-stat-label">已减({{weightUnit === 'kg' ? 'kg' : '斤'}})</text>
-        </view>
-        <view class="profile-stat-divider"></view>
-        <view class="profile-stat-item">
-          <text class="profile-stat-value">{{goalRemaining}}</text>
-          <text class="profile-stat-label">距目标({{weightUnit === 'kg' ? 'kg' : '斤'}})</text>
-        </view>
+      <text class="profile-arrow">›</text>
+    </view>
+    <!-- 下半部分：统计数据 -->
+    <view class="profile-stats">
+      <view class="profile-stat-item">
+        <text class="profile-stat-value">{{daysCount}}</text>
+        <text class="profile-stat-label">打卡天数</text>
+      </view>
+      <view class="profile-stat-divider"></view>
+      <view class="profile-stat-item">
+        <text class="profile-stat-value">{{totalLost}}</text>
+        <text class="profile-stat-label">已减({{weightUnit === 'kg' ? 'kg' : '斤'}})</text>
+      </view>
+      <view class="profile-stat-divider"></view>
+      <view class="profile-stat-item">
+        <text class="profile-stat-value">{{goalRemaining}}</text>
+        <text class="profile-stat-label">距目标({{weightUnit === 'kg' ? 'kg' : '斤'}})</text>
       </view>
     </view>
   </view>
@@ -107,13 +112,7 @@
       <!-- 健康问答 -->
       <view class="menu-item" bindtap="onMenuItemTap" data-action="aiChat">
         <view class="menu-item-left">
-          <view class="menu-icon menu-icon-ai">
-            <view class="ai-icon-mini">
-              <view class="ai-icon-m-circle"></view>
-              <view class="ai-icon-m-line1"></view>
-              <view class="ai-icon-m-line2"></view>
-            </view>
-          </view>
+          <view class="menu-icon menu-icon-ai"></view>
           <text class="menu-text">健康问答</text>
         </view>
         <view class="menu-item-right">
@@ -162,7 +161,7 @@
 
   <!-- 底部信息 -->
   <view class="footer">
-    <text class="footer-version">轻体打卡 v{{version}}</text>
+    <text class="footer-version">轻体日记 v{{version}}</text>
     <view class="footer-links">
       <text class="footer-link" bindtap="onLinkTap" data-url="agreement">用户协议</text>
       <text class="footer-divider">|</text>
@@ -184,7 +183,7 @@
     </view>
     <view class="popup-body">
       <view class="form-group">
-        <input class="form-input" type="nickname" value="{{editNickname}}" bindinput="onEditNicknameInput" placeholder="点击获取微信昵称" focus="{{showNicknameEdit}}" adjust-position="false" cursor-spacing="100" />
+        <input class="form-input" type="nickname" value="{{editNickname}}" bindinput="onEditNicknameInput" placeholder="点击获取微信昵称" focus="{{showNicknameEdit}}" adjust-position="true" cursor-spacing="150" />
       </view>
     </view>
     <view class="popup-footer">
@@ -206,7 +205,7 @@
     <view class="popup-body">
       <view class="form-group">
         <text class="form-label">昵称</text>
-        <input class="form-input" value="{{editNickname}}" bindinput="onNicknameInput" placeholder="请输入昵称" maxlength="20" adjust-position="false" cursor-spacing="80" />
+        <input class="form-input" value="{{editNickname}}" bindinput="onNicknameInput" placeholder="请输入昵称" maxlength="20" adjust-position="true" cursor-spacing="150" />
       </view>
       <view class="form-group">
         <text class="form-label">身高 (cm)</text>
@@ -350,17 +349,29 @@
       </view>
     </view>
     <view class="popup-body about-body">
-      <view class="about-logo">
-        <view class="logo-icon"></view>
-      </view>
-      <text class="about-name">轻体打卡</text>
+      <image class="about-logo-img" src="/images/qingtilogo.png" mode="widthFix" />
+      <text class="about-name">轻体日记</text>
       <text class="about-version">v{{version}}</text>
-      <text class="about-desc">一款简洁的体重管理与饮食记录工具，帮助你坚持记录、科学减脂，遇见更好的自己。</text>
+      <text class="about-desc">一款集体重管理、饮食记录与AI健康助手于一体的智能工具，帮助你坚持记录、科学减脂，遇见更好的自己。</text>
       <view class="about-features">
         <text class="about-feature">体重打卡与趋势追踪</text>
         <text class="about-feature">饮食记录与热量分析</text>
+        <text class="about-feature">AI 智能健康问答与个性化建议</text>
         <text class="about-feature">BMI 计算与目标管理</text>
         <text class="about-feature">深色/浅色主题切换</text>
+        <text class="about-feature">云端数据同步与安全存储</text>
+      </view>
+      <view class="about-contact">
+        <text class="about-contact-title">联系我们</text>
+        <view class="about-contact-item">
+          <text class="about-contact-icon">✉️</text>
+          <text class="about-contact-text">song970502@gmail.com</text>
+          <view class="about-copy-btn {{emailCopied ? 'copied' : ''}}" bindtap="onCopyEmail">
+            <view class="about-copy-icon" wx:if="{{!emailCopied}}"></view>
+            <view class="about-copy-check" wx:if="{{emailCopied}}"></view>
+          </view>
+        </view>
+        <button class="about-contact-btn" open-type="contact">联系客服</button>
       </view>
     </view>
   </view>

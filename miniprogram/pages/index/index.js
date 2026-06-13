@@ -727,19 +727,27 @@ Page({
 
   // --- AI 浮窗拖动 ---
   initFabPosition() {
-    const saved = wx.getStorageSync('fabPosition');
-    if (saved && typeof saved.left === 'number' && typeof saved.top === 'number') {
-      this.setData({ fabLeft: saved.left, fabTop: saved.top });
-      return;
-    }
     const sys = wx.getSystemInfoSync();
     const ratio = sys.windowWidth / 750;
     const fabW = 100 * ratio;
     const fabH = 126 * ratio;
-    const safeBottom = sys.safeArea ? (sys.windowHeight - sys.safeArea.bottom) : 0;
+    const navBarBottom = sys.statusBarHeight + 44;
+    const defaultLeft = sys.windowWidth - 32 * ratio - fabW;
+    const defaultTop = navBarBottom + 20 * ratio;
+    const saved = wx.getStorageSync('fabPosition');
+    if (saved && typeof saved.left === 'number' && typeof saved.top === 'number') {
+      // 如果缓存位置在底部（旧版默认位置），重置到右上角
+      if (saved.top > sys.windowHeight / 2) {
+        wx.removeStorageSync('fabPosition');
+        this.setData({ fabLeft: defaultLeft, fabTop: defaultTop });
+      } else {
+        this.setData({ fabLeft: saved.left, fabTop: saved.top });
+      }
+      return;
+    }
     this.setData({
-      fabLeft: sys.windowWidth - 32 * ratio - fabW,
-      fabTop: sys.windowHeight - safeBottom - 180 * ratio - fabH
+      fabLeft: defaultLeft,
+      fabTop: defaultTop
     });
   },
 

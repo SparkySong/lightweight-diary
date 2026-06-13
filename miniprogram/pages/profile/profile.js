@@ -1,6 +1,6 @@
 // pages/profile/profile.js
 const app = getApp();
-const VERSION = '1.0.0';
+const VERSION = '1.2.1';
 
 // 默认头像 base64（灰色圆形占位图）
 const DEFAULT_AVATAR = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MCIgaGVpZ2h0PSI4MCIgdmlld0JveD0iMCAwIDgwIDgwIj48Y2lyY2xlIGN4PSI0MCIgY3k9IjQwIiByPSI0MCIgZmlsbD0iIzNhM2E0YSIvPjxjaXJjbGUgY3g9IjQwIiBjeT0iMzIiIHI9IjE2IiBmaWxsPSIjNmE2YTdhIi8+PGVsbGlwc2UgY3g9IjQwIiBjeT0iNjgiIHJ4PSIyNCIgcnk9IjE2IiBmaWxsPSIjNmE2YTdhIi8+PC9zdmc+';
@@ -76,6 +76,8 @@ Page({
     // Toast
     toastMsg: '',
     toastShow: false,
+    // 邮箱复制状态
+    emailCopied: false,
     // 昵称编辑
     showNicknameEdit: false,
     editNickname: '',
@@ -382,8 +384,7 @@ loadStats(goalWeight) {
   calcStats(records, goalWeight) {
     const { weightUnit } = this.data;
     const KG_TO_JIN = 2;
-    const unitLabel = weightUnit === 'kg' ? 'kg' : '斤';
-    
+
     // 打卡天数
     const daysCount = records.length;
 
@@ -412,9 +413,9 @@ loadStats(goalWeight) {
         diff = diff * KG_TO_JIN;
       }
       if (diff > 0) {
-        goalRemaining = `还差 ${diff.toFixed(1)} ${unitLabel}`;
+        goalRemaining = diff.toFixed(1);
       } else {
-        goalRemaining = '🎉 已达标！';
+        goalRemaining = '0';
       }
     }
 
@@ -422,14 +423,6 @@ loadStats(goalWeight) {
   },
 
   // ========== 功能入口点击 ==========
-  onProfileCardTap() {
-    this.setData({
-      showProfileEdit: true,
-      editNickname: this.data.nickname,
-      editHeight: this.data.height ? String(this.data.height) : '',
-      editGoalWeight: this.data.goalWeight ? String(this.data.goalWeight) : ''
-    });
-  },
 
   // 选择头像
   onChooseAvatar(e) {
@@ -458,17 +451,6 @@ loadStats(goalWeight) {
         wx.hideLoading();
       }
     });
-  },
-
-  // 昵称输入完成
-  onNicknameBlur(e) {
-    const nickname = e.detail.value.trim();
-    if (nickname && nickname !== this.data.nickname) {
-      wx.setStorageSync('nickname', nickname);
-      this.setData({ nickname });
-      // 同步到云端
-      this.syncFieldToCloud('nickname', nickname);
-    }
   },
 
   // 点击昵称区域
@@ -872,16 +854,27 @@ loadStats(goalWeight) {
 
     if (type === 'agreement') {
       title = '用户协议';
-      content = '一、服务条款\n\n欢迎使用轻体打卡小程序（以下简称"本小程序"）。在使用本小程序前，请您仔细阅读以下服务条款。\n\n1. 服务说明\n本小程序为用户提供体重记录、饮食记录、热量分析等健康管理辅助工具。所有数据仅供参考，不构成任何医疗建议。\n\n2. 用户责任\n用户应对自己输入的数据准确性负责。本小程序不会对用户因使用本服务而产生的任何直接或间接损失承担责任。\n\n3. 数据安全\n我们重视您的隐私保护，所有个人数据均通过微信云开发安全存储，我们不会向第三方泄露您的个人信息。\n\n4. 服务变更\n我们保留随时修改或中断服务的权利，恕不另行通知。\n\n5. 免责声明\n本小程序提供的热量数据、BMI计算等仅供参考，不能替代专业医疗或营养建议。如有健康问题，请咨询专业医生。\n\n二、知识产权\n\n本小程序的所有内容，包括但不限于文字、图片、代码、界面设计等，均受知识产权法保护，未经授权不得复制或使用。\n\n三、适用法律\n\n本协议适用中华人民共和国法律。如发生争议，双方应友好协商解决。';
+      content = '一、服务条款\n\n欢迎使用轻体日记小程序（以下简称“本小程序”）。在使用本小程序前，请您仔细阅读以下服务条款。\n\n1. 服务说明\n本小程序为用户提供体重记录、饮食记录、热量分析等健康管理辅助工具。所有数据仅供参考，不构成任何医疗建议。\n\n2. 健康问答服务\n本小程序提供基于人工智能技术的“健康问答”功能，该功能通过分析您的饮食记录和体重数据，为您提供个性化的健康建议。请注意：\n- 健康问答的回复由AI模型生成，可能存在不准确或不完整的情况\n- AI提供的建议仅供参考，不能替代专业医生、营养师或其他医疗健康从业者的专业意见\n- 请勿将AI回复作为诊断、治疗或用药的依据\n- 如有健康问题，请及时就医并咨询专业人士\n- 我们不对AI生成内容的准确性、完整性或适用性作任何保证\n\n3. 用户责任\n用户应对自己输入的数据准确性负责。本小程序不会对用户因使用本服务而产生的任何直接或间接损失承担责任。\n\n4. 数据安全\n我们重视您的隐私保护，所有个人数据均通过微信云开发安全存储，我们不会向第三方泄露您的个人信息。\n\n5. 服务变更\n我们保留随时修改或中断服务的权利，恕不另行通知。\n\n6. 免责声明\n本小程序提供的热量数据、BMI计算、AI健康问答等内容仅供参考，不能替代专业医疗或营养建议。如有健康问题，请咨询专业医生。\n\n二、知识产权\n\n本小程序的所有内容，包括但不限于文字、图片、代码、界面设计等，均受知识产权法保护，未经授权不得复制或使用。\n\n三、适用法律\n\n本协议适用中华人民共和国法律。如发生争议，双方应友好协商解决。';
     } else {
       title = '隐私政策';
-      content = '轻体打卡小程序隐私政策\n\n生效日期：2026年4月13日\n\n我们非常重视您的隐私保护。本隐私政策说明我们如何收集、使用和保护您的个人信息。\n\n一、信息收集\n我们收集的信息包括您主动输入的数据和授权获取的信息：\n\n1. 您主动输入的数据：\n- 体重记录数据\n- 饮食记录数据\n- 身高、目标体重等个人健康信息\n\n2. 授权获取的信息：\n- 微信昵称：通过微信官方提供的昵称填写组件获取，用于在个人主页展示您的昵称，便于识别和个性化体验\n- 微信头像：通过微信官方提供的头像选择组件获取，用于在个人主页展示您的头像，提升使用体验\n\n上述微信昵称和头像的获取均通过微信官方能力实现，您可以在授权时自主选择是否提供。我们不会在未经您同意的情况下获取上述信息。\n\n二、信息使用\n您的信息仅用于以下目的：\n- 提供体重趋势分析和饮食热量分析功能\n- 保存和展示您的健康数据\n- 在个人主页展示您的昵称和头像，提供个性化体验\n- 改善产品体验\n\n三、信息存储\n您的数据通过微信云开发安全存储，采用加密传输和存储技术，确保数据安全。\n\n四、信息共享\n我们不会将您的个人信息出售、出租或以任何方式分享给第三方，除非：\n- 获得您的明确同意\n- 法律法规要求\n\n五、信息删除\n您可以随时通过"数据管理"功能清空您的所有数据。您也可以在个人信息设置中修改或更换昵称和头像。卸载小程序后，云端数据将依据微信云开发的数据保留策略处理。\n\n六、未成年人保护\n我们不对未成年人提供独立服务。如果您是未成年人，请在监护人指导下使用本小程序。\n\n七、政策更新\n我们可能会不定期更新本隐私政策，更新后将在小程序内通知您。';
+      content = '轻体日记小程序隐私政策\n\n生效日期：2026年4月13日\n\n我们非常重视您的隐私保护。本隐私政策说明我们如何收集、使用和保护您的个人信息。\n\n一、信息收集\n我们收集的信息包括您主动输入的数据和授权获取的信息：\n\n1. 您主动输入的数据：\n- 体重记录数据\n- 饮食记录数据\n- 身高、目标体重等个人健康信息\n- 健康问答中的对话内容\n\n2. 授权获取的信息：\n- 微信昵称：通过微信官方提供的昵称填写组件获取，用于在个人主页展示您的昵称，便于识别和个性化体验\n- 微信头像：通过微信官方提供的头像选择组件获取，用于在个人主页展示您的头像，提升使用体验\n\n上述微信昵称和头像的获取均通过微信官方能力实现，您可以在授权时自主选择是否提供。我们不会在未经您同意的情况下获取上述信息。\n\n二、信息使用\n您的信息仅用于以下目的：\n- 提供体重趋势分析和饮食热量分析功能\n- 保存和展示您的健康数据\n- 在个人主页展示您的昵称和头像，提供个性化体验\n- 健康问答功能中，将您的饮食记录和体重数据作为上下文提供给AI模型，以便生成更准确的个性化建议\n- 改善产品体验\n\n三、第三方服务\n健康问答功能使用第三方AI服务（SiliconFlow）进行对话生成。在使用该功能时：\n- 您的对话内容及相关的饮食、体重数据会被发送至第三方AI服务进行处理\n- 我们仅传输提供个性化建议所必需的最少数据\n- 第三方服务不会将您的数据用于训练AI模型\n- 我们建议您避免在对话中透露敏感的个人健康信息（如具体疾病、用药情况等）\n\n四、信息存储\n您的数据通过微信云开发安全存储，采用加密传输和存储技术，确保数据安全。健康问答的聊天记录仅存储在您的本地设备中，不会上传至云端。\n\n五、信息共享\n我们不会将您的个人信息出售、出租或以任何方式分享给第三方，除非：\n- 获得您的明确同意\n- 法律法规要求\n- 为提供健康问答功能而向第三方AI服务传输必要的对话数据（如上文第三条所述）\n\n六、信息删除\n您可以随时通过“数据管理”功能清空您的所有数据。您也可以在个人信息设置中修改或更换昵称和头像。健康问答的聊天记录可通过清除聊天页面记录删除。卸载小程序后，云端数据将依据微信云开发的数据保留策略处理。\n\n七、未成年人保护\n我们不对未成年人提供独立服务。如果您是未成年人，请在监护人指导下使用本小程序。\n\n八、政策更新\n我们可能会不定期更新本隐私政策，更新后将在小程序内通知您。';
     }
 
     this.setData({
       showAgreement: true,
       agreementTitle: title,
       agreementContent: content
+    });
+  },
+
+  // ========== 复制邮箱 ==========
+  onCopyEmail() {
+    wx.setClipboardData({
+      data: 'song970502@gmail.com',
+      success: () => {
+        this.setData({ emailCopied: true });
+        setTimeout(() => this.setData({ emailCopied: false }), 2000);
+      }
     });
   },
 

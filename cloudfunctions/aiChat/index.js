@@ -1,5 +1,6 @@
-// cloudfunctions/aiChat/index.js —— 混合模式：AI 只处理开放性问题
+// cloudfunctions/aiChat/index.js —— 混合模式：知识库优先 + AI 处理开放性问题
 const https = require('https');
+const { matchKnowledge } = require('./knowledge-base');
 
 const API_KEY = 'sk-43f98e89b7017525e80286fe7959b857690a6a7f99466f1ff37fc8161fc44bc3';
 
@@ -34,6 +35,16 @@ exports.main = async (event) => {
 
   if (!messages || !Array.isArray(messages) || messages.length === 0) {
     return { success: false, error: '请输入消息内容' };
+  }
+
+  // ====== 知识库优先匹配 ======
+  const lastUserMsg = messages.filter(m => m.role === 'user').pop();
+  if (lastUserMsg && lastUserMsg.content) {
+    const kbAnswer = matchKnowledge(lastUserMsg.content);
+    if (kbAnswer) {
+      console.log('[AI] ✅ 命中知识库，直接返回');
+      return { success: true, reply: kbAnswer, fromKB: true };
+    }
   }
 
   const today = new Date();
