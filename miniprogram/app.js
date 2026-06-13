@@ -31,6 +31,35 @@ App({
       wx.setStorageSync('weightUnit', weightUnit);
     }
     this.globalData.weightUnit = weightUnit;
+
+    // 🔑 异步从云端同步偏好设置（不阻塞启动）
+    this.syncPreferencesFromCloud();
+  },
+
+  // 🔑 从云端异步同步偏好设置（体重单位、热量单位）
+  async syncPreferencesFromCloud() {
+    try {
+      const res = await wx.cloud.callFunction({ name: 'getUserSettings', data: {} });
+      const settings = res.result?.settings || {};
+
+      if (settings.weightUnit && settings.weightUnit !== wx.getStorageSync('weightUnit')) {
+        wx.setStorageSync('weightUnit', settings.weightUnit);
+        this.globalData.weightUnit = settings.weightUnit;
+        // 通知所有已加载页面更新单位
+        const pages = getCurrentPages();
+        pages.forEach(page => {
+          if (page.onWeightUnitChange) {
+            page.onWeightUnitChange(settings.weightUnit);
+          }
+        });
+      }
+
+      if (settings.calorieUnit) {
+        wx.setStorageSync('calorieUnit', settings.calorieUnit);
+      }
+    } catch (e) {
+      console.warn('app: 从云端同步偏好设置失败', e);
+    }
   },
   
   // 获取体重单位

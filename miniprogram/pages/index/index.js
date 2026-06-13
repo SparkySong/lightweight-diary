@@ -174,6 +174,35 @@ Page({
     this.setData({ weightUnit, weightUnitLabel });
   },
 
+  // 🔑 从云端同步偏好设置（体重单位、热量单位）
+  async syncPreferencesFromCloud() {
+    try {
+      const res = await wx.cloud.callFunction({ name: 'getUserSettings', data: {} });
+      const settings = res.result?.settings || {};
+      
+      // 同步体重单位（如果云端有且与本地不同）
+      if (settings.weightUnit) {
+        const localWeightUnit = wx.getStorageSync('weightUnit');
+        if (!localWeightUnit || localWeightUnit !== settings.weightUnit) {
+          wx.setStorageSync('weightUnit', settings.weightUnit);
+          app.globalData.weightUnit = settings.weightUnit;
+          const weightUnitLabel = settings.weightUnit === 'kg' ? 'kg' : '斤';
+          this.setData({ weightUnit: settings.weightUnit, weightUnitLabel });
+        }
+      }
+      
+      // 同步热量单位（如果云端有且与本地不同）
+      if (settings.calorieUnit) {
+        const localCalorieUnit = wx.getStorageSync('calorieUnit');
+        if (!localCalorieUnit || localCalorieUnit !== settings.calorieUnit) {
+          wx.setStorageSync('calorieUnit', settings.calorieUnit);
+        }
+      }
+    } catch (e) {
+      console.warn('从云端同步偏好设置失败，使用本地缓存', e);
+    }
+  },
+
   // 初始化导航栏胶囊按钮安全距离（防止被胶囊按钮遮挡）
   initNavBarPadding() {
     try {
@@ -232,7 +261,10 @@ Page({
     try {
       // 重置状态
       this.setData({ cloudReady: false, cloudError: false, errorMsg: '' });
-      
+
+      // 🔑 关键修复：优先从云端同步偏好设置（体重单位、热量单位）
+      await this.syncPreferencesFromCloud();
+
       // 使用 allSettled 代替 all，确保一个失败不会影响其他
       const results = await Promise.allSettled([
         this.loadRecords(),

@@ -1,6 +1,31 @@
 // pages/profile/profile.js
 const app = getApp();
-const VERSION = '1.2.1';
+
+// 🔥 导入版本配置（统一管理）
+const { VERSION: CONFIG_VERSION } = require('../../config/version');
+
+// 自动获取微信小程序版本号
+const getAutoVersion = () => {
+  try {
+    // 优先使用API获取正式版版本号
+    if (wx.getAccountInfoSync) {
+      const accountInfo = wx.getAccountInfoSync();
+      
+      if (accountInfo.miniProgram && accountInfo.miniProgram.version) {
+        // ✅ 正式发布后：返回线上真实版本号
+        return accountInfo.miniProgram.version;
+      }
+    }
+  } catch (e) {
+    console.warn('获取版本号失败:', e);
+  }
+
+  // 回退到配置文件中的版本号（开发/体验/上传时都使用）
+  return CONFIG_VERSION;
+};
+
+// 自动检测版本号
+const VERSION = getAutoVersion();
 
 // 默认头像 base64（灰色圆形占位图）
 const DEFAULT_AVATAR = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MCIgaGVpZ2h0PSI4MCIgdmlld0JveD0iMCAwIDgwIDgwIj48Y2lyY2xlIGN4PSI0MCIgY3k9IjQwIiByPSI0MCIgZmlsbD0iIzNhM2E0YSIvPjxjaXJjbGUgY3g9IjQwIiBjeT0iMzIiIHI9IjE2IiBmaWxsPSIjNmE2YTdhIi8+PGVsbGlwc2UgY3g9IjQwIiBjeT0iNjgiIHJ4PSIyNCIgcnk9IjE2IiBmaWxsPSIjNmE2YTdhIi8+PC9zdmc+';
@@ -254,19 +279,31 @@ Page({
       currentWeight = weightUnit === 'jin' ? latestWeightKg * KG_TO_JIN : latestWeightKg;
     }
 
-    // 从云端获取热量目标，优先使用本地缓存
+    // 从云端获取热量目标、体重单位、热量单位，优先使用本地缓存
     let calorieGoal = wx.getStorageSync('localCalorieGoal') || 0;
     try {
       const res = await wx.cloud.callFunction({ name: 'getUserSettings', data: {} });
       const cloudCalorieGoal = res.result.settings?.dailyCalorieTarget || 0;
+      const cloudWeightUnit = res.result.settings?.weightUnit || null;
+      const cloudCalorieUnit = res.result.settings?.calorieUnit || null;
+      
+      // 🔑 云端有热量目标数据：缓存到本地（下次直接读取）
       if (cloudCalorieGoal > 0) {
-        // 云端有数据：缓存到本地（下次直接读取）
         calorieGoal = cloudCalorieGoal;
         wx.setStorageSync('localCalorieGoal', cloudCalorieGoal);
       }
-      // 如果云端返回 0 但本地有缓存值，保留本地缓存（避免闪烁回"未设置"）
+      // 🔑 云端有体重单位：更新本地存储和页面显示
+      if (cloudWeightUnit && cloudWeightUnit !== wx.getStorageSync('weightUnit')) {
+        wx.setStorageSync('weightUnit', cloudWeightUnit);
+        this.setData({ weightUnit: cloudWeightUnit });
+      }
+      // 🔑 云端有热量单位：更新本地存储和页面显示
+      if (cloudCalorieUnit && cloudCalorieUnit !== wx.getStorageSync('calorieUnit')) {
+        wx.setStorageSync('calorieUnit', cloudCalorieUnit);
+        this.setData({ calorieUnit: cloudCalorieUnit });
+      }
     } catch (e) {
-      console.warn('获取云端热量目标失败，使用本地缓存', e);
+      console.warn('获取云端设置失败，使用本地缓存', e);
     }
 
     // 更新热量目标显示
@@ -695,7 +732,7 @@ loadStats(goalWeight) {
   },
 
   // ========== 偏好设置 ==========
-  onWeightUnitChange(e) {
+  async onWeightUnitChange(e) {
     // 支持从 WXML 调用（有 event）和从 app.notifyWeightUnitChange 调用（无参数）
     let unit;
     if (e && e.currentTarget && e.currentTarget.dataset) {
@@ -704,20 +741,38 @@ loadStats(goalWeight) {
       // 从 app.notifyWeightUnitChange 调用时传入单位字符串
       unit = e;
     }
-    
+
     if (!unit) return;
-    
+
     wx.setStorageSync('weightUnit', unit);
     this.setData({ weightUnit: unit });
+    // 🔑 同步到云端
+    try {
+      await wx.cloud.callFunction({
+        name: 'saveUserSettings',
+        data: { weightUnit: unit }
+      });
+    } catch (e) {
+      console.warn('同步体重单位到云端失败', e);
+    }
     // 刷新页面数据
     this.loadUserData();
     this.showToast(unit === 'kg' ? '已切换为千克' : '已切换为斤');
   },
 
-  onCalorieUnitChange(e) {
+  async onCalorieUnitChange(e) {
     const unit = e.currentTarget.dataset.unit;
     wx.setStorageSync('calorieUnit', unit);
     this.setData({ calorieUnit: unit });
+    // 🔑 同步到云端
+    try {
+      await wx.cloud.callFunction({
+        name: 'saveUserSettings',
+        data: { calorieUnit: unit }
+      });
+    } catch (err) {
+      console.warn('同步热量单位到云端失败', err);
+    }
     this.showToast(unit === 'kcal' ? '已切换为千卡' : '已切换为千焦');
     // 刷新显示
     this.loadUserData();

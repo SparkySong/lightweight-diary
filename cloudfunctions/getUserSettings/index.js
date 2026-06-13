@@ -11,12 +11,14 @@ exports.main = async (event) => {
     .get();
 
   if (res.data.length > 0) {
-    return { 
+    return {
       success: true,
       settings: {
-        dailyCalorieTarget: res.data[0].dailyCalorieTarget || 0
+        dailyCalorieTarget: res.data[0].dailyCalorieTarget || 0,
+        weightUnit: res.data[0].weightUnit || 'kg',
+        calorieUnit: res.data[0].calorieUnit || 'kcal'
       }
     };
   }
-  return { success: true, settings: { dailyCalorieTarget: 0 } };
+  return { success: true, settings: { dailyCalorieTarget: 0, weightUnit: 'kg', calorieUnit: 'kcal' } };
 };

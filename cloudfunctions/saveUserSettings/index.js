@@ -5,25 +5,28 @@ const db = cloud.database();
 
 exports.main = async (event) => {
   const { OPENID } = cloud.getWXContext();
-  const { dailyCalorieTarget, nickname, avatarUrl, goalWeight, height } = event;
+  const { dailyCalorieTarget, nickname, avatarUrl, goalWeight, height, weightUnit, calorieUnit } = event;
 
-  // 保存热量目标到 user_settings
-  if (dailyCalorieTarget !== undefined) {
+  // 保存热量目标、体重单位、热量单位到 user_settings
+  const hasSettingsData = dailyCalorieTarget !== undefined || weightUnit !== undefined || calorieUnit !== undefined;
+  if (hasSettingsData) {
     const collection = db.collection('user_settings');
     const exist = await collection.where({ openid: OPENID }).get();
+    const settingsUpdateData = { updateTime: db.serverDate() };
+
+    if (dailyCalorieTarget !== undefined) settingsUpdateData.dailyCalorieTarget = parseInt(dailyCalorieTarget);
+    if (weightUnit !== undefined) settingsUpdateData.weightUnit = weightUnit;
+    if (calorieUnit !== undefined) settingsUpdateData.calorieUnit = calorieUnit;
 
     if (exist.data.length > 0) {
       await collection.doc(exist.data[0]._id).update({
-        data: { 
-          dailyCalorieTarget: parseInt(dailyCalorieTarget), 
-          updateTime: db.serverDate() 
-        }
+        data: settingsUpdateData
       });
     } else {
       await collection.add({
         data: {
           openid: OPENID,
-          dailyCalorieTarget: parseInt(dailyCalorieTarget),
+          ...settingsUpdateData,
           createTime: db.serverDate()
         }
       });
