@@ -6,7 +6,7 @@ const db = cloud.database();
 exports.main = async (event) => {
   const { OPENID } = cloud.getWXContext();
 
-  // Get profile (height)
+  // Get profile (height, nickname, avatarUrl, goalWeight)
   const profile = await db.collection('user_profiles')
     .where({ openid: OPENID })
     .get();
@@ -16,11 +16,15 @@ exports.main = async (event) => {
     .where({ openid: OPENID })
     .get();
 
+  const profileDoc = profile.data[0] || null;
   const reminderDoc = reminder.data[0] || null;
   const nextReminderDate = reminderDoc?.nextReminderDate || '';
 
   return {
-    height: profile.data.length > 0 ? profile.data[0].height : null,
+    height: profileDoc?.height || null,
+    nickname: profileDoc?.nickname || null,
+    avatarUrl: profileDoc?.avatarUrl || null,
+    goalWeight: profileDoc?.goalWeight || null,
     reminder: reminderDoc ? {
       enabled: Boolean(nextReminderDate),
       remindTime: reminderDoc.remindTime || '08:00',

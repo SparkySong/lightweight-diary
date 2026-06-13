@@ -225,20 +225,20 @@ Page({
   // ========== 数据加载 ==========
   async loadUserData() {
     // 从本地存储加载用户设置
-    const nickname = wx.getStorageSync('nickname') || '轻体用户';
     const weightUnit = wx.getStorageSync('weightUnit') || 'kg';
     const calorieUnit = wx.getStorageSync('calorieUnit') || 'kcal';
     const KG_TO_JIN = 2;
 
-    // 从本地存储加载体重数据
+    // 同步云端数据到本地（包括身高、目标体重、昵称、头像）
+    await this.syncAllFromCloud();
+
+    // 云端同步后重新从本地读取（可能刚被云端数据补全）
+    const nickname = wx.getStorageSync('nickname') || '轻体用户';
+    const avatarUrl = wx.getStorageSync('avatarUrl') || DEFAULT_AVATAR;
     const weightData = wx.getStorageSync('weightData') || {};
     const goalWeightKg = weightData.targetWeight || null;
-    // 根据单位转换显示
     const goalWeight = goalWeightKg ? (weightUnit === 'jin' ? goalWeightKg * KG_TO_JIN : goalWeightKg) : null;
     const height = wx.getStorageSync('userHeight') || null;
-
-    // 同步云端身高数据到本地
-    await this.syncAllFromCloud();
 
     // 从云端获取最新体重记录
     const latestWeightKg = await this.getLatestWeightFromCloud();
@@ -285,6 +285,7 @@ Page({
 
     this.setData({
       nickname,
+      avatarUrl,
       height: syncedHeight,
       goalWeight,
       currentWeight,
@@ -295,7 +296,7 @@ Page({
     });
   },
 
-  // 从云端同步个人数据到本地
+  // 从云端同步个人数据到本地（本地优先，云端补全）
   async syncAllFromCloud() {
     try {
       const res = await wx.cloud.callFunction({ name: 'getProfile' });
@@ -310,8 +311,28 @@ Page({
         weightData.targetWeight = result.goalWeight;
         wx.setStorageSync('weightData', weightData);
       }
+      // 同步昵称（本地没有时才从云端补全）
+      if (result.nickname && !wx.getStorageSync('nickname')) {
+        wx.setStorageSync('nickname', result.nickname);
+      }
+      // 同步头像（本地没有时才从云端补全）
+      if (result.avatarUrl && !wx.getStorageSync('avatarUrl')) {
+        wx.setStorageSync('avatarUrl', result.avatarUrl);
+      }
     } catch (e) {
       console.warn('从云端同步数据失败', e);
+    }
+  },
+
+  // 将单个字段同步到云端
+  async syncFieldToCloud(field, value) {
+    try {
+      await wx.cloud.callFunction({
+        name: 'saveUserSettings',
+        data: { [field]: value }
+      });
+    } catch (e) {
+      console.warn(`同步 ${field} 到云端失败`, e);
     }
   },
 
@@ -421,12 +442,17 @@ loadStats(goalWeight) {
       cloudPath,
       filePath: avatarUrl,
       success: (res) => {
-        wx.setStorageSync('avatarUrl', res.fileID);
-        this.setData({ avatarUrl: res.fileID });
+        const fileID = res.fileID;
+        wx.setStorageSync('avatarUrl', fileID);
+        this.setData({ avatarUrl: fileID });
+        // 同步到云端数据库
+        this.syncFieldToCloud('avatarUrl', fileID);
       },
       fail: () => {
         wx.setStorageSync('avatarUrl', avatarUrl);
         this.setData({ avatarUrl });
+        // 临时路径也同步到云端（下次打开可能失效，但至少保留记录）
+        this.syncFieldToCloud('avatarUrl', avatarUrl);
       },
       complete: () => {
         wx.hideLoading();
@@ -440,6 +466,8 @@ loadStats(goalWeight) {
     if (nickname && nickname !== this.data.nickname) {
       wx.setStorageSync('nickname', nickname);
       this.setData({ nickname });
+      // 同步到云端
+      this.syncFieldToCloud('nickname', nickname);
     }
   },
 
@@ -466,6 +494,8 @@ loadStats(goalWeight) {
     const nickname = this.data.editNickname.trim() || '轻体用户';
     wx.setStorageSync('nickname', nickname);
     this.setData({ nickname, showNicknameEdit: false });
+    // 同步到云端
+    this.syncFieldToCloud('nickname', nickname);
   },
 
   onMenuItemTap(e) {
@@ -579,72 +609,75 @@ loadStats(goalWeight) {
     const { editNickname, editHeight, editCurrentWeight, editGoalWeight, weightUnit } = this.data;
     const KG_TO_JIN = 2;
 
-    // 验证
-    if (editNickname.trim()) {
-      wx.setStorageSync('nickname', editNickname.trim());
-    }
+    // 验证身高
     if (editHeight) {
       const h = parseFloat(editHeight);
       if (h < 100 || h > 250) {
         this.showToast('身高范围 100-250cm');
         return;
       }
-      wx.setStorageSync('userHeight', h);
-      // 同步到云端
-      try {
-        await wx.cloud.callFunction({ name: 'setHeight', data: { height: h } });
-      } catch (e) {
-        console.warn('同步身高到云端失败', e);
-      }
     }
-    // 保存当前体重到云端
+    // 验证当前体重
+    let weightKg = null;
     if (editCurrentWeight) {
       let cw = parseFloat(editCurrentWeight);
-      // 根据单位进行验证
       const minWeight = weightUnit === 'jin' ? 40 : 20;
       const maxWeight = weightUnit === 'jin' ? 600 : 300;
       if (cw < minWeight || cw > maxWeight) {
         this.showToast(`当前体重范围 ${minWeight}-${maxWeight}${weightUnit}`);
         return;
       }
-      // 如果是斤，转换为千克存储
-      if (weightUnit === 'jin') {
-        cw = cw / KG_TO_JIN;
-      }
-      const weightKg = parseFloat(cw.toFixed(1));
-      
-      // 保存到本地
-      const weightData = wx.getStorageSync('weightData') || {};
-      weightData.currentWeight = weightKg;
-      wx.setStorageSync('weightData', weightData);
-      
-      // 同步到云端作为体重记录
-      try {
-        const today = new Date().toISOString().split('T')[0];
-        await wx.cloud.callFunction({ 
-          name: 'addRecord', 
-          data: { date: today, weight: weightKg } 
-        });
-      } catch (e) {
-        console.warn('同步当前体重到云端失败', e);
-      }
+      if (weightUnit === 'jin') cw = cw / KG_TO_JIN;
+      weightKg = parseFloat(cw.toFixed(1));
     }
+    // 验证目标体重
+    let goalWeightKg = null;
     if (editGoalWeight) {
       let w = parseFloat(editGoalWeight);
-      // 根据单位进行验证
       const minWeight = weightUnit === 'jin' ? 40 : 20;
       const maxWeight = weightUnit === 'jin' ? 600 : 300;
       if (w < minWeight || w > maxWeight) {
         this.showToast(`目标体重范围 ${minWeight}-${maxWeight}${weightUnit}`);
         return;
       }
-      // 如果是斤，转换为千克存储
-      if (weightUnit === 'jin') {
-        w = w / KG_TO_JIN;
-      }
+      if (weightUnit === 'jin') w = w / KG_TO_JIN;
+      goalWeightKg = parseFloat(w.toFixed(1));
+    }
+
+    // 保存到本地
+    const trimmedNickname = editNickname.trim();
+    if (trimmedNickname) wx.setStorageSync('nickname', trimmedNickname);
+    if (editHeight) wx.setStorageSync('userHeight', parseFloat(editHeight));
+    if (goalWeightKg !== null) {
       const weightData = wx.getStorageSync('weightData') || {};
-      weightData.targetWeight = parseFloat(w.toFixed(1));
+      weightData.targetWeight = goalWeightKg;
       wx.setStorageSync('weightData', weightData);
+    }
+    if (weightKg !== null) {
+      const weightData = wx.getStorageSync('weightData') || {};
+      weightData.currentWeight = weightKg;
+      wx.setStorageSync('weightData', weightData);
+    }
+
+    // 一次性同步所有个人资料字段到云端
+    const cloudData = {};
+    if (trimmedNickname) cloudData.nickname = trimmedNickname;
+    if (editHeight) cloudData.height = parseFloat(editHeight);
+    if (goalWeightKg !== null) cloudData.goalWeight = goalWeightKg;
+    try {
+      await wx.cloud.callFunction({ name: 'saveUserSettings', data: cloudData });
+    } catch (e) {
+      console.warn('同步个人资料到云端失败', e);
+    }
+
+    // 当前体重作为打卡记录同步到云端
+    if (weightKg !== null) {
+      try {
+        const today = new Date().toISOString().split('T')[0];
+        await wx.cloud.callFunction({ name: 'addRecord', data: { date: today, weight: weightKg } });
+      } catch (e) {
+        console.warn('同步当前体重到云端失败', e);
+      }
     }
 
     this.showToast('保存成功 ✅');
