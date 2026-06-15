@@ -2,7 +2,8 @@
 const https = require('https');
 const { matchKnowledge } = require('./knowledge-base');
 
-const API_KEY = 'sk-43f98e89b7017525e80286fe7959b857690a6a7f99466f1ff37fc8161fc44bc3';
+const API_KEY = '9dd5302e8467401ea52c91d3cedb8b2c.6hoEdWuhxR2aXIEl';
+const API_KEY_BACKUP = 'sk-43f98e89b7017525e80286fe7959b857690a6a7f99466f1ff37fc8161fc44bc3';
 
 // ====== System Prompt（强制结构化输出）======
 const SYSTEM_PROMPT = `你是轻体营养师。全程中文。
@@ -60,32 +61,40 @@ exports.main = async (event) => {
     ...messages
   ];
 
-  // 使用 Claude Opus 4.8（精简 prompt + 低 token 优化速度）
-  const requestBody = JSON.stringify({
-    model: 'claude-opus-4-8',
-    messages: fullMessages,
-    temperature: 0.3,
-    max_tokens: 512,
-    stream: true
-  });
+  // 主模型 + 备用模型降级策略
+  const models = [
+    { name: 'glm-4-flash', label: '主模型', host: 'open.bigmodel.cn', path: '/api/paas/v4/chat/completions', key: API_KEY },
+    { name: 'claude-opus-4-8', label: '备用模型', host: 'ai.loserbai.cn', path: '/v1/chat/completions', key: API_KEY_BACKUP }
+  ];
 
-  console.log('[AI] 模型: Claude Opus 4.8 (streaming), temperature: 0.5');
-  console.log('[AI] 请求体大小:', requestBody.length, 'bytes');
-  console.log('[AI] 开始调用 API...');
+  for (const model of models) {
+    const requestBody = JSON.stringify({
+      model: model.name,
+      messages: fullMessages,
+      temperature: 0.3,
+      max_tokens: 300,
+      stream: true
+    });
 
-  try {
-    // 流式调用：边生成边返回，用户无需干等
-    const reply = await callAPIStream(requestBody);
-    console.log('[AI] API 流式返回成功，长度:', reply.length);
-    const cleanReply = stripMarkdown(reply);
-    return { success: true, reply: cleanReply };
-  } catch (err) {
-    console.error('[AI] 调用 AI API 失败:', err.message);
-    return {
-      success: false,
-      error: err.message || 'AI 服务暂时不可用，请稍后重试'
-    };
+    console.log(`[AI] 尝试${model.label}: ${model.name}`);
+    console.log('[AI] 请求体大小:', requestBody.length, 'bytes');
+
+    try {
+      const reply = await callAPIStream(requestBody, model);
+      console.log(`[AI] ${model.label}成功，长度:`, reply.length);
+      const cleanReply = stripMarkdown(reply);
+      return { success: true, reply: cleanReply, model: model.name };
+    } catch (err) {
+      console.error(`[AI] ${model.label}失败:`, err.message);
+      // 主模型失败才尝试备用，备用模型失败直接返回
+      if (model === models[models.length - 1]) {
+        return { success: false, error: err.message };
+      }
+      // 短暂等待再切备用
+      await new Promise(r => setTimeout(r, 1000));
+    }
   }
+  return { success: false, error: 'AI 服务暂时不可用，请稍后重试' };
 };
 
 // 清理 AI 回复（保留前端渲染需要的格式标记：*标题*、**加粗**、-列表）
@@ -115,16 +124,16 @@ function stripMarkdown(text) {
   return deduped.join('\n').trim();
 }
 
-// ====== SSE 流式调用 API（核心优化：边生成边返回）======
-function callAPIStream(body) {
+// ====== SSE 流式调用 API（支持多模型不同地址）======
+function callAPIStream(body, modelConfig) {
   return new Promise((resolve, reject) => {
     const options = {
-      hostname: 'ai.loserbai.cn',
-      path: '/v1/chat/completions',
+      hostname: modelConfig.host,
+      path: modelConfig.path,
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${API_KEY}`,
+        'Authorization': `Bearer ${modelConfig.key}`,
         'Content-Length': Buffer.byteLength(body),
         'Accept': 'text/event-stream'
       }
@@ -139,7 +148,6 @@ function callAPIStream(body) {
         return;
       }
 
-      // 解析 SSE 流：每个 data 行是一个 JSON 片段
       res.on('data', (chunk) => {
         const text = chunk.toString();
         const lines = text.split('\n');
@@ -162,7 +170,7 @@ function callAPIStream(body) {
     });
 
     req.on('error', (err) => reject(new Error(`网络错误: ${err.message}`)));
-    req.setTimeout(30000, () => { req.destroy(); reject(new Error('请求超时，请稍后重试')); });
+    req.setTimeout(25000, () => { req.destroy(); reject(new Error('请求超时，请稍后重试')); });
     req.write(body);
     req.end();
   });

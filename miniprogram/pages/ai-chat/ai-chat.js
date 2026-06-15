@@ -32,6 +32,8 @@ Page({
 
   // 流式输出定时器引用
   _typingTimer: null,
+  // 限流：上次发送时间戳
+  _lastSendTime: 0,
 
   async onLoad(options) {
     const savedMessages = wx.getStorageSync('aiChatMessages');
@@ -413,6 +415,14 @@ Page({
   // ===== 发送消息（混合模式 + 流式输出）=====
 
   async sendMessage(text, isResend = false) {
+    // 限流：3秒内禁止重复发送
+    const now = Date.now();
+    if (now - this._lastSendTime < 3000) {
+      wx.showToast({ title: '发送太快啦，稍等一下～', icon: 'none' });
+      return;
+    }
+    this._lastSendTime = now;
+
     const userMsg = { role: 'user', content: text };
 
     let messages;
@@ -459,11 +469,11 @@ Page({
       if (result.success && result.reply) {
         this._startStreamEffect(result.reply, messages);
       } else {
-        this._showError(result.error || '未知错误');
+        this._showFriendlyError(result.error || '未知错误');
       }
     } catch (err) {
       console.error('调用 AI 失败:', err);
-      this._showError(err.message || '网络异常');
+      this._showFriendlyError(err.message || '网络异常');
     }
   },
 
@@ -678,6 +688,21 @@ Page({
     this.setData({ messages: updated, isLoading: false, isStreaming: false });
     this.saveMessages(updated);
     this.scrollToBottom();
+  },
+
+  // 把技术性错误转成用户友好提示
+  _showFriendlyError(rawErr) {
+    let tip = 'AI 暂时有点忙，请稍后再试试～';
+    if (/429|限流|速率限制/.test(rawErr)) {
+      tip = '问得太快啦，等一会再试试吧～';
+    } else if (/exhausted|502|503|504/.test(rawErr)) {
+      tip = '营养师正在休息中，过几秒再问问看～';
+    } else if (/timeout|超时/.test(rawErr)) {
+      tip = '响应有点慢，稍等一下再试试～';
+    } else if (/网络错误|network/.test(rawErr)) {
+      tip = '网络连接有点问题，检查一下网络再试试～';
+    }
+    this._showError(tip);
   },
 
   scrollToBottom() {
