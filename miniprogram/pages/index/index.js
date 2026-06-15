@@ -147,6 +147,11 @@ Page({
     this.initTheme(); // 在数据加载前立即同步主题
     this.showPendingThemeToast(); // 显示 reLaunch 后的主题切换提示
 
+    // 🔑 修复：恢复页面可见性（主题变化期间 hidePage 可能被设为 true 导致白屏）
+    if (this.data.hidePage) {
+      this.setData({ hidePage: false });
+    }
+
     // 防抖：避免频繁切换tab时重复加载（3秒内不重复加载）
     const now = Date.now();
     if (this._lastLoadTime && (now - this._lastLoadTime < 3000)) return;

@@ -157,6 +157,12 @@ Page({
   onShow() {
     this.initTheme();
     this.showPendingThemeToast(); // 显示 reLaunch 后的主题切换提示
+    
+    // 🔑 修复：恢复页面可见性（主题变化期间 hidePage 可能被设为 true 导致白屏）
+    if (this.data.hidePage) {
+      this.setData({ hidePage: false });
+    }
+    
     // 每次显示都同步刷新本地数据（确保其他页面修改后数据最新）
     this.initBasicData();
     // 异步从云端拉取最新数据更新

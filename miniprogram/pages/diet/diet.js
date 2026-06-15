@@ -379,6 +379,11 @@ Page({
     this.initTheme();
     this.showPendingThemeToast(); // 显示 reLaunch 后的主题切换提示
     
+    // 🔑 修复：恢复页面可见性（主题变化期间 hidePage 可能被设为 true 导致白屏）
+    if (this.data.hidePage) {
+      this.setData({ hidePage: false });
+    }
+    
     this.loadRecords();
     // 加载云端自定义食物
     this.loadCustomFoods();
