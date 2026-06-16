@@ -268,13 +268,18 @@ Page({
       // 已授权，获取加密数据
       const weRunData = await wx.getWeRunData();
       console.log('[步数] 获取到微信运动加密数据');
-      
+
+      // 获取登录凭证 code（用于云函数换取 session_key 解密）
+      const loginRes = await wx.login();
+      console.log('[步数] login code:', loginRes.code);
+
       // 发送到云函数解密
       const res = await wx.cloud.callFunction({
         name: 'syncWeRunSteps',
         data: {
           encryptedData: weRunData.encryptedData,
-          iv: weRunData.iv
+          iv: weRunData.iv,
+          code: loginRes.code
         }
       });
 
