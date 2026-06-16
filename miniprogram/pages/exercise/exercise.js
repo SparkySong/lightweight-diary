@@ -115,7 +115,8 @@ Page({
       await Promise.allSettled([
         this.syncWeRunSteps(),
         this.loadExercises(),
-        this.loadTodayDiet()
+        this.loadTodayDiet(),
+        this.syncGenderFromCloud()
       ]);
     } catch (e) {
       console.error('加载运动数据失败', e);
@@ -419,6 +420,18 @@ Page({
 
   // 阻止冒泡
   stopPropagation() {},
+
+  // 从云端同步性别（确保多设备一致）
+  async syncGenderFromCloud() {
+    try {
+      const res = await wx.cloud.callFunction({ name: 'getProfile' });
+      if (res.result?.gender) {
+        wx.setStorageSync('userGender', res.result.gender);
+      }
+    } catch (e) {
+      // 静默失败
+    }
+  },
 
   showToast(msg) {
     this.setData({ toastMsg: msg, toastShow: true });

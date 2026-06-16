@@ -84,44 +84,6 @@
     </view>
   </view>
 
-  <!-- 热量收支看板 -->
-  <view class="card calorie-balance-card" bindtap="goToExercise">
-    <view class="card-header">
-      <view class="card-title-wrap">
-        <view class="title-icon icon-calorie-balance"></view>
-        <text class="card-title">今日热量收支</text>
-      </view>
-      <text class="calorie-more">查看详情 ›</text>
-    </view>
-    <view class="calorie-balance-body">
-      <view class="calorie-side">
-        <text class="calorie-label">摄入</text>
-        <view class="calorie-num-row">
-          <text class="calorie-value intake">{{todayIntake || 0}}</text>
-          <text class="calorie-unit">kcal</text>
-        </view>
-      </view>
-      <view class="calorie-center">
-        <view class="calorie-diff-badge {{todayBalance <= 0 ? 'deficit' : 'surplus'}}">
-          <text class="calorie-diff-label">{{todayBalance <= 0 ? '赤字' : '盈余'}}</text>
-          <text class="calorie-diff-val">{{todayBalanceAbs || 0}}</text>
-        </view>
-      </view>
-      <view class="calorie-side">
-        <text class="calorie-label">消耗</text>
-        <view class="calorie-num-row">
-          <text class="calorie-value burn">{{todayTotalBurn || 0}}</text>
-          <text class="calorie-unit">kcal</text>
-        </view>
-      </view>
-    </view>
-    <!-- 摄入/消耗比例条 -->
-    <view class="calorie-ratio-bar">
-      <view class="ratio-fill intake-fill" style="width: {{(todayIntake || 0) + (todayTotalBurn || 0) > 0 ? ((todayIntake || 0) / ((todayIntake || 0) + (todayTotalBurn || 0)) * 100) : 50}}%"></view>
-      <view class="ratio-fill burn-fill"></view>
-    </view>
-  </view>
-
   <!-- BMI Card - 优化进度条设计 -->
   <view class="card bmi-card">
     <view class="card-header">
@@ -160,6 +122,48 @@
       <view wx:else class="height-input-wrap" catchtap="stopPropagation">
         <input id="height-input" class="height-input" type="digit" placeholder="身高 (cm)" value="{{inputHeight}}" bindinput="onHeightInput" />
         <button id="height-btn" class="btn-sm" bindtap="onSetHeight">保存</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 今日能量概览 -->
+  <view class="card energy-overview-card" bindtap="goToExercise">
+    <view class="card-header">
+      <view class="card-title-wrap">
+        <view class="title-icon icon-calorie-balance"></view>
+        <text class="card-title">今日能量</text>
+      </view>
+      <text class="energy-hint">消耗 {{todayTotalBurn || 0}} kcal</text>
+    </view>
+    <view class="energy-body">
+      <!-- 主数字：剩余可摄入 -->
+      <view class="energy-main">
+        <text class="energy-label">{{todayBalance <= 0 ? '今天还能吃' : '已超出消耗'}}</text>
+        <view class="energy-num-row">
+          <text class="energy-big-num {{todayBalance <= 0 ? 'ok' : 'over'}}">{{todayBalanceAbs || 0}}</text>
+          <text class="energy-unit">kcal</text>
+        </view>
+        <text class="energy-sub" wx:if="{{todayBalance > 0}}">建议适当运动或减少晚餐</text>
+        <text class="energy-sub" wx:elif="{{todayIntake > 0}}">保持当前节奏，继续加油</text>
+        <text class="energy-sub" wx:else>还没记录饮食哦～</text>
+      </view>
+    </view>
+    <!-- 能量构成条 -->
+    <view class="energy-bar-section">
+      <view class="energy-bar-row">
+        <view class="energy-bar-item">
+          <text class="bar-dot dot-intake"></text>
+          <text class="bar-label">已吃</text>
+          <text class="bar-val intake">{{todayIntake || 0}}</text>
+        </view>
+        <view class="energy-bar-item">
+          <text class="bar-dot dot-burn"></text>
+          <text class="bar-label">基础代谢</text>
+          <text class="bar-val burn">{{bmr || 0}}</text>
+        </view>
+      </view>
+      <view class="energy-progress-bar">
+        <view class="ep-fill ep-intake" style="width: {{(todayTotalBurn||1) > 0 ? Math.min(100, ((todayIntake||0) / (todayTotalBurn||1)) * 100) : 0}}%"></view>
       </view>
     </view>
   </view>

@@ -365,7 +365,7 @@ Page({
       if (result.avatarUrl && !wx.getStorageSync('avatarUrl')) {
         wx.setStorageSync('avatarUrl', result.avatarUrl);
       }
-      // 同步性别
+      // 同步性别（云端优先，确保多设备一致）
       if (result.gender) {
         wx.setStorageSync('userGender', result.gender);
       }

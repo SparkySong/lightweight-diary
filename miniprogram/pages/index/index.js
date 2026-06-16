@@ -157,9 +157,9 @@ Page({
       this.setData({ hidePage: false });
     }
 
-    // 防抖：避免频繁切换tab时重复加载（3秒内不重复加载）
+    // 防抖：避免频繁切换tab时重复加载（1秒内不重复加载）
     const now = Date.now();
-    if (this._lastLoadTime && (now - this._lastLoadTime < 3000)) return;
+    if (this._lastLoadTime && (now - this._lastLoadTime < 1000)) return;
     this._lastLoadTime = now;
 
     this.loadAll();
@@ -490,7 +490,9 @@ Page({
   async loadProfile() {
     try {
       const res = await wx.cloud.callFunction({ name: 'getProfile', timeout: 15000 });
-      const { height } = res.result;
+      const { height, gender } = res.result;
+      // 同步性别到本地（确保多设备一致）
+      if (gender) wx.setStorageSync('userGender', gender);
       this.setData({
         height: height,
         showHeightInput: !height

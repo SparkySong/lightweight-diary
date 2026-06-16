@@ -21,6 +21,7 @@ exports.main = async (event) => {
   const nextReminderDate = reminderDoc?.nextReminderDate || '';
 
   return {
+    gender: profileDoc?.gender || null,
     height: profileDoc?.height || null,
     nickname: profileDoc?.nickname || null,
     avatarUrl: profileDoc?.avatarUrl || null,

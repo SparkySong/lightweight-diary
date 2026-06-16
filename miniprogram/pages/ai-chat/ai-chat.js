@@ -441,8 +441,9 @@ Page({
   },
 
   /**
-   * 从 AI 回复中解析【推荐追问】区块，更新快捷推荐
+   * 从 AI 回复中解析推荐追问区块，更新快捷推荐
    * 推荐由 AI 动态生成，而非前端硬编码关键词匹配
+   * 支持多种格式：【推荐追问】/ 🌟推荐追问 / 💡推荐追问 等
    */
   _updateDynamicQuickQuestions(messages) {
     const msgs = messages || this.data.messages;
@@ -454,21 +455,99 @@ Page({
 
     const content = lastAiReply.content;
 
-    // 解析 【推荐追问】 区块：匹配 - 开头的列表项
-    const followUpMatch = content.match(/【推荐追问】\s*\n((?:- .+\n?)+)/);
-    if (followUpMatch) {
-      const questions = followUpMatch[1]
-        .split('\n')
-        .map(line => line.replace(/^-\s*/, '').trim())
-        .filter(q => q.length > 0 && q.length <= 20);
+    // 匹配多种格式的推荐追问区块
+    const patterns = [
+      /【推荐追问】\s*\n([\s\S]*?)(?=\n\n|\n*$)/,           // 【推荐追问】标准格式
+      /[🌟💡⭐✨📌][ \t]*推荐追问\s*\n([\s\S]*?)(?=\n\n|\n*$)/, // emoji + 推荐追问
+      /^[^\n]*推荐追问[：:]\s*\n([\s\S]*?)(?=\n\n|\n*$)/im     // 其他"推荐追问："格式
+    ];
 
-      if (questions.length > 0) {
-        this.setData({ quickQuestions: questions.slice(0, 4) });
-        return;
+    for (const pattern of patterns) {
+      const match = content.match(pattern);
+      if (match && match[1]) {
+        // 提取问题：支持 - 开头、数字开头、或纯文本行
+        const questions = match[1]
+          .split('\n')
+          .map(line => line.replace(/^[-\d\.\)、\s]+/, '').trim())
+          .filter(q => q.length > 1 && q.length <= 25);
+
+        if (questions.length > 0) {
+          this.setData({ quickQuestions: questions.slice(0, 4) });
+          return;
+        }
       }
     }
 
-    // AI 没输出推荐追问（如知识库回复），保持当前推荐不变
+    // ===== 智能回退：AI 未输出推荐追问时，根据上下文动态生成 =====
+    const userMsg = [...msgs].reverse().find(m => m.role === 'user');
+    if (!userMsg || !userMsg.content) return;
+
+    const userText = userMsg.content;
+    let suggestions = [];
+
+    // 根据用户问题主题生成关联追问
+    if (/午休|午睡|休息|睡眠|睡觉|失眠|熬夜/.test(userText)) {
+      suggestions = [
+        '晚上几点睡比较好',
+        '睡眠不好怎么改善',
+        '作息时间怎么调整',
+        '运动后能马上睡吗'
+      ];
+    } else if (/饮食|吃|食物|热量|卡路里|早餐|午餐|晚餐|加餐|减肥|减脂|瘦|胖|体重|BMI|目标|碳水|蛋白|脂肪|营养|蔬菜|水果|食谱|怎么吃|吃什么|该吃|能吃|摄入|消耗|缺口|超标|控制/.test(userText)) {
+      suggestions = [
+        '帮我制定饮食计划',
+        '适合我的运动是什么',
+        '我多久能达到目标',
+        '分析我的整体情况'
+      ];
+    } else if (/运动|锻炼|健身|跑步|走路|步数|有氧|无氧|力量|拉伸|瑜伽|普拉提|游泳|骑车|跳绳|HIIT|燃脂|心率/.test(userText)) {
+      suggestions = [
+        '今天运动消耗多少',
+        '运动后怎么吃',
+        '每周运动几次合适',
+        '居家运动推荐'
+      ];
+    } else if (/经期|月经|例假|生理期|排卵|痛经|周期|经血|流量/.test(userText)) {
+      suggestions = [
+        '经期饮食注意事项',
+        '经期可以运动吗',
+        '如何缓解痛经',
+        '预测下次经期'
+      ];
+    } else if (/水|喝水|饮水|补水|脱水/.test(userText)) {
+      suggestions = [
+        '每天要喝多少水',
+        '喝什么水最好',
+        '运动前后怎么补水',
+        '不爱喝水怎么办'
+      ];
+    } else if (/报告|周报|月报|总结|统计|数据|趋势|分析/.test(userText)) {
+      suggestions = [
+        '生成本周健康周报',
+        '本月饮食怎么样',
+        '体重变化趋势分析',
+        '给我个性化建议'
+      ];
+    } else if (/成就|勋章|打卡|坚持|连续|记录/.test(userText)) {
+      suggestions = [
+        '我有哪些成就',
+        '连续打卡多少天了',
+        '下一个解锁什么',
+        '怎么获得更多徽章'
+      ];
+    }
+
+    // 如果没有命中任何主题规则，从 AI 回复内容中提取关键词做通用追问
+    if (suggestions.length === 0) {
+      const topics = ['详细说说怎么做', '有什么具体建议', '帮我制定一个计划', '还有其他注意事项吗'];
+      // 随机选3个，每次不完全一样
+      const shuffled = topics.sort(() => Math.random() - 0.5);
+      suggestions = shuffled.slice(0, 3);
+    }
+
+    if (suggestions.length > 0) {
+      this.setData({ quickQuestions: suggestions.slice(0, 4) });
+    }
   },
 
   onInput(e) {
@@ -562,8 +641,11 @@ Page({
   _formatRichText(text) {
     if (!text) return '';
     let html = text;
-    // 先剥离【推荐追问】区块（这部分给快捷推荐栏用，不在气泡里展示）
-    html = html.replace(/【推荐追问】[\s\S]*$/, '');
+    // 先剥离推荐追问区块（这部分给快捷推荐栏用，不在气泡里展示）
+    // 必须与 _updateDynamicQuickQuestions 的匹配规则保持一致
+    html = html.replace(/【推荐追问】[\s\S]*$/, '');           // 标准格式
+    html = html.replace(/[🌟💡⭐✨📌][ \t]*推荐追问[\s\S]*$/i, '');  // emoji格式
+    html = html.replace(/^[^\n]*推荐追问[：:][\s\S]*$/im, '');      // 其他冒号格式
     // 转义 HTML（在格式标记处理之前）
     html = html.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
@@ -660,8 +742,11 @@ Page({
    */
   _detectCardType(userText, aiReply) {
     const ut = (userText || '').toLowerCase();
-    // 先剥离【推荐追问】区块，避免混入卡片内容
-    const cleanReply = (aiReply || '').replace(/【推荐追问】[\s\S]*$/, '');
+    // 先剥离推荐追问区块，避免混入卡片内容（与 _formatRichText 保持一致）
+    let cleanReply = (aiReply || '');
+    cleanReply = cleanReply.replace(/【推荐追问】[\s\S]*$/, '');
+    cleanReply = cleanReply.replace(/[🌟💡⭐✨📌][ \t]*推荐追问[\s\S]*$/i, '');
+    cleanReply = cleanReply.replace(/^[^\n]*推荐追问[：:][\s\S]*$/im, '');
     if (/周报|本周分析|周报告|这周总结|上周分析/.test(ut)) {
       return { type: 'report', sections: this._parseReportSections(cleanReply) };
     }

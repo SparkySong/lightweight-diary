@@ -5,7 +5,7 @@ const db = cloud.database();
 
 exports.main = async (event) => {
   const { OPENID } = cloud.getWXContext();
-  const { dailyCalorieTarget, nickname, avatarUrl, goalWeight, height, weightUnit, calorieUnit } = event;
+  const { dailyCalorieTarget, nickname, avatarUrl, goalWeight, height, gender, weightUnit, calorieUnit } = event;
 
   // 保存热量目标、体重单位、热量单位到 user_settings
   const hasSettingsData = dailyCalorieTarget !== undefined || weightUnit !== undefined || calorieUnit !== undefined;
@@ -34,7 +34,7 @@ exports.main = async (event) => {
   }
 
   // 保存个人资料到 user_profiles（nickname / avatarUrl / goalWeight / height）
-  const hasProfileData = nickname !== undefined || avatarUrl !== undefined || goalWeight !== undefined || height !== undefined;
+  const hasProfileData = nickname !== undefined || avatarUrl !== undefined || goalWeight !== undefined || height !== undefined || gender !== undefined;
   if (hasProfileData) {
     const profileCol = db.collection('user_profiles');
     const existProfile = await profileCol.where({ openid: OPENID }).get();
@@ -44,6 +44,7 @@ exports.main = async (event) => {
     if (avatarUrl !== undefined) updateData.avatarUrl = avatarUrl;
     if (goalWeight !== undefined) updateData.goalWeight = parseFloat(goalWeight);
     if (height !== undefined) updateData.height = parseFloat(height);
+    if (gender !== undefined) updateData.gender = gender;
 
     if (existProfile.data.length > 0) {
       await profileCol.doc(existProfile.data[0]._id).update({ data: updateData });

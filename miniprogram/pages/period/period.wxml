@@ -84,7 +84,7 @@
   <!-- 历史记录 -->
   <view class="history-section" wx:if="{{periods.length > 0}}">
     <text class="history-title">历史记录</text>
-    <view class="history-item" wx:for="{{periods}}" wx:key="_id">
+    <view class="history-item" wx:for="{{periods}}" wx:key="_id" bindtap="onEditPeriod" data-item="{{item}}">
       <view class="history-left">
         <view class="history-info">
           <text class="history-date">{{item.startDate}} ~ {{item.endDate || '进行中'}}</text>
@@ -109,9 +109,9 @@
 
 <!-- 记录弹窗 -->
 <view class="popup-overlay" wx:if="{{showRecordPopup}}" bindtap="onClosePopup">
-  <view class="popup-panel" bindtap="stopPropagation">
+  <view class="popup-panel" catchtap="stopPropagation">
     <view class="popup-header">
-      <text class="popup-title">记录经期开始</text>
+      <text class="popup-title">{{recordAction === 'edit' ? '编辑经期记录' : '记录经期开始'}}</text>
       <view class="popup-close" catchtap="onClosePopup">
         <text class="close-icon">✕</text>
       </view>
@@ -127,6 +127,18 @@
           </view>
         </view>
       </picker>
+      <!-- 结束日期（仅编辑模式显示） -->
+      <view wx:if="{{recordAction === 'edit'}}">
+        <view class="section-label">结束日期（选填）</view>
+        <picker mode="date" value="{{selectedEndDate}}" start="{{selectedDate}}" end="{{today}}" bindchange="onEndDateChange" bindcancel="onPickerCancel" catchtap="stopPropagation">
+          <view class="date-select-row">
+            <view class="date-display">
+              <text>{{selectedEndDate || '未结束'}}</text>
+              <text class="date-arrow">▼</text>
+            </view>
+          </view>
+        </picker>
+      </view>
       <!-- 流量选择 -->
       <view class="section-label">经血量</view>
       <view class="flow-options">
@@ -144,7 +156,7 @@
     </view>
     <view class="popup-footer">
       <view class="popup-btn popup-btn-cancel" catchtap="onClosePopup">取消</view>
-      <view class="popup-btn popup-btn-confirm" catchtap="onConfirmRecord">确认记录</view>
+      <view class="popup-btn popup-btn-confirm" catchtap="{{recordAction === 'edit' ? 'onConfirmEdit' : 'onConfirmRecord'}}">{{recordAction === 'edit' ? '保存修改' : '确认记录'}}</view>
     </view>
   </view>
 </view>

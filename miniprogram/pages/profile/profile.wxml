@@ -395,7 +395,7 @@
         <view class="icon-close"></view>
       </view>
     </view>
-    <view class="popup-body about-body">
+    <scroll-view class="popup-body about-body" scroll-y enhanced show-scrollbar="{{false}}">
       <image class="about-logo-img" src="/images/qingtilogo.png" mode="widthFix" />
       <text class="about-name">轻体日记</text>
       <text class="about-version">v{{version}}</text>
@@ -405,6 +405,10 @@
         <text class="about-feature">饮食记录与热量分析</text>
         <text class="about-feature">AI 智能健康问答与个性化建议</text>
         <text class="about-feature">BMI 计算与目标管理</text>
+        <text class="about-feature">运动记录与微信步数同步</text>
+        <text class="about-feature">经期记录与周期追踪</text>
+        <text class="about-feature">成就徽章系统</text>
+        <text class="about-feature">周报/月报健康报告生成</text>
         <text class="about-feature">深色/浅色主题切换</text>
         <text class="about-feature">云端数据同步与安全存储</text>
       </view>
@@ -420,7 +424,7 @@
         </view>
         <button class="about-contact-btn" open-type="contact">联系客服</button>
       </view>
-    </view>
+    </scroll-view>
   </view>
 </view>
 

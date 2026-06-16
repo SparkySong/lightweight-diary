@@ -43,9 +43,12 @@ Page({
     cycleDay: 0,
     // UI
     showRecordPopup: false,
+    recordAction: 'start', // 'start' | 'edit'
+    editingRecordId: '',
     selectedFlow: 'medium',
     selectedSymptoms: [],
     selectedDate: formatDateStr(new Date()),
+    selectedEndDate: '',
     symptomsList: SYMPTOMS_LIST,
     flowOptions: FLOW_OPTIONS,
     loading: true,
@@ -139,6 +142,21 @@ Page({
         data: { limit: 50 }
       });
       const periods = res.result?.data || [];
+      // 统一计算持续天数（避免数据库脏数据导致显示错误）
+      periods.forEach(p => {
+        if (p.startDate && p.endDate) {
+          p.periodLength = Math.ceil(
+            (new Date(p.endDate) - new Date(p.startDate)) / (1000 * 60 * 60 * 24)
+          ) + 1;
+        } else if (p.startDate) {
+          // 进行中的，按到今天算
+          p.periodLength = Math.ceil(
+            (new Date(formatDateStr(new Date())) - new Date(p.startDate)) / (1000 * 60 * 60 * 24)
+          ) + 1;
+        } else {
+          p.periodLength = 0;
+        }
+      });
       const hasOngoing = periods.some(p => !p.endDate);
       const ongoingRecord = periods.find(p => !p.endDate) || null;
 
@@ -275,6 +293,61 @@ Page({
 
   onDateChange(e) {
     this.setData({ selectedDate: e.detail.value });
+  },
+
+  onEndDateChange(e) {
+    this.setData({ selectedEndDate: e.detail.value });
+  },
+
+  // 编辑历史记录
+  onEditPeriod(e) {
+    const item = e.currentTarget.dataset.item;
+    const symptomArr = new Array(this.data.symptomsList.length).fill(false);
+    if (item.symptoms && item.symptoms.length > 0) {
+      item.symptoms.forEach(s => {
+        const idx = this.data.symptomsList.indexOf(s);
+        if (idx >= 0) symptomArr[idx] = true;
+      });
+    }
+    this.setData({
+      showRecordPopup: true,
+      recordAction: 'edit',
+      editingRecordId: item._id,
+      selectedDate: item.startDate,
+      selectedEndDate: item.endDate || '',
+      selectedFlow: item.flow || 'medium',
+      selectedSymptoms: symptomArr
+    });
+  },
+
+  // 确认编辑
+  async onConfirmEdit() {
+    wx.showLoading({ title: '保存中...' });
+    try {
+      const symptoms = this.data.symptomsList.filter((_, i) => this.data.selectedSymptoms[i]);
+      const result = await wx.cloud.callFunction({
+        name: 'addPeriod',
+        data: {
+          action: 'update',
+          id: this.data.editingRecordId,
+          startDate: this.data.selectedDate,
+          endDate: this.data.selectedEndDate || null,
+          flow: this.data.selectedFlow,
+          symptoms: symptoms
+        }
+      });
+      wx.hideLoading();
+      if (result.result?.success) {
+        this.showToast('已更新');
+        this.setData({ showRecordPopup: false });
+        await this.loadPeriods();
+      } else {
+        this.showToast(result.result?.error || '保存失败');
+      }
+    } catch (e) {
+      wx.hideLoading();
+      this.showToast('保存失败');
+    }
   },
 
   onPickerCancel() {},

@@ -300,17 +300,10 @@
 
 /* Card 基础样式 - 毛玻璃效果 */
 
-/* 热量收支看板 */
-.calorie-balance-card {
-  cursor: pointer;
-  transition: transform 0.2s;
-}
+/* ===== 今日能量概览卡片 ===== */
+.energy-overview-card {}
 
-.calorie-balance-card:active {
-  transform: scale(0.98);
-}
-
-.calorie-more {
+.energy-hint {
   font-size: 22rpx;
   color: #5FA895;
   font-weight: 500;
@@ -325,165 +318,147 @@
   font-size: 24rpx;
 }
 
-.calorie-balance-body {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 16rpx 0 20rpx;
+/* 主区域：剩余/超出 */
+.energy-body {
+  padding: 8rpx 0 20rpx;
 }
 
-.calorie-side {
-  flex: 1;
+.energy-main {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8rpx;
+  padding: 16rpx 0;
 }
 
-.calorie-label {
+.energy-label {
   font-size: 24rpx;
-  color: #6B7280;
-  font-weight: 500;
+  color: #9CA3AF;
+  margin-bottom: 8rpx;
 }
 
-.calorie-num-row {
+.energy-num-row {
   display: flex;
   align-items: baseline;
   gap: 6rpx;
 }
 
-.calorie-value {
-  font-size: 48rpx;
+.energy-big-num {
+  font-size: 72rpx;
   font-weight: 700;
-  line-height: 1.2;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
 }
 
-.calorie-value.intake {
-  color: #D4A574;
+.energy-big-num.ok { color: #5FA895; }
+.energy-big-num.over { color: #C98B8B; }
+
+.energy-unit {
+  font-size: 24rpx;
+  color: #6B7280;
+  font-weight: 500;
 }
 
-.calorie-value.burn {
-  color: #5FA895;
-}
-
-.calorie-unit {
+.energy-sub {
   font-size: 22rpx;
   color: #6B7280;
+  margin-top: 10rpx;
 }
 
-.calorie-center {
-  padding: 0 20rpx;
+/* 能量构成条 */
+.energy-bar-section {
+  padding-top: 16rpx;
+  border-top: 1rpx solid rgba(255, 255, 255, 0.06);
+}
+
+.energy-bar-row {
   display: flex;
-  align-items: center;
   justify-content: center;
+  gap: 40rpx;
+  margin-bottom: 12rpx;
 }
 
-.calorie-diff-badge {
+.energy-bar-item {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 4rpx;
-  padding: 12rpx 20rpx;
-  border-radius: 20rpx;
-  min-width: 100rpx;
+  gap: 8rpx;
 }
 
-.calorie-diff-badge.deficit {
-  background: rgba(95, 168, 149, 0.12);
+.bar-dot {
+  width: 12rpx;
+  height: 12rpx;
+  border-radius: 50%;
 }
 
-.calorie-diff-badge.surplus {
-  background: rgba(212, 165, 116, 0.12);
-}
+.dot-intake { background: #D4A574; }
+.dot-burn { background: #5FA895; }
 
-.calorie-diff-label {
-  font-size: 20rpx;
-  font-weight: 600;
-}
-
-.calorie-diff-badge.deficit .calorie-diff-label {
-  color: #5FA895;
-}
-
-.calorie-diff-badge.surplus .calorie-diff-label {
-  color: #D4A574;
-}
-
-.calorie-diff-val {
-  font-size: 26rpx;
-  font-weight: 700;
-  color: #F5F5F5;
-}
-
-/* 比例条 */
-.calorie-ratio-bar {
-  display: flex;
-  height: 8rpx;
-  border-radius: 4rpx;
-  overflow: hidden;
-  background: rgba(255,255,255,0.06);
-}
-
-.ratio-fill {
-  height: 100%;
-  transition: width 0.5s ease;
-}
-
-.ratio-fill.intake-fill {
-  background: linear-gradient(90deg, #D4A574, #E8C9A0);
-  border-radius: 4rpx 0 0 4rpx;
-}
-
-.ratio-fill.burn-fill {
-  flex: 1;
-  background: linear-gradient(90deg, #5FA895, #7DBEAF);
-  border-radius: 0 4rpx 4rpx 0;
-}
-
-/* 浅色主题 - 热量收支看板 */
-.theme-light .calorie-more {
-  color: #4A9B8A;
-}
-
-.theme-light .calorie-label {
-  color: #6B7280;
-}
-
-.theme-light .calorie-value.intake {
-  color: #C49A6C;
-}
-
-.theme-light .calorie-value.burn {
-  color: #4A9B8A;
-}
-
-.theme-light .calorie-unit {
+.bar-label {
+  font-size: 22rpx;
   color: #9CA3AF;
 }
 
-.theme-light .calorie-diff-badge.deficit {
-  background: rgba(74, 155, 138, 0.08);
+.bar-val {
+  font-size: 26rpx;
+  font-weight: 600;
 }
 
-.theme-light .calorie-diff-badge.surplus {
-  background: rgba(196, 154, 108, 0.08);
+.bar-val.intake { color: #D4A574; }
+.bar-val.burn { color: #5FA895; }
+
+/* 进度条 */
+.energy-progress-bar {
+  height: 12rpx;
+  border-radius: 6rpx;
+  background: rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+  margin-bottom: 8rpx;
 }
 
-.theme-light .calorie-diff-badge.deficit .calorie-diff-label {
+.ep-fill {
+  height: 100%;
+  border-radius: 6rpx;
+  transition: width 0.5s ease;
+  background: linear-gradient(90deg, #D4A574, #E8C9A0);
+}
+
+.energy-bar-markers {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 4rpx;
+}
+
+.marker-text {
+  font-size: 18rpx;
+  color: #6B7280;
+}
+
+.marker-target { color: #9CA3AF; }
+
+/* 浅色主题 - 今日能量概览 */
+.theme-light .energy-hint {
   color: #4A9B8A;
 }
 
-.theme-light .calorie-diff-badge.surplus .calorie-diff-label {
-  color: #C49A6C;
+.theme-light .energy-label { color: #9CA3AF; }
+.theme-light .energy-big-num.ok { color: #4A9B8A; }
+.theme-light .energy-big-num.over { color: #C98B8B; }
+.theme-light .energy-unit { color: #9CA3AF; }
+.theme-light .energy-sub { color: #6B7280; }
+
+.theme-light .energy-bar-section {
+  border-top-color: rgba(0, 0, 0, 0.06);
 }
 
-.theme-light .calorie-diff-val {
-  color: #1F2937;
+.theme-light .bar-label { color: #9CA3AF; }
+.theme-light .bar-val.intake { color: #C49A6C; }
+.theme-light .bar-val.burn { color: #4A9B8A; }
+
+.theme-light .energy-progress-bar {
+  background: rgba(0, 0, 0, 0.06);
 }
 
-.theme-light .calorie-ratio-bar {
-  background: rgba(0,0,0,0.04);
-}
+.theme-light .marker-text { color: #9CA3AF; }
+.theme-light .marker-target { color: #6B7280; }
 
 /* Card 基础样式 - 毛玻璃效果 */
 .card {
