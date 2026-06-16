@@ -5,7 +5,11 @@
     "pages/profile/profile",
     "pages/calorie-detail/calorie-detail",
     "pages/recipe/recipe",
-    "pages/ai-chat/ai-chat"
+    "pages/ai-chat/ai-chat",
+    "pages/exercise/exercise",
+    "pages/achievements/achievements",
+    "pages/report/report",
+    "pages/period/period"
   ],
   "window": {
     "navigationBarBackgroundColor": "#121212",

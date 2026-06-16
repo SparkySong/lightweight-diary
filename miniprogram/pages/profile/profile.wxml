@@ -120,6 +120,42 @@
           <text class="menu-arrow">›</text>
         </view>
       </view>
+
+      <!-- 我的成就 -->
+      <view class="menu-item" bindtap="onMenuItemTap" data-action="achievements">
+        <view class="menu-item-left">
+          <view class="menu-icon menu-icon-achievement">🏆</view>
+          <text class="menu-text">我的成就</text>
+        </view>
+        <view class="menu-item-right">
+          <text class="menu-desc">解锁徽章</text>
+          <text class="menu-arrow">›</text>
+        </view>
+      </view>
+
+      <!-- 健康报告 -->
+      <view class="menu-item" bindtap="onMenuItemTap" data-action="report">
+        <view class="menu-item-left">
+          <view class="menu-icon menu-icon-report">📊</view>
+          <text class="menu-text">健康报告</text>
+        </view>
+        <view class="menu-item-right">
+          <text class="menu-desc">周报月报</text>
+          <text class="menu-arrow">›</text>
+        </view>
+      </view>
+
+      <!-- 经期记录 -->
+      <view class="menu-item" bindtap="onMenuItemTap" data-action="period">
+        <view class="menu-item-left">
+          <view class="menu-icon menu-icon-period">🌙</view>
+          <text class="menu-text">经期记录</text>
+        </view>
+        <view class="menu-item-right">
+          <text class="menu-desc">私密健康</text>
+          <text class="menu-arrow">›</text>
+        </view>
+      </view>
     </view>
 
     <view class="menu-card">
@@ -206,6 +242,17 @@
       <view class="form-group">
         <text class="form-label">昵称</text>
         <input class="form-input" value="{{editNickname}}" bindinput="onNicknameInput" placeholder="请输入昵称" maxlength="20" adjust-position="true" cursor-spacing="150" />
+      </view>
+      <view class="form-group">
+        <text class="form-label">性别</text>
+        <view class="gender-options">
+          <view class="gender-option {{editGender === 'male' ? 'gender-active' : ''}}" bindtap="onGenderSelect" data-gender="male">
+            <text>👨 男</text>
+          </view>
+          <view class="gender-option {{editGender === 'female' ? 'gender-active' : ''}}" bindtap="onGenderSelect" data-gender="female">
+            <text>👩 女</text>
+          </view>
+        </view>
       </view>
       <view class="form-group">
         <text class="form-label">身高 (cm)</text>

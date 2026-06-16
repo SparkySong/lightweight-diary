@@ -94,6 +94,7 @@ Page({
     agreementContent: '',
     // 编辑表单
     editNickname: '',
+    editGender: 'female',
     editHeight: '',
     editCurrentWeight: '',
     editGoalWeight: '',
@@ -364,6 +365,10 @@ Page({
       if (result.avatarUrl && !wx.getStorageSync('avatarUrl')) {
         wx.setStorageSync('avatarUrl', result.avatarUrl);
       }
+      // 同步性别
+      if (result.gender) {
+        wx.setStorageSync('userGender', result.gender);
+      }
     } catch (e) {
       console.warn('从云端同步数据失败', e);
     }
@@ -551,6 +556,7 @@ loadStats(goalWeight) {
         this.setData({
           showProfileEdit: true,
           editNickname: this.data.nickname,
+          editGender: wx.getStorageSync('userGender') || 'female',
           editHeight: this.data.height ? String(this.data.height) : '',
           editCurrentWeight: displayCurrentWeight,
           editGoalWeight: displayGoalWeight
@@ -570,6 +576,15 @@ loadStats(goalWeight) {
         break;
       case 'aiChat':
         wx.navigateTo({ url: '/pages/ai-chat/ai-chat' });
+        break;
+      case 'achievements':
+        wx.navigateTo({ url: '/pages/achievements/achievements' });
+        break;
+      case 'report':
+        wx.navigateTo({ url: '/pages/report/report' });
+        break;
+      case 'period':
+        wx.navigateTo({ url: '/pages/period/period' });
         break;
       case 'dataManage':
         this.setData({ showDataManage: true });
@@ -618,6 +633,10 @@ loadStats(goalWeight) {
     this.setData({ editNickname: e.detail.value });
   },
 
+  onGenderSelect(e) {
+    this.setData({ editGender: e.currentTarget.dataset.gender });
+  },
+
   onHeightInput(e) {
     this.setData({ editHeight: e.detail.value });
   },
@@ -631,7 +650,7 @@ loadStats(goalWeight) {
   },
 
   async onSaveProfile() {
-    const { editNickname, editHeight, editCurrentWeight, editGoalWeight, weightUnit } = this.data;
+    const { editNickname, editHeight, editCurrentWeight, editGoalWeight, editGender, weightUnit } = this.data;
     const KG_TO_JIN = 2;
 
     // 验证身高
@@ -673,6 +692,7 @@ loadStats(goalWeight) {
     const trimmedNickname = editNickname.trim();
     if (trimmedNickname) wx.setStorageSync('nickname', trimmedNickname);
     if (editHeight) wx.setStorageSync('userHeight', parseFloat(editHeight));
+    wx.setStorageSync('userGender', editGender);
     if (goalWeightKg !== null) {
       const weightData = wx.getStorageSync('weightData') || {};
       weightData.targetWeight = goalWeightKg;
@@ -688,6 +708,7 @@ loadStats(goalWeight) {
     const cloudData = {};
     if (trimmedNickname) cloudData.nickname = trimmedNickname;
     if (editHeight) cloudData.height = parseFloat(editHeight);
+    if (editGender) cloudData.gender = editGender;
     if (goalWeightKg !== null) cloudData.goalWeight = goalWeightKg;
     try {
       await wx.cloud.callFunction({ name: 'saveUserSettings', data: cloudData });
@@ -875,6 +896,7 @@ loadStats(goalWeight) {
             wx.removeStorageSync('weightData');
             wx.removeStorageSync('nickname');
             wx.removeStorageSync('userHeight');
+            wx.removeStorageSync('userGender');
             wx.removeStorageSync('calorieGoal');
             wx.removeStorageSync('localCalorieGoal');
             // 保留主题和单位设置

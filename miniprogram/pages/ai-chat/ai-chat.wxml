@@ -57,12 +57,44 @@
           <block wx:else>
             <!-- 用户消息：纯文本 -->
             <text class="bubble-text" user-select wx:if="{{item.role === 'user'}}">{{item.displayContent || item.content}}</text>
-            <!-- AI消息：富文本排版 -->
-            <rich-text wx:if="{{item.role === 'assistant'}}" nodes="{{item.richNodes || (item.displayContent || item.content)}}" class="bubble-rich" user-select></rich-text>
+
+            <!-- AI消息：结构化卡片 -->
+            <block wx:if="{{item.role === 'assistant' && item.cardType === 'report'}}">
+              <view class="card-report">
+                <view class="card-report-header">
+                  <text class="card-report-icon">📊</text>
+                  <text class="card-report-title">健康周报</text>
+                </view>
+                <view class="card-report-section" wx:for="{{item.cardData}}" wx:for-item="section" wx:key="title">
+                  <view class="card-section-title">{{section.title}}</view>
+                  <view class="card-section-item" wx:for="{{section.items}}" wx:for-item="si" wx:key="*this">• {{si}}</view>
+                </view>
+              </view>
+            </block>
+
+            <block wx:elif="{{item.role === 'assistant' && item.cardType === 'dietPlan'}}">
+              <view class="card-dietplan">
+                <view class="card-dietplan-header">
+                  <text class="card-dietplan-icon">🍽️</text>
+                  <text class="card-dietplan-title">饮食计划</text>
+                </view>
+                <scroll-view scroll-x class="card-dietplan-scroll" enhanced show-scrollbar="{{false}}">
+                  <view class="card-dietplan-list">
+                    <view class="card-diet-day" wx:for="{{item.cardData}}" wx:for-item="day" wx:key="day">
+                      <view class="card-day-title">{{day.day}}</view>
+                      <view class="card-day-meal" wx:for="{{day.meals}}" wx:for-item="meal" wx:key="*this">{{meal}}</view>
+                    </view>
+                  </view>
+                </scroll-view>
+              </view>
+            </block>
+
+            <!-- AI消息：普通富文本 -->
+            <rich-text wx:elif="{{item.role === 'assistant'}}" nodes="{{item.richNodes || (item.displayContent || item.content)}}" class="bubble-rich" user-select></rich-text>
             <!-- 流式光标 -->
             <text class="stream-cursor" wx:if="{{item.streaming}}">|</text>
             <!-- 复制按钮 -->
-            <view class="copy-btn {{copiedIndex === index ? 'copied' : ''}}" wx:if="{{item.role === 'assistant' && !item.streaming}}" data-text="{{item.content}}" data-index="{{index}}" catchtap="onCopyMessage">
+            <view class="copy-btn {{copiedIndex === index ? 'copied' : ''}}" wx:if="{{item.role === 'assistant' && !item.streaming && !item.cardType}}" data-text="{{item.content}}" data-index="{{index}}" catchtap="onCopyMessage">
               <view class="copy-icon-lines" wx:if="{{copiedIndex !== index}}"></view>
               <view class="copy-icon-check" wx:if="{{copiedIndex === index}}"></view>
             </view>
@@ -103,7 +135,7 @@
   </scroll-view>
 
   <!-- 快捷提问区域 -->
-  <view class="quick-bar" wx:if="{{!isLoading && messages.length <= 2}}">
+  <view class="quick-bar" wx:if="{{quickQuestions.length > 0}}">
     <scroll-view scroll-x class="quick-scroll" enhanced show-scrollbar="{{false}}">
       <view class="quick-list">
         <view

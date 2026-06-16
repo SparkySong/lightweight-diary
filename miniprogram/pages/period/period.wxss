@@ -1,0 +1,232 @@
+/* pages/period/period.wxss */
+@import "/styles/simple-theme.wxss";
+@import "/styles/theme.wxss";
+
+.page-container {
+  min-height: 100vh;
+  padding: 30rpx 30rpx 60rpx;
+  box-sizing: border-box;
+  background: #121212;
+}
+.page-container.theme-light { background: #F8FAF9; }
+
+/* 周期信息卡 */
+.cycle-card {
+  background: rgba(30,30,30,0.85); border: 1rpx solid rgba(255,255,255,0.06);
+  border-radius: 20rpx; padding: 32rpx 24rpx; margin-bottom: 24rpx;
+}
+.theme-light .cycle-card {
+  background: #FFF; border-color: rgba(0,0,0,0.06); box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.04);
+}
+.cycle-info { display: flex; margin-bottom: 20rpx; }
+.cycle-stat { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6rpx; }
+.cycle-value { font-size: 36rpx; font-weight: 700; color: #E8878C; }
+.theme-light .cycle-value { color: #D4707A; }
+.cycle-label { font-size: 22rpx; color: #6B7280; }
+.cycle-predict { border-top: 1rpx solid rgba(255,255,255,0.06); padding-top: 16rpx; text-align: center; }
+.theme-light .cycle-predict { border-top-color: rgba(0,0,0,0.06); }
+.predict-text { font-size: 26rpx; color: #9CA3AF; display: block; }
+.predict-ovulation { font-size: 22rpx; color: #6B7280; display: block; margin-top: 8rpx; }
+.ongoing-text { color: #E8878C; font-weight: 500; }
+
+/* 日历 */
+.calendar-card {
+  background: rgba(30,30,30,0.85); border: 1rpx solid rgba(255,255,255,0.06);
+  border-radius: 20rpx; padding: 24rpx; margin-bottom: 24rpx;
+}
+.theme-light .calendar-card {
+  background: #FFF; border-color: rgba(0,0,0,0.06); box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.04);
+}
+.calendar-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20rpx; }
+.cal-nav {
+  width: 52rpx; height: 52rpx; display: flex; align-items: center; justify-content: center;
+  border-radius: 50%; background: rgba(255,255,255,0.06);
+}
+.theme-light .cal-nav { background: rgba(0,0,0,0.04); }
+.cal-nav-icon { font-size: 32rpx; color: #9CA3AF; font-weight: 300; }
+.cal-title { font-size: 30rpx; font-weight: 600; color: #F5F5F5; }
+.theme-light .cal-title { color: #1F2937; }
+
+.calendar-weekdays { display: flex; margin-bottom: 8rpx; }
+.weekday { flex: 1; text-align: center; font-size: 22rpx; color: #6B7280; padding: 8rpx 0; }
+
+.calendar-grid { display: flex; flex-wrap: wrap; }
+.cal-day {
+  width: calc(100% / 7); height: 80rpx; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; box-sizing: border-box; position: relative;
+}
+.cal-day-num { font-size: 26rpx; color: #D1D5DB; }
+.theme-light .cal-day-num { color: #4B5563; }
+.cal-empty .cal-day-num { color: transparent; }
+.cal-today .cal-day-num { color: #5FA895; font-weight: 700; }
+.theme-light .cal-today .cal-day-num { color: #4A9B8A; }
+
+.cal-period { background: rgba(232,135,140,0.15); border-radius: 8rpx; }
+.cal-period .cal-day-num { color: #E8878C; }
+.theme-light .cal-period { background: rgba(212,112,122,0.1); }
+.theme-light .cal-period .cal-day-num { color: #D4707A; }
+
+.cal-predicted { background: rgba(232,135,140,0.08); border-radius: 8rpx; border: 1rpx dashed rgba(232,135,140,0.3); }
+.cal-predicted .cal-day-num { color: #E8878C; opacity: 0.7; }
+
+.cal-ovulation { background: rgba(100,149,237,0.12); border-radius: 8rpx; }
+.cal-ovulation .cal-day-num { color: #6495ED; }
+.theme-light .cal-ovulation { background: rgba(100,149,237,0.08); }
+.theme-light .cal-ovulation .cal-day-num { color: #4169E1; }
+
+.cal-day-label { font-size: 16rpx; color: #9CA3AF; position: absolute; bottom: 4rpx; }
+
+/* 图例 */
+.calendar-legend { display: flex; justify-content: center; gap: 32rpx; margin-top: 16rpx; padding-top: 12rpx; border-top: 1rpx solid rgba(255,255,255,0.06); }
+.theme-light .calendar-legend { border-top-color: rgba(0,0,0,0.06); }
+.legend-item { display: flex; align-items: center; gap: 8rpx; font-size: 20rpx; color: #6B7280; }
+.legend-dot { width: 16rpx; height: 16rpx; border-radius: 4rpx; }
+.legend-period { background: rgba(232,135,140,0.4); }
+.legend-predicted { background: rgba(232,135,140,0.15); border: 1rpx dashed rgba(232,135,140,0.4); }
+.legend-ovulation { background: rgba(100,149,237,0.3); }
+
+/* 操作按钮 */
+.action-btns { display: flex; gap: 20rpx; margin-bottom: 30rpx; }
+.action-btn {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8rpx;
+  padding: 28rpx 0; border-radius: 16rpx;
+  background: rgba(30,30,30,0.85); border: 1rpx solid rgba(255,255,255,0.06);
+}
+.theme-light .action-btn { background: #FFF; border-color: rgba(0,0,0,0.06); }
+.action-start { border-color: rgba(232,135,140,0.3); }
+.action-end { border-color: rgba(95,168,149,0.3); }
+.action-disabled { opacity: 0.4; }
+.action-icon { font-size: 36rpx; }
+.action-text { font-size: 26rpx; color: #D1D5DB; font-weight: 500; }
+.theme-light .action-text { color: #4B5563; }
+
+/* 历史记录 */
+.history-section { margin-bottom: 30rpx; }
+.history-title { font-size: 30rpx; font-weight: 600; color: #F5F5F5; margin-bottom: 16rpx; display: block; }
+.theme-light .history-title { color: #1F2937; }
+.history-item {
+  background: rgba(30,30,30,0.85); border: 1rpx solid rgba(255,255,255,0.06);
+  border-radius: 16rpx; padding: 24rpx 20rpx; margin-bottom: 16rpx;
+  display: flex; align-items: center;
+}
+.theme-light .history-item { background: #FFF; border-color: rgba(0,0,0,0.06); }
+.history-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+.history-info { display: flex; align-items: center; gap: 16rpx; flex-wrap: wrap; flex: 1; }
+.history-date { font-size: 26rpx; color: #D1D5DB; font-weight: 500; }
+.theme-light .history-date { color: #4B5563; }
+.history-detail { font-size: 22rpx; color: #6B7280; }
+.history-flow { font-size: 20rpx; padding: 4rpx 12rpx; border-radius: 8rpx; font-weight: 500; }
+.flow-light { background: rgba(100,149,237,0.12); color: #6495ED; }
+.flow-medium { background: rgba(232,135,140,0.12); color: #E8878C; }
+.flow-heavy { background: rgba(220,80,80,0.12); color: #DC5050; }
+.history-symptoms { display: flex; flex-wrap: wrap; gap: 8rpx; }
+.symptom-tag {
+  font-size: 20rpx; color: #9CA3AF; padding: 4rpx 12rpx;
+  background: rgba(255,255,255,0.05); border-radius: 8rpx;
+}
+.theme-light .symptom-tag { background: rgba(0,0,0,0.04); color: #6B7280; }
+.history-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-shrink: 0;
+}
+.history-delete {
+  font-size: 24rpx;
+  color: #E57373;
+  padding: 10rpx 24rpx;
+  border-radius: 20rpx;
+  background: rgba(229,115,115,0.1);
+}
+
+/* 加载 */
+.loading-box { display: flex; align-items: center; justify-content: center; padding: 60rpx 0; }
+.loading-text { font-size: 28rpx; color: #6B7280; }
+
+/* 弹窗 */
+.popup-overlay {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.6); z-index: 10000;
+  display: flex; align-items: flex-end; justify-content: center;
+}
+.popup-panel {
+  width: 100%; background: #1E1E1E; border-radius: 32rpx 32rpx 0 0;
+  padding: 40rpx 30rpx; padding-bottom: calc(env(safe-area-inset-bottom) + 40rpx);
+  animation: slideUp 0.3s ease;
+}
+.theme-light .popup-panel { background: #FFF; }
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.popup-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28rpx; }
+.popup-title { font-size: 34rpx; font-weight: 600; color: #F5F5F5; }
+.theme-light .popup-title { color: #1F2937; }
+.popup-close {
+  width: 48rpx; height: 48rpx; display: flex; align-items: center; justify-content: center;
+  border-radius: 50%; font-size: 28rpx; color: #6B7280;
+}
+.close-icon { font-size: 28rpx; }
+.section-label { font-size: 26rpx; color: #6B7280; margin-bottom: 12rpx; font-weight: 500; }
+
+.flow-options { display: flex; gap: 16rpx; margin-bottom: 28rpx; }
+.flow-option {
+  flex: 1; height: 72rpx; display: flex; align-items: center; justify-content: center;
+  background: #2D2D2D; border: 2rpx solid #3D3D3D; border-radius: 16rpx;
+  font-size: 26rpx; color: #D1D5DB;
+}
+.theme-light .flow-option { background: #F0F4F3; border-color: #E5E7EB; color: #4B5563; }
+.flow-option.flow-active { background: rgba(232,135,140,0.15); border-color: #E8878C; color: #E8878C; }
+.theme-light .flow-option.flow-active { background: rgba(212,112,122,0.1); border-color: #D4707A; color: #D4707A; }
+
+.symptom-options { display: flex; flex-wrap: wrap; gap: 12rpx; margin-bottom: 28rpx; }
+.symptom-option {
+  padding: 14rpx 28rpx; background: #2D2D2D; border: 2rpx solid #3D3D3D;
+  border-radius: 24rpx; font-size: 24rpx; color: #D1D5DB;
+  display: flex; align-items: center; gap: 6rpx;
+  transition: all 0.2s ease;
+}
+.theme-light .symptom-option { background: #F0F4F3; border-color: #E5E7EB; color: #4B5563; }
+.symptom-option.symptom-active {
+  background: rgba(232,135,140,0.25); border-color: #E8878C; color: #FF8A8A;
+  font-weight: 600;
+  box-shadow: 0 0 0 2rpx rgba(232,135,140,0.3);
+}
+.theme-light .symptom-option.symptom-active {
+  background: rgba(212,112,122,0.15); border-color: #D4707A; color: #C85A65;
+  box-shadow: 0 0 0 2rpx rgba(212,112,122,0.2);
+}
+
+/* 日期选择 */
+.date-select-row { display: flex; align-items: center; gap: 16rpx; margin-bottom: 28rpx; }
+.date-display {
+  flex: 1; height: 72rpx; display: flex; align-items: center; justify-content: center;
+  background: #2D2D2D; border: 2rpx solid #3D3D3D; border-radius: 16rpx;
+  font-size: 28rpx; color: #F5F5F5;
+}
+.theme-light .date-display { background: #F0F4F3; border-color: #E5E7EB; color: #1F2937; }
+.date-arrow { font-size: 20rpx; color: #6B7280; margin-left: 8rpx; }
+
+.popup-footer { display: flex; gap: 20rpx; }
+.popup-btn {
+  flex: 1; height: 88rpx; line-height: 88rpx; text-align: center;
+  border-radius: 16rpx; font-size: 30rpx; font-weight: 500;
+}
+.popup-btn-cancel { background: #3D3D3D; color: #9CA3AF; }
+.theme-light .popup-btn-cancel { background: #E5E7EB; color: #6B7280; }
+.popup-btn-confirm { background: #E8878C; color: #FFF; }
+.theme-light .popup-btn-confirm { background: #D4707A; }
+
+/* Toast */
+.toast {
+  position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  background: rgba(30,30,30,0.95); color: #F5F5F5;
+  padding: 24rpx 48rpx; border-radius: 16rpx; font-size: 28rpx;
+  z-index: 99999; opacity: 0; transition: opacity 0.3s; pointer-events: none;
+}
+.toast-show { opacity: 1; }
+.toast-text { color: #F5F5F5; }
+.theme-light .toast { background: rgba(255,255,255,0.98); border: 1rpx solid rgba(0,0,0,0.08); }
+.theme-light .toast-text { color: #1F2937; }

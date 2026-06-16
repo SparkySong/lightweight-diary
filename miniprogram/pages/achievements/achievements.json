@@ -1,0 +1,8 @@
+{
+  "usingComponents": {},
+  "navigationBarTitleText": "我的成就",
+  "navigationBarBackgroundColor": "#121212",
+  "navigationBarTextStyle": "white",
+  "navigationStyle": "default",
+  "enablePullDownRefresh": false
+}

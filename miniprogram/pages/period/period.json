@@ -1,0 +1,8 @@
+{
+  "usingComponents": {},
+  "navigationBarTitleText": "经期记录",
+  "navigationBarBackgroundColor": "#121212",
+  "navigationBarTextStyle": "white",
+  "navigationStyle": "default",
+  "enablePullDownRefresh": false
+}

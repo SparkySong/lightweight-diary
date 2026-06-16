@@ -594,3 +594,139 @@
 .send-btn:active { transform: scale(0.92); }
 .send-icon { font-size: 32rpx; color: #6B7280; transition: color 0.25s; }
 .send-active .send-icon { color: #fff; }
+
+/* ========== 结构化卡片：周报 ========== */
+.card-report {
+  padding: 8rpx 0;
+}
+
+.card-report-header {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  padding: 12rpx 0 20rpx;
+  border-bottom: 1rpx solid rgba(95,168,149,0.2);
+  margin-bottom: 20rpx;
+}
+
+.card-report-icon { font-size: 36rpx; }
+
+.card-report-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #5FA895;
+}
+
+.theme-light .card-report-title { color: #3A8A76; }
+
+.card-report-section {
+  margin-bottom: 24rpx;
+  padding: 20rpx 24rpx;
+  background: rgba(95,168,149,0.06);
+  border-radius: 16rpx;
+  border-left: 4rpx solid #5FA895;
+}
+
+.theme-light .card-report-section {
+  background: rgba(74,155,138,0.05);
+  border-left-color: #4A9B8A;
+}
+
+.card-section-title {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #5FA895;
+  margin-bottom: 12rpx;
+}
+
+.theme-light .card-section-title { color: #3A8A76; }
+
+.card-section-item {
+  font-size: 26rpx;
+  line-height: 1.8;
+  color: #D0D0D0;
+  padding-left: 8rpx;
+}
+
+.theme-light .card-section-item { color: #4B5563; }
+
+/* ========== 结构化卡片：饮食计划 ========== */
+.card-dietplan {
+  padding: 8rpx 0;
+}
+
+.card-dietplan-header {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  padding: 12rpx 0 20rpx;
+  border-bottom: 1rpx solid rgba(95,168,149,0.2);
+  margin-bottom: 20rpx;
+}
+
+.card-dietplan-icon { font-size: 36rpx; }
+
+.card-dietplan-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #5FA895;
+}
+
+.theme-light .card-dietplan-title { color: #3A8A76; }
+
+.card-dietplan-scroll {
+  white-space: nowrap;
+  margin: 0 -28rpx;
+  padding: 0 28rpx;
+}
+
+.card-dietplan-list {
+  display: inline-flex;
+  gap: 20rpx;
+  padding: 8rpx 0 16rpx;
+}
+
+.card-diet-day {
+  display: inline-flex;
+  flex-direction: column;
+  min-width: 300rpx;
+  max-width: 360rpx;
+  padding: 24rpx;
+  background: rgba(95,168,149,0.08);
+  border-radius: 20rpx;
+  border: 1rpx solid rgba(95,168,149,0.15);
+  white-space: normal;
+  vertical-align: top;
+}
+
+.theme-light .card-diet-day {
+  background: rgba(74,155,138,0.06);
+  border-color: rgba(74,155,138,0.12);
+}
+
+.card-day-title {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #5FA895;
+  margin-bottom: 16rpx;
+  padding-bottom: 12rpx;
+  border-bottom: 1rpx solid rgba(95,168,149,0.15);
+}
+
+.theme-light .card-day-title { color: #3A8A76; }
+
+.card-day-meal {
+  font-size: 24rpx;
+  line-height: 1.8;
+  color: #D0D0D0;
+  padding: 4rpx 0;
+}
+
+.theme-light .card-day-meal { color: #4B5563; }
+
+/* 卡片消息调整气泡样式 */
+.bubble-ai:has(.card-report),
+.bubble-ai:has(.card-dietplan) {
+  max-width: 85%;
+  padding-bottom: 28rpx;
+}

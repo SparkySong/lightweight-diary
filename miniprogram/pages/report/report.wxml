@@ -1,0 +1,102 @@
+<!--pages/report/report.wxml-->
+<page-meta
+  background-text-style="{{currentTheme === 'light' ? 'dark' : 'light'}}"
+  background-color="{{currentTheme === 'light' ? '#F8FAF9' : '#121212'}}"
+  background-color-top="{{currentTheme === 'light' ? '#F8FAF9' : '#121212'}}"
+  background-color-bottom="{{currentTheme === 'light' ? '#F8FAF9' : '#121212'}}"
+  root-background-color="{{currentTheme === 'light' ? '#F8FAF9' : '#121212'}}"
+  navigation-bar-style="{{currentTheme === 'light' ? 'dark' : 'light'}}"
+/>
+<page class="{{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}}">
+
+<view class="page-container {{currentTheme === 'light' ? 'theme-light' : ''}}">
+
+  <!-- Tab 切换 + 生成按钮 -->
+  <view class="tab-bar-row">
+    <view class="tab-bar">
+      <view class="tab-item {{activeTab === 'weekly' ? 'tab-active' : ''}}" bindtap="onTabChange" data-tab="weekly">
+        <text>周报</text>
+      </view>
+      <view class="tab-item {{activeTab === 'monthly' ? 'tab-active' : ''}}" bindtap="onTabChange" data-tab="monthly">
+        <text>月报</text>
+      </view>
+    </view>
+    <view class="generate-btn" bindtap="onGenerateReport">
+      <text>{{generating ? '生成中...' : '+ 生成'}}</text>
+    </view>
+  </view>
+
+  <!-- 加载状态 -->
+  <view class="loading-box" wx:if="{{loading}}">
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <!-- 无报告 -->
+  <view class="empty-box" wx:elif="{{reports.length === 0}}">
+    <text class="empty-icon">📋</text>
+    <text class="empty-text">暂无{{activeTab === 'weekly' ? '周报' : '月报'}}数据</text>
+    <text class="empty-sub">点击上方“生成”按钮创建报告</text>
+  </view>
+
+  <!-- 报告列表 -->
+  <block wx:else>
+    <!-- 报告选择器（横向滚动） -->
+    <scroll-view class="report-selector" scroll-x enhanced show-scrollbar="{{false}}">
+      <view class="selector-list">
+        <view class="selector-item {{currentReport._id === item._id ? 'selector-active' : ''}}" wx:for="{{reports}}" wx:key="_id" bindtap="onSelectReport" data-idx="{{index}}">
+          <text class="selector-date">{{item.dateRange}}</text>
+          <text class="selector-type">{{item.typeLabel}}</text>
+        </view>
+      </view>
+    </scroll-view>
+
+    <!-- 当前报告详情 -->
+    <view class="report-card" wx:if="{{currentReport}}">
+      <view class="report-header">
+        <text class="report-title">{{currentReport.typeLabel}}</text>
+        <text class="report-date">{{currentReport.dateRange}}</text>
+      </view>
+
+      <!-- 数据概览 -->
+      <view class="report-stats">
+        <view class="report-stat">
+          <text class="stat-value {{currentReport.isLoss ? 'stat-green' : (currentReport.weightChange > 0 ? 'stat-red' : '')}}">{{currentReport.weightChangeDisplay}}kg</text>
+          <text class="stat-label">体重变化</text>
+        </view>
+        <view class="report-stat-divider"></view>
+        <view class="report-stat">
+          <text class="stat-value">{{currentReport.avgDailyCalories}}</text>
+          <text class="stat-label">日均摄入(kcal)</text>
+        </view>
+      </view>
+
+      <view class="report-stats">
+        <view class="report-stat">
+          <text class="stat-value">{{currentReport.checkinDays}}</text>
+          <text class="stat-label">打卡天数</text>
+        </view>
+        <view class="report-stat-divider"></view>
+        <view class="report-stat">
+          <text class="stat-value">{{currentReport.exerciseDays}}</text>
+          <text class="stat-label">运动天数</text>
+        </view>
+        <view class="report-stat-divider"></view>
+        <view class="report-stat">
+          <text class="stat-value">{{currentReport.totalExerciseCal}}</text>
+          <text class="stat-label">运动消耗(kcal)</text>
+        </view>
+      </view>
+
+      <!-- 亮点 -->
+      <view class="report-highlights" wx:if="{{currentReport.highlights.length > 0}}">
+        <text class="highlights-title">本期亮点</text>
+        <view class="highlight-item" wx:for="{{currentReport.highlights}}" wx:key="*this">
+          <text class="highlight-dot">✦</text>
+          <text class="highlight-text">{{item}}</text>
+        </view>
+      </view>
+    </view>
+  </block>
+</view>
+
+</page>

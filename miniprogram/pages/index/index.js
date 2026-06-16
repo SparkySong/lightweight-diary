@@ -79,11 +79,8 @@ Page({
     bmiIndicatorStyle: '',
     // Progress width
     goalProgressWidth: 0,
-    // Reminder
-    reminderEnabled: false,
-    remindTime: '08:00',
-    nextReminderDate: '',
-    reminderStatusText: '打卡后可自动续订下一次提醒',
+    // Health Tip
+    healthTip: '',
     // 主题相关 - 🔑 关键：初始值从存储直接读取，避免闪烁
     currentTheme: getInitTheme(),
     currentThemeSetting: getInitThemeSetting(),
@@ -123,6 +120,13 @@ Page({
     fabLeft: 0,
     fabTop: 0,
     fabDragging: false,
+    // 热量收支看板
+    todayIntake: 0,
+    todayBurn: 0,
+    todayTotalBurn: 0,
+    todayBalance: 0,
+    todayBalanceAbs: 0,
+    bmr: 0,
   },
 
   onLoad() {
@@ -137,6 +141,7 @@ Page({
     this.initNavBarPadding();  // 计算胶囊按钮安全距离
     this.initTheme(); // 在数据加载前立即初始化主题
     this.initFabPosition(); // 初始化 AI 浮窗位置
+    this.setData({ healthTip: this.getRandomTip() }); // 初始化小贴士
     // 数据加载放在主题初始化之后，不阻塞主题渲染
     this.loadAll();
   },
@@ -274,7 +279,8 @@ Page({
       const results = await Promise.allSettled([
         this.loadRecords(),
         this.loadGoal(),
-        this.loadProfile()
+        this.loadProfile(),
+        this.loadTodayCalorieBalance()
       ]);
       
       // 检查是否有成功的结果
@@ -303,7 +309,7 @@ Page({
         // 尝试使用本地存储
         const localRecords = wx.getStorageSync('localRecords') || [];
         const localGoal = wx.getStorageSync('localGoal');
-        const localProfile = wx.getStorageSync('localProfile') || { height: null, reminder: { enabled: false, remindTime: '08:00' }};
+        const localProfile = wx.getStorageSync('localProfile') || { height: null };
         const { weightUnit } = this.data;
         
         if (localRecords.length > 0) {
@@ -322,11 +328,7 @@ Page({
         }
         this.setData({
           height: localProfile.height,
-          showHeightInput: !localProfile.height,
-          reminderEnabled: localProfile.reminder.enabled,
-          remindTime: localProfile.reminder.remindTime,
-          nextReminderDate: localProfile.reminder.nextReminderDate || '',
-          reminderStatusText: this.getReminderStatusText(localProfile.reminder)
+          showHeightInput: !localProfile.height
         });
         this.calcBMI();
       }
@@ -488,14 +490,10 @@ Page({
   async loadProfile() {
     try {
       const res = await wx.cloud.callFunction({ name: 'getProfile', timeout: 15000 });
-      const { height, reminder } = res.result;
+      const { height } = res.result;
       this.setData({
         height: height,
-        showHeightInput: !height,
-        reminderEnabled: reminder.enabled,
-        remindTime: reminder.remindTime,
-        nextReminderDate: reminder.nextReminderDate || '',
-        reminderStatusText: this.getReminderStatusText(reminder)
+        showHeightInput: !height
       });
       this.calcBMI();
     } catch (e) {
@@ -619,138 +617,42 @@ Page({
     }
   },
 
-  getReminderStatusText(reminder = {}) {
-    if (reminder.enabled && reminder.nextReminderDate) {
-      return `已订阅 ${reminder.nextReminderDate} ${reminder.remindTime || '08:00'} 提醒`;
-    }
-    if (reminder.lastStatus === 'consumed') {
-      return '上次提醒已发送，请打卡后续订下一次';
-    }
-    if (reminder.lastStatus === 'failed') {
-      return '上次提醒发送失败，请重新订阅下一次';
-    }
-    return '打卡后可自动续订下一次提醒';
+  getReminderStatusText() {},
+  applyReminderResult() {},
+  async renewNextReminder() {},
+  async onToggleReminder() {},
+  onTimePickerTap() {},
+  onRemindTimeChange() {},
+
+  // --- Health Tips ---
+  _healthTips: [
+    '吃饭先菜后饭，血糖更平稳，减脂效果更好。',
+    '每餐吃七八分饱，感觉“还能吃”就停下。',
+    '晚餐尽量在睡前3小时吃完，给消化留足时间。',
+    '减脂不等于不吃碳水，适量粗粮比精白米面更好。',
+    '每天喝够1500-2000ml水，代谢更快，饥饿感更少。',
+    '睡眠不足会让饥饿素升高，熬夜更容易暴饮暴食。',
+    '细嚼慢咽每口吃20次以上，大脑才有时间接收“饱了”的信号。',
+    '水果虽然健康，但果糖也不低，每天200-300g就够。',
+    '蛋白质是减脂期最重要的营养素，每公斤体重吃1.2-1.6g。',
+    '运动前后适当补碳，表现更好，恢复更快。',
+    '记录饮食比节食更重要， awareness 本身就是改变的开始。',
+    '偶尔吃多不必内疖，第二天正常吃就好，不要报复性节食。',
+    '体重波动很正常，水分、肠道内容物都会影响数字。',
+    '减脂速度建议每周0.5kg，太快容易掉肌肉且反弹。',
+    '早餐不必非得吃，但如果吃就吃优质蛋白+复合碳水。',
+    '奶茶一杯可能超过一顿正餐的热量，尽量选择无糖。',
+    '蔬菜不限量，但沙拉酱、油炒的热量不能忽视。',
+    '体重秤只是参考，围度变化和衣服松紧更能反映真实进展。'
+  ],
+
+  getRandomTip() {
+    const tips = this._healthTips;
+    return tips[Math.floor(Math.random() * tips.length)];
   },
 
-  applyReminderResult(reminder = {}) {
-    const mergedReminder = {
-      enabled: Boolean(reminder.enabled),
-      remindTime: reminder.remindTime || this.data.remindTime || '08:00',
-      nextReminderDate: reminder.nextReminderDate || '',
-      lastStatus: reminder.lastStatus || (reminder.enabled ? 'pending' : '')
-    };
-
-    this.setData({
-      reminderEnabled: mergedReminder.enabled,
-      remindTime: mergedReminder.remindTime,
-      nextReminderDate: mergedReminder.nextReminderDate,
-      reminderStatusText: this.getReminderStatusText(mergedReminder)
-    });
-  },
-
-  async renewNextReminder(options = {}) {
-    const {
-      remindTime = this.data.remindTime,
-      targetDate,
-      silent = false,
-      source = 'manual'
-    } = options;
-    const templateId = app.globalData?.subscribeTemplateId || '5X2tUq0NbycqoeFiymKj4FiKaLts5K5ZdSgzqHf4Lt4';
-
-    try {
-      const res = await wx.requestSubscribeMessage({
-        tmplIds: [templateId]
-      });
-      if (res[templateId] !== 'accept') {
-        console.warn('用户未接受下一次提醒订阅', res[templateId]);
-        if (!silent) {
-          this.showToast('未授权下一次提醒');
-        }
-        return false;
-      }
-
-      const cloudRes = await wx.cloud.callFunction({
-        name: 'subscribeReminder',
-        data: {
-          enabled: true,
-          remindTime,
-          targetDate,
-          source
-        }
-      });
-      this.applyReminderResult(cloudRes.result?.reminder || {
-        enabled: true,
-        remindTime,
-        nextReminderDate: targetDate || ''
-      });
-      return true;
-    } catch (e) {
-      console.error('续订下一次提醒失败:', e);
-      if (!silent) {
-        this.showToast('订阅下一次提醒失败');
-      }
-      return false;
-    }
-  },
-
-  // --- Reminder ---
-  async onToggleReminder() {
-    if (!this.data.reminderEnabled) {
-      const success = await this.renewNextReminder({
-        remindTime: this.data.remindTime,
-        targetDate: getTomorrowDateStr(),
-        silent: true,
-        source: 'manual'
-      });
-      if (success) {
-        this.showToast('已订阅下一次提醒');
-      } else {
-        this.showToast('需要授权下一次提醒');
-      }
-    } else {
-      await wx.cloud.callFunction({
-        name: 'subscribeReminder',
-        data: { enabled: false }
-      });
-      this.applyReminderResult({
-        enabled: false,
-        remindTime: this.data.remindTime,
-        nextReminderDate: ''
-      });
-      this.showToast('已取消下一次提醒');
-    }
-  },
-
-  // 点击时间选择器
-  onTimePickerTap() {
-    // 这个方法只是用来阻止事件冒泡到父元素的 onToggleReminder
-    // e 参数不需要使用
-  },
-  
-  onRemindTimeChange(e) {
-    const newTime = e.detail.value;
-    this.setData({ remindTime: newTime });
-    if (this.data.reminderEnabled) {
-      wx.cloud.callFunction({
-        name: 'subscribeReminder',
-        data: {
-          enabled: true,
-          remindTime: newTime,
-          targetDate: this.data.nextReminderDate || getTomorrowDateStr(),
-          source: 'manual'
-        }
-      }).then((res) => {
-        this.applyReminderResult(res.result?.reminder || {
-          enabled: true,
-          remindTime: newTime,
-          nextReminderDate: this.data.nextReminderDate || getTomorrowDateStr()
-        });
-        this.showToast('下次提醒时间已更新');
-      }).catch((err) => {
-        console.error('更新提醒时间失败:', err);
-        this.showToast('更新时间失败');
-      });
-    }
+  onRefreshTip() {
+    this.setData({ healthTip: this.getRandomTip() });
   },
 
   // --- Navigation ---
@@ -760,6 +662,61 @@ Page({
 
   goToAiChat() {
     wx.navigateTo({ url: '/pages/ai-chat/ai-chat' });
+  },
+
+  goToExercise() {
+    wx.navigateTo({ url: '/pages/exercise/exercise' });
+  },
+
+  // 加载今日热量收支数据
+  async loadTodayCalorieBalance() {
+    const today = formatDateStr(new Date());
+    let todayIntake = 0;
+    let todayBurn = 0;
+
+    try {
+      // 加载今日饮食
+      const dietRes = await wx.cloud.callFunction({
+        name: 'getDietRecords',
+        data: { date: today }
+      });
+      const dietRecords = dietRes.result?.data || [];
+      todayIntake = dietRecords.reduce((sum, r) => sum + (r.totalCal || r.calories || 0), 0);
+    } catch (e) {
+      console.warn('加载饮食数据失败', e);
+    }
+
+    try {
+      // 加载今日运动
+      const exRes = await wx.cloud.callFunction({
+        name: 'getExercises',
+        data: { startDate: today, endDate: today }
+      });
+      const exRecords = exRes.result?.data || [];
+      todayBurn = exRecords.reduce((sum, r) => sum + (r.calories || 0), 0);
+    } catch (e) {
+      console.warn('加载运动数据失败', e);
+    }
+
+    // 计算BMR (Mifflin-St Jeor公式)
+    const weightData = wx.getStorageSync('weightData') || {};
+    const userHeight = wx.getStorageSync('userHeight') || 165;
+    const userGender = wx.getStorageSync('userGender') || 'female';
+    const weight = weightData.currentWeight || 60;
+    // 男性: +5, 女性: -161
+    const genderOffset = userGender === 'male' ? 5 : -161;
+    const bmr = Math.round(10 * weight + 6.25 * userHeight - 5 * 25 + genderOffset);
+    const todayTotalBurn = bmr + Math.round(todayBurn);
+    const balance = Math.round(todayIntake) - todayTotalBurn;
+
+    this.setData({
+      todayIntake: Math.round(todayIntake),
+      todayBurn: Math.round(todayBurn),
+      todayTotalBurn,
+      todayBalance: balance,
+      todayBalanceAbs: Math.abs(balance),
+      bmr
+    });
   },
 
   // --- AI 浮窗拖动 ---
@@ -1124,21 +1081,6 @@ Page({
 
   async afterCheckinSuccess(recordDate) {
     await this.loadAll();
-
-    if (recordDate !== formatDateStr(new Date())) {
-      return;
-    }
-
-    const renewed = await this.renewNextReminder({
-      remindTime: this.data.remindTime,
-      targetDate: getTomorrowDateStr(),
-      silent: true,
-      source: 'checkin'
-    });
-
-    if (renewed) {
-      this.showToast('已为你订阅明天提醒');
-    }
   },
 
   async onCheckin() {

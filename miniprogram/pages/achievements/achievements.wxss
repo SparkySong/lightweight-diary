@@ -1,0 +1,325 @@
+/* pages/achievements/achievements.wxss */
+@import "/styles/simple-theme.wxss";
+@import "/styles/theme.wxss";
+
+.page-container {
+  min-height: 100vh;
+  padding: 30rpx 30rpx 60rpx;
+  box-sizing: border-box;
+  background: #121212;
+}
+
+.page-container.theme-light {
+  background: #F8FAF9;
+}
+
+/* 统计头部 */
+.stats-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40rpx 0 30rpx;
+  margin-bottom: 30rpx;
+}
+
+.stats-circle {
+  display: flex;
+  align-items: baseline;
+  margin-bottom: 12rpx;
+}
+
+.stats-number {
+  font-size: 80rpx;
+  font-weight: 700;
+  color: #5FA895;
+  letter-spacing: -0.03em;
+}
+
+.theme-light .stats-number {
+  color: #4A9B8A;
+}
+
+.stats-total {
+  font-size: 36rpx;
+  color: #6B7280;
+  font-weight: 500;
+}
+
+.stats-label {
+  font-size: 26rpx;
+  color: #6B7280;
+  margin-bottom: 20rpx;
+}
+
+.stats-bar {
+  width: 300rpx;
+  height: 8rpx;
+  background: rgba(255,255,255,0.08);
+  border-radius: 4rpx;
+  overflow: hidden;
+}
+
+.theme-light .stats-bar {
+  background: rgba(0,0,0,0.06);
+}
+
+.stats-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #5FA895, #4A9B8A);
+  border-radius: 4rpx;
+  transition: width 0.5s ease;
+}
+
+.theme-light .stats-bar-fill {
+  background: linear-gradient(90deg, #4A9B8A, #3D8B7A);
+}
+
+/* 加载状态 */
+.loading-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 100rpx 0;
+}
+
+.loading-text {
+  font-size: 28rpx;
+  color: #6B7280;
+}
+
+/* 徽章网格 */
+.badge-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20rpx;
+  justify-content: flex-start;
+}
+
+.badge-card {
+  width: 48%;
+  background: rgba(30,30,30,0.85);
+  border: 1rpx solid rgba(255,255,255,0.06);
+  border-radius: 20rpx;
+  padding: 24rpx 16rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+}
+
+.badge-card.badge-unlocked {
+  border-color: rgba(95,168,149,0.3);
+  box-shadow: 0 4rpx 20rpx rgba(95,168,149,0.15);
+}
+
+.theme-light .badge-card {
+  background: #FFFFFF;
+  border-color: rgba(0,0,0,0.06);
+  box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.04);
+}
+
+.theme-light .badge-card.badge-unlocked {
+  border-color: rgba(74,155,138,0.3);
+  box-shadow: 0 4rpx 20rpx rgba(74,155,138,0.12);
+}
+
+.badge-icon-wrap {
+  width: 72rpx;
+  height: 72rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.05);
+  margin-bottom: 12rpx;
+  position: relative;
+}
+
+.badge-icon-wrap.icon-active {
+  background: rgba(95,168,149,0.15);
+}
+
+.theme-light .badge-icon-wrap {
+  background: rgba(0,0,0,0.03);
+}
+
+.theme-light .badge-icon-wrap.icon-active {
+  background: rgba(74,155,138,0.12);
+}
+
+.badge-icon {
+  font-size: 40rpx;
+}
+
+.badge-lock {
+  position: absolute;
+  bottom: -4rpx;
+  right: -4rpx;
+  width: 32rpx;
+  height: 32rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(30,30,30,0.9);
+  border-radius: 50%;
+}
+
+.theme-light .badge-lock {
+  background: rgba(255,255,255,0.95);
+}
+
+.lock-icon {
+  font-size: 18rpx;
+}
+
+.badge-name {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #F5F5F5;
+  margin-bottom: 4rpx;
+}
+
+.badge-name.name-locked {
+  color: #6B7280;
+}
+
+.theme-light .badge-name {
+  color: #1F2937;
+}
+
+.theme-light .badge-name.name-locked {
+  color: #9CA3AF;
+}
+
+.badge-desc {
+  font-size: 20rpx;
+  color: #6B7280;
+  margin-bottom: 12rpx;
+  line-height: 1.3;
+}
+
+/* 进度条 */
+.badge-progress {
+  width: 100%;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 6rpx;
+  background: rgba(255,255,255,0.08);
+  border-radius: 3rpx;
+  overflow: hidden;
+  margin-bottom: 8rpx;
+}
+
+.theme-light .progress-bar {
+  background: rgba(0,0,0,0.06);
+}
+
+.progress-fill {
+  height: 100%;
+  background: #5FA895;
+  border-radius: 3rpx;
+  transition: width 0.5s ease;
+}
+
+.theme-light .progress-fill {
+  background: #4A9B8A;
+}
+
+.progress-text {
+  font-size: 20rpx;
+  color: #6B7280;
+}
+
+/* 已解锁标记 */
+.badge-done {
+  margin-top: 4rpx;
+}
+
+.done-text {
+  font-size: 22rpx;
+  color: #5FA895;
+  font-weight: 500;
+}
+
+.theme-light .done-text {
+  color: #4A9B8A;
+}
+
+/* 徽章解锁弹窗 */
+.unlock-overlay {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.7); z-index: 10000;
+  display: flex; align-items: center; justify-content: center;
+  animation: fadeIn 0.3s ease;
+}
+
+.unlock-card {
+  position: relative;
+  width: 560rpx;
+  background: linear-gradient(160deg, #1E1E1E 0%, #2A2A2A 100%);
+  border: 1rpx solid rgba(95,168,149,0.3);
+  border-radius: 32rpx;
+  padding: 60rpx 40rpx 48rpx;
+  display: flex; flex-direction: column; align-items: center;
+  animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  overflow: hidden;
+}
+
+.theme-light .unlock-card {
+  background: linear-gradient(160deg, #FFF 0%, #F0F4F3 100%);
+  border-color: rgba(74,155,138,0.3);
+}
+
+.unlock-glow {
+  position: absolute; top: -60rpx; left: 50%; transform: translateX(-50%);
+  width: 300rpx; height: 300rpx;
+  background: radial-gradient(circle, rgba(95,168,149,0.25) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.unlock-badge-icon {
+  font-size: 100rpx;
+  margin-bottom: 24rpx;
+  animation: bounce 0.6s ease 0.3s;
+}
+
+.unlock-title {
+  font-size: 28rpx; color: #5FA895;
+  font-weight: 600; margin-bottom: 16rpx;
+}
+
+.unlock-name {
+  font-size: 38rpx; color: #F5F5F5;
+  font-weight: 700; margin-bottom: 12rpx;
+}
+
+.theme-light .unlock-name { color: #1F2937; }
+
+.unlock-desc {
+  font-size: 26rpx; color: #9CA3AF;
+  margin-bottom: 36rpx;
+}
+
+.unlock-btn {
+  width: 360rpx; height: 80rpx;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, #5FA895, #4A9B8A);
+  border-radius: 40rpx;
+  font-size: 28rpx; color: #FFF; font-weight: 600;
+}
+
+.theme-light .unlock-btn {
+  background: linear-gradient(135deg, #4A9B8A, #3D8B7A);
+}
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes popIn { from { transform: scale(0.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes bounce {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}

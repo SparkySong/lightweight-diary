@@ -21,13 +21,16 @@ Page({
     hidePage: false,
     quickQuestions: [
       '分析我的整体情况',
-      '我的BMI正常吗',
+      '我的 BMI正常吗',
       '今天吃得怎么样',
-      '给我一条健康建议'
+      '生成周报',
+      '帮我制定饮食计划'
     ],
     // 编辑模式状态
     editIndex: -1,
-    editValue: ''
+    editValue: '',
+    // 结构化卡片类型
+    cardType: ''  // 'report' | 'dietPlan' | ''
   },
 
   // 流式输出定时器引用
@@ -50,7 +53,7 @@ Page({
     }
 
     try {
-      await Promise.all([this.loadDietData(), this.refreshWeightFromCloud()]);
+      await Promise.all([this.loadDietData(), this.refreshWeightFromCloud(), this.loadExerciseData()]);
     } catch (e) {
       console.warn('预加载数据失败，使用缓存:', e);
     }
@@ -113,6 +116,7 @@ Page({
   // ===== 数据加载 =====
 
   _dietRawData: null,
+  _exerciseRawData: null,
 
   async loadDietData() {
     try {
@@ -121,6 +125,15 @@ Page({
       this._dietRawData = days.length > 0 ? days.slice(0, 2) : null;
     } catch (e) {
       console.warn('加载饮食记录失败', e);
+    }
+  },
+
+  async loadExerciseData() {
+    try {
+      const res = await wx.cloud.callFunction({ name: 'getExercises', data: { limit: 20 } });
+      this._exerciseRawData = res.result?.data || [];
+    } catch (e) {
+      console.warn('加载运动数据失败', e);
     }
   },
 
@@ -339,6 +352,8 @@ Page({
     sections.push(this._buildProfileSection());
     const dietSection = this._buildDietSection();
     if (dietSection) sections.push(dietSection);
+    const exerciseSection = this._buildExerciseSection();
+    if (exerciseSection) sections.push(exerciseSection);
     const kb = sections.join('\n\n');
     console.log('[KB] 知识库长度:', kb.length, '内容预览:', kb.substring(0, 300));
     this.setData({ knowledgeBase: kb });
@@ -386,6 +401,29 @@ Page({
     return '【饮食】\n' + lines.join('\n');
   },
 
+  _buildExerciseSection() {
+    const exercises = this._exerciseRawData;
+    if (!exercises || !exercises.length) return null;
+    const now = new Date();
+    const todayStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+    // 取最近 7 天的运动数据
+    const recentExercises = exercises.slice(0, 15);
+    const lines = [];
+    const dateGroups = {};
+    recentExercises.forEach(ex => {
+      if (!dateGroups[ex.date]) dateGroups[ex.date] = [];
+      dateGroups[ex.date].push(ex);
+    });
+    Object.keys(dateGroups).sort().reverse().forEach(date => {
+      const items = dateGroups[date];
+      const tag = date === todayStr ? '今天' : date;
+      const details = items.map(ex => `${ex.typeLabel||ex.type}(${ex.duration}分钟,${ex.calories}kcal)`).join('、');
+      const totalCal = items.reduce((s, ex) => s + (ex.calories || 0), 0);
+      lines.push(`${tag} ${details} = ${totalCal}kcal`);
+    });
+    return '【运动】\n' + lines.join('\n');
+  },
+
   formatDate(dateStr) {
     if (!dateStr) return '未知';
     if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr;
@@ -400,6 +438,37 @@ Page({
     const q = e.currentTarget.dataset.q;
     if (this.data.isLoading) return;
     this.sendMessage(q);
+  },
+
+  /**
+   * 从 AI 回复中解析【推荐追问】区块，更新快捷推荐
+   * 推荐由 AI 动态生成，而非前端硬编码关键词匹配
+   */
+  _updateDynamicQuickQuestions(messages) {
+    const msgs = messages || this.data.messages;
+    if (!msgs || msgs.length === 0) return;
+
+    // 取最后一条 AI 回复，解析推荐追问
+    const lastAiReply = [...msgs].reverse().find(m => m.role === 'assistant' && m.content);
+    if (!lastAiReply) return;
+
+    const content = lastAiReply.content;
+
+    // 解析 【推荐追问】 区块：匹配 - 开头的列表项
+    const followUpMatch = content.match(/【推荐追问】\s*\n((?:- .+\n?)+)/);
+    if (followUpMatch) {
+      const questions = followUpMatch[1]
+        .split('\n')
+        .map(line => line.replace(/^-\s*/, '').trim())
+        .filter(q => q.length > 0 && q.length <= 20);
+
+      if (questions.length > 0) {
+        this.setData({ quickQuestions: questions.slice(0, 4) });
+        return;
+      }
+    }
+
+    // AI 没输出推荐追问（如知识库回复），保持当前推荐不变
   },
 
   onInput(e) {
@@ -454,7 +523,7 @@ Page({
     // 走 AI
     console.log('[Chat] 模板未命中，走 AI');
     try {
-      await Promise.all([this.loadDietData(), this.refreshWeightFromCloud()]);
+      await Promise.all([this.loadDietData(), this.refreshWeightFromCloud(), this.loadExerciseData()]);
     } catch(e) {}
     const kb = this.buildKnowledgeBase();
     const recentMsgs = messages.slice(-10).map(m => ({ role: m.role, content: m.content }));
@@ -467,7 +536,13 @@ Page({
 
       const result = res.result || {};
       if (result.success && result.reply) {
-        this._startStreamEffect(result.reply, messages);
+        // 检测是否为结构化卡片内容
+        const cardInfo = this._detectCardType(text, result.reply);
+        if (cardInfo) {
+          this._renderStructuredCard(cardInfo, messages);
+        } else {
+          this._startStreamEffect(result.reply, messages);
+        }
       } else {
         this._showFriendlyError(result.error || '未知错误');
       }
@@ -487,6 +562,8 @@ Page({
   _formatRichText(text) {
     if (!text) return '';
     let html = text;
+    // 先剥离【推荐追问】区块（这部分给快捷推荐栏用，不在气泡里展示）
+    html = html.replace(/【推荐追问】[\s\S]*$/, '');
     // 转义 HTML（在格式标记处理之前）
     html = html.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
@@ -575,6 +652,165 @@ Page({
     return result.join('');
   },
 
+  // ===== 结构化卡片检测与渲染 =====
+
+  /**
+   * 检测 AI 回复是否为结构化卡片（周报 / 饮食计划）
+   * 返回 { type: 'report'|'dietPlan', sections: [...] } 或 null
+   */
+  _detectCardType(userText, aiReply) {
+    const ut = (userText || '').toLowerCase();
+    // 先剥离【推荐追问】区块，避免混入卡片内容
+    const cleanReply = (aiReply || '').replace(/【推荐追问】[\s\S]*$/, '');
+    if (/周报|本周分析|周报告|这周总结|上周分析/.test(ut)) {
+      return { type: 'report', sections: this._parseReportSections(cleanReply) };
+    }
+    if (/饮食计划|下周吃|这周吃|制定.*饮食|饮食安排|meal\s*plan/.test(ut)) {
+      return { type: 'dietPlan', sections: this._parseDietPlanSections(cleanReply) };
+    }
+    return null;
+  },
+
+  /**
+   * 解析周报内容为结构化段落
+   */
+  _parseReportSections(text) {
+    const sections = [];
+    const lines = text.split('\n');
+    let currentTitle = '';
+    let currentItems = [];
+
+    for (const rawLine of lines) {
+      const line = rawLine.trim();
+      // 匹配 *标题* 或数字序号标题
+      const titleMatch = line.match(/^\*(.+?)\*$/) || line.match(/^(\d+[\.\、])\s*(.+)/);
+      if (titleMatch) {
+        if (currentTitle && currentItems.length > 0) {
+          sections.push({ title: currentTitle, items: [...currentItems] });
+        }
+        currentTitle = titleMatch[2] ? titleMatch[2] : titleMatch[1];
+        currentItems = [];
+        continue;
+      }
+      // 列表项
+      const liMatch = line.match(/^[-•·]\s*(.+)$/);
+      if (liMatch) {
+        currentItems.push(liMatch[1].replace(/\*\*(.+?)\*\*/g, '$1'));
+        continue;
+      }
+      // 普通文本行
+      if (line) {
+        currentItems.push(line.replace(/\*\*(.+?)\*\*/g, '$1'));
+      }
+    }
+    if (currentTitle && currentItems.length > 0) {
+      sections.push({ title: currentTitle, items: currentItems });
+    }
+    return sections;
+  },
+
+  /**
+   * 解析饮食计划为每天/每餐一个卡片
+   * 支持格式：
+   *   - **早餐计划** / *第1天* / 1. 第一天
+   *   - - 食物名 xxx（xxx kcal）
+   */
+  _parseDietPlanSections(text) {
+    const days = [];
+    const lines = text.split('\n');
+    let currentDay = '';
+    let currentMeals = [];
+
+    // 标题行正则：**标题** / *标题* / 数字序号.标题 / 中文日期等
+    const headerPatterns = [
+      /^\s*\*\*(.+)\*\*\s*$/,          // **标题**
+      /^\s*\*(.+)\*\s*$/,               // *标题*
+      /^(\d+)[\.\、\）]\s*(.+)$/,       // 1. 标题 / 1、标题
+      /^(第\s*[一二三四五六七八九十\d]+\s*天)$/,  // 第X天
+      /^(Day\s*\d+)$/i,                  // Day X
+      /^(周[一二三四五六日]|星期[一二三四五六日])$/,  // 周X/星期X
+      /^(\d{4}年\d{1,2}月\d{1,2}日|\d{1,2}月\d{1,2}日)$/,  // 6月16日
+      /^((?:早|午|晚|加|夜|下午)餐(?:计划|安排|建议)?|(?:饮食)?计划概览|总体建议|注意事项|温馨提示)/,  // 早餐计划/午餐/加餐建议等
+    ];
+
+    function matchHeader(line) {
+      for (const p of headerPatterns) {
+        const m = line.match(p);
+        if (m) return m[1] || m[2] || line;
+      }
+      return null;
+    }
+
+    for (const rawLine of lines) {
+      const line = rawLine.trim();
+      if (!line) continue; // 空行跳过
+
+      // 尝试匹配标题行
+      const title = matchHeader(line);
+      if (title) {
+        if (currentDay && currentMeals.length > 0) {
+          days.push({ day: currentDay, meals: [...currentMeals] });
+        } else if (currentDay) {
+          days.push({ day: currentDay, meals: ['(暂无详细内容)'] });
+        }
+        currentDay = title.replace(/\*/g, '').replace(/^\d+[\.\、\)]\s*/, '').trim() || '计划详情';
+        currentMeals = [];
+        continue;
+      }
+
+      // 列表项 = 餐次（支持 - • · 1. 2. 等前缀）
+      const mealMatch = line.match(/^[-•··]\s*(.+)$/) || line.match(/^(\d+)[\.\）、\s]\s*(.+)$/);
+      if (mealMatch) {
+        const content = mealMatch[2] || mealMatch[1];
+        currentMeals.push(content.replace(/\*\*(.+?)\*\*/g, '$1'));
+        continue;
+      }
+
+      // 普通文本行：如果已有标题则归入 meals，否则跳过前言
+      if (currentDay) {
+        currentMeals.push(line.replace(/\*\*(.+?)\*\*/g, '$1'));
+      }
+    }
+
+    // 收尾
+    if (currentDay) {
+      if (currentMeals.length > 0) {
+        days.push({ day: currentDay, meals: [...currentMeals] });
+      } else {
+        days.push({ day: currentDay, meals: ['(暂无详细内容)'] });
+      }
+    }
+
+    // 兜底：完全没解析出结构 → 整段文本作为单个卡片
+    if (days.length === 0 && text.trim()) {
+      days.push({
+        day: '饮食计划',
+        meals: text.split('\n').map(l => l.trim().replace(/[#*]/g, '')).filter(Boolean)
+      });
+    }
+
+    return days;
+  },
+
+  /**
+   * 渲染结构化卡片消息（跳过流式，直接显示卡片）
+   */
+  _renderStructuredCard(cardInfo, baseMessages) {
+    const aiIndex = baseMessages.length;
+    const cardMsg = {
+      role: 'assistant',
+      content: '', // 原始文本不展示
+      cardType: cardInfo.type,
+      cardData: cardInfo.sections,
+      streaming: false
+    };
+    const updated = [...baseMessages, cardMsg];
+    this.setData({ messages: updated, isLoading: false, isStreaming: false });
+    this.saveMessages(updated);
+    this._updateDynamicQuickQuestions(updated);
+    this.scrollToBottom();
+  },
+
   /**
    * 打字机效果：收到完整文本后逐字显示，模拟流式体验
    */
@@ -617,6 +853,7 @@ Page({
         );
         this.setData({ messages: finalMsgs, isStreaming: false });
         this.saveMessages(finalMsgs);
+        this._updateDynamicQuickQuestions(finalMsgs);
         this.scrollToBottom();
         return;
       }

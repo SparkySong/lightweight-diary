@@ -373,6 +373,19 @@ page.theme-dark {
   font-style: italic;
 }
 
+/* Emoji 图标菜单项 */
+.menu-icon-achievement,
+.menu-icon-report,
+.menu-icon-period {
+  font-size: 32rpx;
+  line-height: 1;
+  width: 36rpx;
+  height: 36rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .menu-text {
   font-size: 30rpx;
   color: #F5F5F5;
@@ -568,6 +581,44 @@ page.theme-dark {
 
 .form-input::placeholder {
   color: #6B7280;
+}
+
+.gender-options {
+  display: flex;
+  gap: 16rpx;
+}
+.gender-option {
+  flex: 1;
+  height: 72rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #2D2D2D;
+  border: 2rpx solid #3D3D3D;
+  border-radius: 16rpx;
+  font-size: 28rpx;
+  color: #D1D5DB;
+  transition: all 0.2s;
+  box-sizing: border-box;
+}
+.gender-option text {
+  /* emoji 与汉字天然对齐，无需额外处理 */
+}
+.gender-option.gender-active {
+  background: rgba(95, 168, 149, 0.15);
+  border-color: #5FA895;
+  color: #5FA895;
+  font-weight: 500;
+}
+page.theme-light .gender-option {
+  background: #F0F4F3;
+  border-color: #E5E7EB;
+  color: #4B5563;
+}
+page.theme-light .gender-option.gender-active {
+  background: rgba(95, 168, 149, 0.1);
+  border-color: #5FA895;
+  color: #4A9080;
 }
 
 .form-tips {

@@ -84,6 +84,44 @@
     </view>
   </view>
 
+  <!-- 热量收支看板 -->
+  <view class="card calorie-balance-card" bindtap="goToExercise">
+    <view class="card-header">
+      <view class="card-title-wrap">
+        <view class="title-icon icon-calorie-balance"></view>
+        <text class="card-title">今日热量收支</text>
+      </view>
+      <text class="calorie-more">查看详情 ›</text>
+    </view>
+    <view class="calorie-balance-body">
+      <view class="calorie-side">
+        <text class="calorie-label">摄入</text>
+        <view class="calorie-num-row">
+          <text class="calorie-value intake">{{todayIntake || 0}}</text>
+          <text class="calorie-unit">kcal</text>
+        </view>
+      </view>
+      <view class="calorie-center">
+        <view class="calorie-diff-badge {{todayBalance <= 0 ? 'deficit' : 'surplus'}}">
+          <text class="calorie-diff-label">{{todayBalance <= 0 ? '赤字' : '盈余'}}</text>
+          <text class="calorie-diff-val">{{todayBalanceAbs || 0}}</text>
+        </view>
+      </view>
+      <view class="calorie-side">
+        <text class="calorie-label">消耗</text>
+        <view class="calorie-num-row">
+          <text class="calorie-value burn">{{todayTotalBurn || 0}}</text>
+          <text class="calorie-unit">kcal</text>
+        </view>
+      </view>
+    </view>
+    <!-- 摄入/消耗比例条 -->
+    <view class="calorie-ratio-bar">
+      <view class="ratio-fill intake-fill" style="width: {{(todayIntake || 0) + (todayTotalBurn || 0) > 0 ? ((todayIntake || 0) / ((todayIntake || 0) + (todayTotalBurn || 0)) * 100) : 50}}%"></view>
+      <view class="ratio-fill burn-fill"></view>
+    </view>
+  </view>
+
   <!-- BMI Card - 优化进度条设计 -->
   <view class="card bmi-card">
     <view class="card-header">
@@ -205,17 +243,15 @@
     <view class="action-card" bindtap="goToDiet">
       <view class="action-icon icon-food"></view>
       <text class="action-label">饮食记录</text>
-      <text class="action-desc">记录每日饮食</text>
+      <text class="action-desc tip-text">记录每日三餐
+热量一目了然</text>
+      <text class="action-link">去记录</text>
     </view>
-    <view class="action-card" bindtap="onToggleReminder">
-      <view class="action-icon {{reminderEnabled ? 'icon-bell' : 'icon-bell-off'}}"></view>
-      <text class="action-label">{{reminderEnabled ? '已订阅下次提醒' : '订阅下一次提醒'}}</text>
-      <text class="action-desc">{{reminderStatusText}}</text>
-      <view class="time-picker-wrap" wx:if="{{reminderEnabled}}" catchtap="onTimePickerTap">
-        <picker mode="time" value="{{remindTime}}" bindchange="onRemindTimeChange">
-          <text class="action-link">修改时间</text>
-        </picker>
-      </view>
+    <view class="action-card tip-card" bindtap="onRefreshTip">
+      <view class="action-icon icon-tip"></view>
+      <text class="action-label">今日小贴士</text>
+      <text class="action-desc tip-text">{{healthTip}}</text>
+      <text class="action-link">换一条</text>
     </view>
   </view>
 

@@ -1,0 +1,70 @@
+<!--pages/achievements/achievements.wxml-->
+<page-meta
+  background-text-style="{{currentTheme === 'light' ? 'dark' : 'light'}}"
+  background-color="{{currentTheme === 'light' ? '#F8FAF9' : '#121212'}}"
+  background-color-top="{{currentTheme === 'light' ? '#F8FAF9' : '#121212'}}"
+  background-color-bottom="{{currentTheme === 'light' ? '#F8FAF9' : '#121212'}}"
+  root-background-color="{{currentTheme === 'light' ? '#F8FAF9' : '#121212'}}"
+  navigation-bar-style="{{currentTheme === 'light' ? 'dark' : 'light'}}"
+/>
+<page class="{{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}}">
+
+<view class="page-container {{currentTheme === 'light' ? 'theme-light' : ''}}">
+
+  <!-- 统计头 -->
+  <view class="stats-header">
+    <view class="stats-circle">
+      <text class="stats-number">{{unlockedCount}}</text>
+      <text class="stats-total">/{{totalCount}}</text>
+    </view>
+    <text class="stats-label">已解锁徽章</text>
+    <view class="stats-bar">
+      <view class="stats-bar-fill" style="width: {{totalCount > 0 ? (unlockedCount / totalCount * 100) : 0}}%"></view>
+    </view>
+  </view>
+
+  <!-- 加载状态 -->
+  <view class="loading-box" wx:if="{{loading}}">
+    <text class="loading-text">正在检查成就...</text>
+  </view>
+
+  <!-- 徽章网格 -->
+  <view class="badge-grid" wx:else>
+    <view class="badge-card {{item.unlocked ? 'badge-unlocked' : 'badge-locked'}}" wx:for="{{badges}}" wx:key="badgeId">
+      <view class="badge-icon-wrap {{item.unlocked ? 'icon-active' : ''}}">
+        <text class="badge-icon">{{item.icon}}</text>
+        <view class="badge-lock" wx:if="{{!item.unlocked}}">
+          <text class="lock-icon">🔒</text>
+        </view>
+      </view>
+      <text class="badge-name {{item.unlocked ? '' : 'name-locked'}}">{{item.name}}</text>
+      <text class="badge-desc">{{item.desc}}</text>
+      <!-- 进度条 -->
+      <view class="badge-progress" wx:if="{{!item.unlocked}}">
+        <view class="progress-bar">
+          <view class="progress-fill" style="width: {{item.progressPercent}}%"></view>
+        </view>
+        <text class="progress-text">{{item.progress}}/{{item.target}}</text>
+      </view>
+      <view class="badge-done" wx:if="{{item.unlocked}}">
+        <text class="done-text">✅ 已解锁</text>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- 徽章解锁弹窗 -->
+<view class="unlock-overlay" wx:if="{{showUnlockPopup}}" bindtap="onCloseUnlockPopup">
+  <view class="unlock-card" catchtap="">
+    <view class="unlock-glow"></view>
+    <view class="unlock-badge-icon">{{currentUnlock.icon}}</view>
+    <text class="unlock-title">🎉 徽章解锁</text>
+    <text class="unlock-name">{{currentUnlock.name}}</text>
+    <text class="unlock-desc">{{currentUnlock.desc}}</text>
+    <view class="unlock-btn" bindtap="onCloseUnlockPopup">
+      <text>{{unlockQueue.length > 1 ? '下一个' : '太棒了！'}}</text>
+    </view>
+  </view>
+</view>
+
+</page>

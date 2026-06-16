@@ -1,0 +1,159 @@
+<!--pages/exercise/exercise.wxml-->
+<page-meta
+  background-text-style="{{currentTheme === 'light' ? 'dark' : 'light'}}"
+  background-color="{{currentTheme === 'light' ? '#F8FAF9' : '#121212'}}"
+  background-color-top="{{currentTheme === 'light' ? '#F8FAF9' : '#121212'}}"
+  background-color-bottom="{{currentTheme === 'light' ? '#F8FAF9' : '#121212'}}"
+  root-background-color="{{currentTheme === 'light' ? '#F8FAF9' : '#121212'}}"
+  navigation-bar-style="{{currentTheme === 'light' ? 'dark' : 'light'}}"
+/>
+<page class="{{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}}">
+
+<view class="container {{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}}">
+
+  <!-- 今日热量收支看板 -->
+  <view class="card balance-card">
+    <view class="card-header">
+      <view class="card-title-wrap">
+        <view class="title-icon icon-fire"></view>
+        <text class="card-title">今日热量收支</text>
+      </view>
+    </view>
+    <view class="balance-row">
+      <view class="balance-item">
+        <text class="balance-label">摄入</text>
+        <text class="balance-value intake">{{todayIntake || 0}}</text>
+        <text class="balance-unit">kcal</text>
+      </view>
+      <view class="balance-divider">
+        <view class="balance-diff {{todayBalance <= 0 ? 'surplus-minus' : 'surplus-plus'}}">
+          <text class="balance-diff-label">{{todayBalance <= 0 ? '赤字' : '盈余'}}</text>
+          <text class="balance-diff-val">{{todayBalanceAbs || 0}}</text>
+        </view>
+      </view>
+      <view class="balance-item">
+        <text class="balance-label">消耗</text>
+        <text class="balance-value burn">{{todayTotalBurn || 0}}</text>
+        <text class="balance-unit">kcal</text>
+      </view>
+    </view>
+    <view class="balance-detail">
+      <text class="balance-detail-text">基础代谢 {{bmr || 0}} + 运动 {{todayBurn || 0}} kcal</text>
+    </view>
+  </view>
+
+  <!-- 微信步数卡片 -->
+  <view class="card step-card">
+    <view class="card-header">
+      <view class="card-title-wrap">
+        <view class="title-icon icon-step"></view>
+        <text class="card-title">今日步数</text>
+      </view>
+      <view class="step-refresh {{stepSyncing ? 'syncing' : ''}}" bindtap="onRefreshSteps">
+        <view class="refresh-icon"></view>
+        <text>{{stepSyncing ? '同步中' : (stepSyncTime || '刷新')}}</text>
+      </view>
+    </view>
+    <view class="step-content">
+      <view class="step-main">
+        <text class="step-count">{{todaySteps}}</text>
+        <text class="step-unit">步</text>
+      </view>
+      <view class="step-cal">
+        <text class="step-cal-value">{{stepCalories}}</text>
+        <text class="step-cal-unit">kcal</text>
+      </view>
+    </view>
+    <view class="step-hint" wx:if="{{!stepSynced && !stepSyncing}}">
+      <text>授权微信运动后可自动同步步数</text>
+    </view>
+  </view>
+
+  <!-- 运动记录列表 -->
+  <view class="card record-card">
+    <view class="card-header">
+      <view class="card-title-wrap">
+        <view class="title-icon icon-sport"></view>
+        <text class="card-title">运动记录</text>
+      </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view class="empty-state" wx:if="{{!loading && exercises.length === 0}}">
+      <text class="empty-icon-big">🏃</text>
+      <text class="empty-text">还没有运动记录</text>
+      <text class="empty-hint">点击下方按钮开始记录</text>
+    </view>
+
+    <!-- 分组列表 -->
+    <view class="exercise-groups" wx:if="{{exercises.length > 0}}">
+      <view class="exercise-group" wx:for="{{groupedExercises}}" wx:key="date">
+        <view class="group-header">
+          <text class="group-date">{{item.date}}</text>
+          <text class="group-cal">共消耗 {{item.totalCal}} kcal</text>
+        </view>
+        <view class="exercise-item" wx:for="{{item.items}}" wx:for-item="ex" wx:key="_id">
+          <view class="ex-left">
+            <text class="ex-icon">{{ex.type === 'walking' ? '🚶' : ex.type === 'running' ? '🏃' : ex.type === 'swimming' ? '🏊' : ex.type === 'gym' ? '💪' : ex.type === 'cycling' ? '🚴' : ex.type === 'yoga' ? '🧘' : '⚡'}}</text>
+            <view class="ex-info">
+              <text class="ex-name">{{ex.typeLabel}} {{ex.isAuto ? '(自动)' : ''}}</text>
+              <text class="ex-detail">{{ex.duration}}分钟 · {{ex.calories}}kcal{{ex.steps ? ' · ' + ex.steps + '步' : ''}}</text>
+            </view>
+          </view>
+          <view class="ex-delete" catchtap="onDeleteExercise" data-id="{{ex._id}}" wx:if="{{!ex.isAuto}}">
+            <view class="icon-close-small"></view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="footer-space"></view>
+</view>
+
+<!-- 浮动添加按钮 -->
+<view class="fab-add {{currentTheme === 'light' ? 'theme-light' : ''}}" bindtap="onAddExercise">
+  <view class="fab-plus"></view>
+</view>
+
+<!-- 添加运动弹窗 -->
+<view class="popup-overlay {{showAddPopup ? 'show' : ''}}" bindtap="onClosePopup"></view>
+<view class="add-popup {{showAddPopup ? 'show' : ''}} {{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}}">
+  <view class="popup-header">
+    <text class="popup-title">添加运动</text>
+    <view class="popup-close" bindtap="onClosePopup">
+      <view class="icon-close"></view>
+    </view>
+  </view>
+  <view class="popup-body">
+    <!-- 运动类型选择 -->
+    <text class="form-label">运动类型</text>
+    <view class="type-grid">
+      <view class="type-item {{selectedType === item.type ? 'active' : ''}}" 
+            wx:for="{{exerciseTypes}}" wx:key="type" 
+            bindtap="onSelectType" data-type="{{item.type}}">
+        <text class="type-icon">{{item.icon}}</text>
+        <text class="type-label">{{item.label}}</text>
+      </view>
+    </view>
+    <!-- 运动时长 -->
+    <view class="form-group">
+      <text class="form-label">运动时长 (分钟)</text>
+      <input class="form-input" type="digit" value="{{inputDuration}}" bindinput="onDurationInput" placeholder="如 30" />
+    </view>
+    <!-- 消耗卡路里 -->
+    <view class="form-group">
+      <text class="form-label">消耗卡路里 (kcal)</text>
+      <input class="form-input" type="digit" value="{{inputCalories}}" bindinput="onCaloriesInput" placeholder="自动估算，可手动修改" />
+    </view>
+  </view>
+  <view class="popup-footer">
+    <button class="popup-btn popup-btn-cancel" bindtap="onClosePopup">取消</button>
+    <button class="popup-btn popup-btn-confirm" bindtap="onSaveExercise">保存</button>
+  </view>
+</view>
+
+<!-- Toast -->
+<view class="toast {{toastShow ? 'show' : ''}}">{{toastMsg}}</view>
+
+</page>

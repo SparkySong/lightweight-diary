@@ -1,0 +1,157 @@
+<!--pages/period/period.wxml-->
+<page-meta
+  background-text-style="{{currentTheme === 'light' ? 'dark' : 'light'}}"
+  background-color="{{currentTheme === 'light' ? '#F8FAF9' : '#121212'}}"
+  background-color-top="{{currentTheme === 'light' ? '#F8FAF9' : '#121212'}}"
+  background-color-bottom="{{currentTheme === 'light' ? '#F8FAF9' : '#121212'}}"
+  root-background-color="{{currentTheme === 'light' ? '#F8FAF9' : '#121212'}}"
+  navigation-bar-style="{{currentTheme === 'light' ? 'dark' : 'light'}}"
+/>
+<page class="{{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}}">
+
+<view class="page-container {{currentTheme === 'light' ? 'theme-light' : ''}}">
+
+  <!-- 周期信息卡 -->
+  <view class="cycle-card">
+    <view class="cycle-info">
+      <view class="cycle-stat">
+        <text class="cycle-value">{{cycleDay > 0 ? cycleDay : '--'}}</text>
+        <text class="cycle-label">当前周期第{{cycleDay > 0 ? cycleDay : '0'}}天</text>
+      </view>
+      <view class="cycle-stat">
+        <text class="cycle-value">{{avgCycleLength}}天</text>
+        <text class="cycle-label">平均周期</text>
+      </view>
+    </view>
+    <view class="cycle-predict" wx:if="{{nextPeriodDate}}">
+      <text class="predict-text">预计下次经期：{{nextPeriodDate}}</text>
+      <text class="predict-ovulation" wx:if="{{ovulationDate}}">排卵日约：{{ovulationDate}}</text>
+    </view>
+    <view class="cycle-predict" wx:elif="{{hasOngoing}}">
+      <text class="predict-text ongoing-text">经期中...</text>
+    </view>
+  </view>
+
+  <!-- 日历 -->
+  <view class="calendar-card">
+    <view class="calendar-header">
+      <view class="cal-nav" bindtap="onPrevMonth">
+        <text class="cal-nav-icon">‹</text>
+      </view>
+      <text class="cal-title">{{currentYear}}年{{currentMonth}}月</text>
+      <view class="cal-nav" bindtap="onNextMonth">
+        <text class="cal-nav-icon">›</text>
+      </view>
+    </view>
+    <view class="calendar-weekdays">
+      <text class="weekday" wx:for="{{['日','一','二','三','四','五','六']}}" wx:key="*this">{{item}}</text>
+    </view>
+    <view class="calendar-grid">
+      <view class="cal-day {{item.type === 'empty' ? 'cal-empty' : ''}} {{item.type === 'period' ? 'cal-period' : ''}} {{item.type === 'predicted' ? 'cal-predicted' : ''}} {{item.type === 'ovulation' ? 'cal-ovulation' : ''}} {{item.isToday ? 'cal-today' : ''}}" wx:for="{{calendarDays}}" wx:key="date">
+        <text class="cal-day-num">{{item.day}}</text>
+        <text class="cal-day-label" wx:if="{{item.label}}">{{item.label}}</text>
+      </view>
+    </view>
+    <!-- 图例 -->
+    <view class="calendar-legend">
+      <view class="legend-item">
+        <view class="legend-dot legend-period"></view>
+        <text>经期</text>
+      </view>
+      <view class="legend-item">
+        <view class="legend-dot legend-predicted"></view>
+        <text>预测</text>
+      </view>
+      <view class="legend-item">
+        <view class="legend-dot legend-ovulation"></view>
+        <text>排卵</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 快速操作 -->
+  <view class="action-btns">
+    <view class="action-btn action-start {{hasOngoing ? 'action-disabled' : ''}}" bindtap="onStartPeriod">
+      <text class="action-icon">🔴</text>
+      <text class="action-text">经期来了</text>
+    </view>
+    <view class="action-btn action-end {{!hasOngoing ? 'action-disabled' : ''}}" bindtap="onEndPeriod">
+      <text class="action-icon">✅</text>
+      <text class="action-text">经期结束</text>
+    </view>
+  </view>
+
+  <!-- 历史记录 -->
+  <view class="history-section" wx:if="{{periods.length > 0}}">
+    <text class="history-title">历史记录</text>
+    <view class="history-item" wx:for="{{periods}}" wx:key="_id">
+      <view class="history-left">
+        <view class="history-info">
+          <text class="history-date">{{item.startDate}} ~ {{item.endDate || '进行中'}}</text>
+          <text class="history-detail" wx:if="{{item.periodLength}}">持续{{item.periodLength}}天</text>
+          <text class="history-flow flow-{{item.flow}}">{{item.flow === 'light' ? '少量' : (item.flow === 'heavy' ? '大量' : '中等')}}</text>
+        </view>
+        <view class="history-symptoms" wx:if="{{item.symptoms && item.symptoms.length > 0}}">
+          <text class="symptom-tag" wx:for="{{item.symptoms}}" wx:for-item="s" wx:key="*this">{{s}}</text>
+        </view>
+      </view>
+      <view class="history-actions">
+        <text class="history-delete" catchtap="onDeletePeriod" data-id="{{item._id}}">删除</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 加载状态 -->
+  <view class="loading-box" wx:if="{{loading}}">
+    <text class="loading-text">加载中...</text>
+  </view>
+</view>
+
+<!-- 记录弹窗 -->
+<view class="popup-overlay" wx:if="{{showRecordPopup}}" bindtap="onClosePopup">
+  <view class="popup-panel" bindtap="stopPropagation">
+    <view class="popup-header">
+      <text class="popup-title">记录经期开始</text>
+      <view class="popup-close" catchtap="onClosePopup">
+        <text class="close-icon">✕</text>
+      </view>
+    </view>
+    <view class="popup-body">
+      <!-- 日期选择 -->
+      <view class="section-label">开始日期</view>
+      <picker mode="date" value="{{selectedDate}}" start="2020-01-01" end="{{today}}" bindchange="onDateChange" bindcancel="onPickerCancel" catchtap="stopPropagation">
+        <view class="date-select-row">
+          <view class="date-display">
+            <text>{{selectedDate}}</text>
+            <text class="date-arrow">▼</text>
+          </view>
+        </view>
+      </picker>
+      <!-- 流量选择 -->
+      <view class="section-label">经血量</view>
+      <view class="flow-options">
+        <view class="flow-option {{selectedFlow === item.value ? 'flow-active' : ''}}" wx:for="{{flowOptions}}" wx:key="value" catchtap="onFlowSelect" data-flow="{{item.value}}">
+          <text>{{item.label}}</text>
+        </view>
+      </view>
+      <!-- 症状选择 -->
+      <view class="section-label">症状（可多选）</view>
+      <view class="symptom-options">
+        <view class="symptom-option symptom-tag-{{index}} {{selectedSymptoms[index] ? 'symptom-active' : ''}}" wx:for="{{symptomsList}}" wx:key="*this" catchtap="onSymptomToggle" data-index="{{index}}">
+          <text>{{item}}</text>
+        </view>
+      </view>
+    </view>
+    <view class="popup-footer">
+      <view class="popup-btn popup-btn-cancel" catchtap="onClosePopup">取消</view>
+      <view class="popup-btn popup-btn-confirm" catchtap="onConfirmRecord">确认记录</view>
+    </view>
+  </view>
+</view>
+
+<!-- Toast -->
+<view class="toast {{toastShow ? 'toast-show' : ''}}" wx:if="{{toastMsg}}">
+  <text class="toast-text">{{toastMsg}}</text>
+</view>
+
+</page>
