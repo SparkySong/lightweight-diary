@@ -1,16 +1,21 @@
 # Lightweight Diary
 
-A **weight management and diet tracking** Mini Program built on WeChat Cloud Development, featuring AI nutritionist chat, calorie analysis, and low-calorie recipe recommendations.
+A **weight management and diet tracking** Mini Program built on WeChat Cloud Development, featuring AI nutritionist chat, calorie analysis, exercise tracking, period management, and low-calorie recipe recommendations.
 
 ## Features
 
 ### Weight Management
 - Daily weight check-in (supports kg / jin dual units)
 - Weight trend line chart (smooth Catmull-Rom spline with area fill)
-- Real-time BMI calculation & classification
+- Real-time BMI calculation & classification (with visual progress bar)
 - Goal setting & progress tracking
 - Consecutive check-in streak counter
 - WeChat subscription message reminders
+
+### Today's Energy
+- Real-time calorie balance overview (intake / BMR / remaining)
+- At-a-glance over-target detection with smart suggestions
+- Energy composition progress bar visualization
 
 ### Diet Tracking
 - 4 meal categories: Breakfast, Lunch, Dinner, Snack
@@ -19,12 +24,24 @@ A **weight management and diet tracking** Mini Program built on WeChat Cloud Dev
 - Real-time fuzzy search (local + cloud merged & deduplicated)
 - Per-meal / daily calorie totals
 
+### Exercise Tracking
+- Custom exercise type & duration logging
+- WeChat Run step auto-sync
+- Exercise calorie burn calculation
+- Daily exercise summary
+
 ### Calorie Analysis
 - Daily total vs target comparison
 - Meal distribution donut chart
 - 7-day calorie trend line chart
 - Actual vs recommended intake bar chart comparison
 - Smart suggestion engine (context-aware recommendations based on status)
+
+### Period Management
+- Period logging (start/end dates)
+- Auto-calculated duration days
+- Period history list & management
+- Active period status indicator
 
 ### AI Nutritionist
 - **Hybrid architecture**: Template responses for structured queries (instant), AI LLM for open questions
@@ -39,6 +56,14 @@ A **weight management and diet tracking** Mini Program built on WeChat Cloud Dev
 - Date-seeded pseudo-random recommendation (stable per day, changes next day)
 - One-tap daily meal plan generation
 
+### Health Reports
+- AI-generated personalized health analysis reports
+- Historical report archive & viewing
+
+### Achievements
+- Multi-dimensional health achievement badges
+- Check-in milestones & incentives
+
 ### Theme System
 - 3 modes: Dark / Light / Follow System (default: follow system)
 - Global CSS variable management
@@ -51,7 +76,7 @@ A **weight management and diet tracking** Mini Program built on WeChat Cloud Dev
 |------------|-------------|
 | Frontend | Native WeChat Mini Program |
 | Backend | WeChat Cloud Development (CloudBase) |
-| Database | WeCloud Database (7 collections) |
+| Database | WeChat Cloud Database (10 collections) |
 | AI | Claude Opus 4.8 (SSE streaming) |
 | UI Design | Modern minimalist, dark/light dual theme |
 

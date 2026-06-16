@@ -618,7 +618,7 @@ Page({
         // 检测是否为结构化卡片内容
         const cardInfo = this._detectCardType(text, result.reply);
         if (cardInfo) {
-          this._renderStructuredCard(cardInfo, messages);
+          this._renderStructuredCard(cardInfo, messages, result.reply);
         } else {
           this._startStreamEffect(result.reply, messages);
         }
@@ -767,8 +767,13 @@ Page({
 
     for (const rawLine of lines) {
       const line = rawLine.trim();
-      // 匹配 *标题* 或数字序号标题
-      const titleMatch = line.match(/^\*(.+?)\*$/) || line.match(/^(\d+[\.\、])\s*(.+)/);
+      // 匹配多种标题格式：
+      // 1. *单星号标题*
+      // 2. **双星号加粗标题**（AI 有时用 bold 格式输出标题）
+      // 3. 数字序号 1. xxx / 1、xxx
+      const titleMatch = line.match(/^\*(.+?)\*$/) 
+        || line.match(/^\*\*(.+?)\*\*[：:\s]*$/) 
+        || line.match(/^(\d+[\.\、])\s*(.+)/);
       if (titleMatch) {
         if (currentTitle && currentItems.length > 0) {
           sections.push({ title: currentTitle, items: [...currentItems] });
@@ -880,7 +885,15 @@ Page({
   /**
    * 渲染结构化卡片消息（跳过流式，直接显示卡片）
    */
-  _renderStructuredCard(cardInfo, baseMessages) {
+  _renderStructuredCard(cardInfo, baseMessages, fallbackText) {
+    // 兜底：解析出的内容为空时，降级为普通文本展示
+    if (!cardInfo.sections || cardInfo.sections.length === 0) {
+      console.log('[Chat] 卡片解析为空，降级为文本展示');
+      if (fallbackText) {
+        this._startStreamEffect(fallbackText, baseMessages);
+        return;
+      }
+    }
     const aiIndex = baseMessages.length;
     const cardMsg = {
       role: 'assistant',
