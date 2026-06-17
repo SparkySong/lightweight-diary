@@ -152,6 +152,20 @@
         <view class="symptom-option symptom-tag-{{index}} {{selectedSymptoms[index] ? 'symptom-active' : ''}}" wx:for="{{symptomsList}}" wx:key="*this" catchtap="onSymptomToggle" data-index="{{index}}">
           <text>{{item}}</text>
         </view>
+        <!-- 自定义症状标签 -->
+        <view class="symptom-option custom-symptom-tag {{selectedSymptoms[symptomsList.length + index] ? 'symptom-active' : ''}}" wx:for="{{customSymptoms}}" wx:key="*this" catchtap="onSymptomToggle" data-index="{{symptomsList.length + index}}">
+          <text>{{item}}</text>
+          <text class="custom-tag-close" catchtap="onRemoveCustomSymptom" data-idx="{{index}}">✕</text>
+        </view>
+        <!-- 内联输入框（点击+后显示） -->
+        <view class="symptom-option custom-input-tag" wx:if="{{showCustomInput}}">
+          <input class="custom-inline-input" placeholder="输入症状" value="{{customSymptomInput}}" bindinput="onCustomSymptomInput" bindconfirm="onAddCustomSymptom" bindblur="onAddCustomSymptom" focus="{{showCustomInput}}" maxlength="10" />
+          <text class="custom-input-confirm" catchtap="onAddCustomSymptom">✔</text>
+        </view>
+        <!-- +号添加按钮 -->
+        <view class="symptom-option custom-add-btn" wx:if="{{!showCustomInput}}" catchtap="onShowCustomInput">
+          <text>+</text>
+        </view>
       </view>
     </view>
     <view class="popup-footer">

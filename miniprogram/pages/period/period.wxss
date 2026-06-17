@@ -199,6 +199,49 @@
   box-shadow: 0 0 0 2rpx rgba(212,112,122,0.2);
 }
 
+/* 自定义症状标签 */
+.custom-symptom-tag {
+  position: relative;
+  padding-right: 48rpx;
+}
+.custom-tag-close {
+  position: absolute; right: 10rpx; top: 50%; transform: translateY(-50%);
+  font-size: 20rpx; color: #9CA3AF; width: 28rpx; height: 28rpx;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+}
+.custom-tag-close:active { background: rgba(0,0,0,0.1); }
+
+/* +号添加按钮 */
+.custom-add-btn {
+  border: 2rpx dashed #4D4D4D !important;
+  background: transparent !important;
+  color: #6B7280 !important;
+  font-size: 32rpx;
+  font-weight: 300;
+  min-width: 72rpx;
+  justify-content: center;
+}
+.theme-light .custom-add-btn { border-color: #D1D5DB !important; color: #9CA3AF !important; }
+.custom-add-btn:active { opacity: 0.6; }
+
+/* 内联输入框标签 */
+.custom-input-tag {
+  padding: 6rpx 8rpx !important;
+  border-color: #E8878C !important;
+  background: rgba(232,135,140,0.08) !important;
+  gap: 4rpx;
+}
+.custom-inline-input {
+  width: 160rpx; height: 48rpx; font-size: 24rpx; color: #F5F5F5;
+  background: transparent; border: none; padding: 0;
+}
+.theme-light .custom-inline-input { color: #1F2937; }
+.custom-inline-input::placeholder { color: #6B7280; font-size: 22rpx; }
+.custom-input-confirm {
+  font-size: 24rpx; color: #E8878C; padding: 4rpx 10rpx;
+}
+
 /* 日期选择 */
 .date-select-row { display: flex; align-items: center; gap: 16rpx; margin-bottom: 28rpx; }
 .date-display {

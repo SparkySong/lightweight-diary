@@ -50,6 +50,9 @@ Page({
     selectedDate: formatDateStr(new Date()),
     selectedEndDate: '',
     symptomsList: SYMPTOMS_LIST,
+    customSymptoms: [],
+    customSymptomInput: '',
+    showCustomInput: false,
     flowOptions: FLOW_OPTIONS,
     loading: true,
     // Toast
@@ -238,6 +241,9 @@ Page({
       selectedFlow: 'medium',
       selectedSymptoms: [],
       selectedDate: formatDateStr(new Date()),
+      customSymptoms: [],
+      customSymptomInput: '',
+      showCustomInput: false,
       recordAction: 'start'
     });
   },
@@ -291,6 +297,51 @@ Page({
     this.setData({ selectedSymptoms: selected });
   },
 
+  // 点击+号显示输入
+  onShowCustomInput() {
+    this.setData({ showCustomInput: true });
+  },
+
+  // 自定义症状输入
+  onCustomSymptomInput(e) {
+    this.setData({ customSymptomInput: e.detail.value });
+  },
+
+  // 添加自定义症状
+  onAddCustomSymptom() {
+    const val = this.data.customSymptomInput.trim();
+    if (!val) {
+      this.setData({ showCustomInput: false });
+      return;
+    }
+    const allSymptoms = [...this.data.symptomsList, ...this.data.customSymptoms];
+    if (allSymptoms.includes(val)) {
+      this.showToast('该症状已存在');
+      this.setData({ showCustomInput: false, customSymptomInput: '' });
+      return;
+    }
+    const customSymptoms = [...this.data.customSymptoms, val];
+    const selectedSymptoms = [...this.data.selectedSymptoms, true];
+    this.setData({
+      customSymptoms,
+      selectedSymptoms,
+      customSymptomInput: '',
+      showCustomInput: false
+    });
+  },
+
+  // 删除自定义症状
+  onRemoveCustomSymptom(e) {
+    const idx = e.currentTarget.dataset.idx;
+    const baseLen = this.data.symptomsList.length;
+    const removeAt = baseLen + idx;
+    const customSymptoms = [...this.data.customSymptoms];
+    customSymptoms.splice(idx, 1);
+    const selectedSymptoms = [...this.data.selectedSymptoms];
+    selectedSymptoms.splice(removeAt, 1);
+    this.setData({ customSymptoms, selectedSymptoms });
+  },
+
   onDateChange(e) {
     this.setData({ selectedDate: e.detail.value });
   },
@@ -302,13 +353,16 @@ Page({
   // 编辑历史记录
   onEditPeriod(e) {
     const item = e.currentTarget.dataset.item;
-    const symptomArr = new Array(this.data.symptomsList.length).fill(false);
+    const allSymptoms = [...this.data.symptomsList, ...this.data.customSymptoms];
+    const symptomArr = new Array(allSymptoms.length).fill(false);
     if (item.symptoms && item.symptoms.length > 0) {
       item.symptoms.forEach(s => {
-        const idx = this.data.symptomsList.indexOf(s);
+        const idx = allSymptoms.indexOf(s);
         if (idx >= 0) symptomArr[idx] = true;
       });
     }
+    // 识别出记录中的自定义症状
+    const customInRecord = (item.symptoms || []).filter(s => !SYMPTOMS_LIST.includes(s));
     this.setData({
       showRecordPopup: true,
       recordAction: 'edit',
@@ -316,7 +370,8 @@ Page({
       selectedDate: item.startDate,
       selectedEndDate: item.endDate || '',
       selectedFlow: item.flow || 'medium',
-      selectedSymptoms: symptomArr
+      selectedSymptoms: symptomArr,
+      customSymptoms: customInRecord
     });
   },
 
@@ -324,7 +379,8 @@ Page({
   async onConfirmEdit() {
     wx.showLoading({ title: '保存中...' });
     try {
-      const symptoms = this.data.symptomsList.filter((_, i) => this.data.selectedSymptoms[i]);
+      const allSymptoms = [...this.data.symptomsList, ...this.data.customSymptoms];
+      const symptoms = allSymptoms.filter((_, i) => this.data.selectedSymptoms[i]);
       const result = await wx.cloud.callFunction({
         name: 'addPeriod',
         data: {
@@ -356,7 +412,8 @@ Page({
     wx.showLoading({ title: '保存中...' });
     try {
       // 将布尔数组转换为实际症状名称
-      const symptoms = this.data.symptomsList.filter((_, i) => this.data.selectedSymptoms[i]);
+      const allSymptoms = [...this.data.symptomsList, ...this.data.customSymptoms];
+      const symptoms = allSymptoms.filter((_, i) => this.data.selectedSymptoms[i]);
       const result = await wx.cloud.callFunction({
         name: 'addPeriod',
         data: {
