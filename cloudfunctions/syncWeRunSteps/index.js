@@ -95,8 +95,9 @@ exports.main = async (event) => {
     // 获取最新一天的数据
     const todayStep = stepInfo[stepInfo.length - 1];
     const steps = todayStep.step || 0;
-    const now = new Date();
-    const date = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    // 使用用户本地时区（UTC+8）生成日期，避免与服务端 UTC 时间不一致
+    const now = new Date(Date.now() + 8 * 60 * 60 * 1000);
+    const date = `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, '0')}-${String(now.getUTCDate()).padStart(2, '0')}`;
 
     // 计算消耗
     const calories = Math.round(steps * 0.04);

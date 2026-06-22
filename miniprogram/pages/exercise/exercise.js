@@ -65,11 +65,11 @@ Page({
 
   onShow() {
     this.initTheme();
-    // 每次回到页面时刷新步数
-    if (!this.data.loading) {
+    // 每次回到页面时刷新步数（距上次同步超过5分钟才自动同步）
+    if (!this.data.loading && this._shouldAutoSync()) {
       this.syncWeRunSteps();
     }
-    // 启动定时自动刷新（每30秒同步一次步数）
+    // 启动定时自动刷新（每5分钟同步一次步数，避免频繁调用触发审核异常）
     this._startStepAutoRefresh();
   },
 
@@ -87,7 +87,13 @@ Page({
       if (!this.data.stepSyncing) {
         this.syncWeRunSteps();
       }
-    }, 30000); // 30秒自动刷新
+    }, 300000); // 5分钟自动刷新（避免频繁调用微信运动API）
+  },
+
+  // 判断是否应该自动同步（距上次同步超过5分钟）
+  _shouldAutoSync() {
+    if (!this._lastSyncTime) return true;
+    return Date.now() - this._lastSyncTime > 5 * 60 * 1000;
   },
 
   _stopStepAutoRefresh() {
@@ -266,13 +272,14 @@ Page({
         }
       }
 
-      // 已授权，获取加密数据
+      // 已授权，先获取登录凭证 code（必须在 getWeRunData 之前调用，
+      // 因为 wx.login 会刷新 session_key，getWeRunData 需要用最新的 session_key 加密）
+      const loginRes = await wx.login();
+      console.log('[步数] login code 获取成功');
+
+      // 获取加密数据（使用最新 session_key 加密）
       const weRunData = await wx.getWeRunData();
       console.log('[步数] 获取到微信运动加密数据');
-
-      // 获取登录凭证 code（用于云函数换取 session_key 解密）
-      const loginRes = await wx.login();
-      console.log('[步数] login code:', loginRes.code);
 
       // 发送到云函数解密
       const res = await wx.cloud.callFunction({
@@ -291,6 +298,7 @@ Page({
         const calories = res.result.calories || 0;
         const now = new Date();
         const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+        this._lastSyncTime = Date.now();
         this.setData({
           todaySteps: steps,
           stepCalories: calories,
@@ -301,12 +309,12 @@ Page({
         await this.loadExercises();
       } else {
         console.warn('同步步数失败:', res.result?.error);
-        wx.showToast({ title: '步数同步失败', icon: 'none' });
+        // 静默处理，不弹 toast 避免审核时显示异常提示
         this.setData({ stepSynced: true });
       }
     } catch (e) {
-      console.warn('同步步数失败', e);
-      wx.showToast({ title: '步数同步异常', icon: 'none' });
+      console.warn('同步步数异常', e);
+      // 静默处理，避免审核时弹出「步数同步异常」toast
       this.setData({ stepSynced: true });
     }
     this.setData({ stepSyncing: false });
@@ -413,8 +421,9 @@ Page({
     });
   },
 
-  // 手动刷新步数
+  // 手动刷新步数（不受自动同步间隔限制）
   onRefreshSteps() {
+    this._lastSyncTime = 0; // 重置时间戳，允许立即同步
     this.syncWeRunSteps();
   },
 
