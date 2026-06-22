@@ -180,9 +180,9 @@ Page({
       // 云函数返回的是 days 格式，每个day包含records数组
       const allDays = res.result.days || [];
       
-      console.log('=== 热量分析调试 ===');
-      console.log('allDays:', JSON.stringify(allDays).slice(0, 500));
-      console.log('todayDate:', this.data.todayDate);
+      // console.log('=== 热量分析调试 ===');
+      // console.log('allDays:', JSON.stringify(allDays).slice(0, 500));
+      // console.log('todayDate:', this.data.todayDate);
       
       // 将 days 转换为 records 数组，同时聚合每个record的热量
       const allRecords = [];
@@ -199,8 +199,8 @@ Page({
         }
       });
       
-      console.log('allRecords count:', allRecords.length);
-      console.log('allRecords sample:', JSON.stringify(allRecords.slice(0, 2)));
+      // console.log('allRecords count:', allRecords.length);
+      // console.log('allRecords sample:', JSON.stringify(allRecords.slice(0, 2)));
       
       // 计算今日数据
       this.calculateTodayData(allRecords);
@@ -230,7 +230,7 @@ Page({
     const today = this.data.todayDate;
     const todayRecords = records.filter(r => r.date === today);
     
-    console.log('todayRecords:', JSON.stringify(todayRecords));
+    // console.log('todayRecords:', JSON.stringify(todayRecords));
     
     // 计算三餐热量
     const meals = {
@@ -245,7 +245,7 @@ Page({
       meals[mealType] = (meals[mealType] || 0) + (record.calories || 0);
     });
     
-    console.log('meals:', JSON.stringify(meals));
+    // console.log('meals:', JSON.stringify(meals));
     
     const totalCal = Object.values(meals).reduce((a, b) => a + b, 0);
     // 目标热量上限5000，防止存储异常值导致计算溢出

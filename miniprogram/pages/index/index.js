@@ -1489,7 +1489,7 @@ Page({
 
   // 下拉刷新相关方法
   onPullDownRefresh() {
-    console.log('下拉刷新开始');
+    // console.log('下拉刷新开始');
     this.setData({ refreshing: true });
     
     // 加载数据

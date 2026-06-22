@@ -16,7 +16,7 @@ exports.main = async (event) => {
     if (e.errCode === -502005 || e.message.includes('collection not exists')) {
       try {
         await db.createCollection('food_library');
-        console.log('集合 food_library 创建成功');
+        // console.log('集合 food_library 创建成功');
       } catch (createErr) {
         console.error('创建集合失败', createErr);
         return { success: false, error: '数据库集合不存在，请手动创建 food_library 集合' };
@@ -55,7 +55,7 @@ exports.main = async (event) => {
       } else {
         // 已存在，检查能量是否相同
         const existingFood = existRes.data[0];
-        console.log(`食物 ${food.name} 已存在，当前能量: ${existingFood.calories}, 新能量: ${newCalories}`);
+        // console.log(`食物 ${food.name} 已存在，当前能量: ${existingFood.calories}, 新能量: ${newCalories}`);
         
         const updateData = {
           useCount: db.command.inc(1)
@@ -64,7 +64,7 @@ exports.main = async (event) => {
         // 如果能量不同，更新为最新能量
         if (existingFood.calories !== newCalories) {
           updateData.calories = newCalories;
-          console.log(`更新能量: ${existingFood.calories} -> ${newCalories}`);
+          // console.log(`更新能量: ${existingFood.calories} -> ${newCalories}`);
         }
         // 如果单位不同，更新为单位
         if (existingFood.unit !== newUnit) {
@@ -76,7 +76,7 @@ exports.main = async (event) => {
           data: updateData
         });
         
-        console.log(`更新结果:`, updateRes);
+        // console.log(`更新结果:`, updateRes);
         
         const updated = existingFood.calories !== newCalories || existingFood.unit !== newUnit;
         results.push({ 

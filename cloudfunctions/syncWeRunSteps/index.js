@@ -59,7 +59,7 @@ exports.main = async (event) => {
   const OPENID = cloud.getWXContext().OPENID;
   const { encryptedData, iv, code } = event;
 
-  console.log('[步数] OPENID:', OPENID);
+  // console.log('[步数] OPENID:', OPENID);
 
   if (!encryptedData || !iv) {
     return { success: false, error: '缺少加密数据' };
@@ -74,7 +74,7 @@ exports.main = async (event) => {
 
   try {
     // Step 1: 用 code 换取 session_key
-    console.log('[步数] 正在换取 session_key...');
+    // console.log('[步数] 正在换取 session_key...');
     const sessionRes = await code2Session(code);
 
     if (!sessionRes.session_key) {
@@ -83,10 +83,10 @@ exports.main = async (event) => {
     }
 
     // Step 2: AES 解密微信运动数据
-    console.log('[步数] 正在解密运动数据...');
+    // console.log('[步数] 正在解密运动数据...');
     const decrypted = decryptWxData(encryptedData, iv, sessionRes.session_key);
     const stepInfo = decrypted.stepInfoList || [];
-    console.log('[步数] 解密成功, stepInfoList长度:', stepInfo.length);
+    // console.log('[步数] 解密成功, stepInfoList长度:', stepInfo.length);
 
     if (stepInfo.length === 0) {
       return { success: false, error: '无步数数据' };

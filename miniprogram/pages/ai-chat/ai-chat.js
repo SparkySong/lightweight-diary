@@ -42,7 +42,21 @@ Page({
     const savedMessages = wx.getStorageSync('aiChatMessages');
     const welcomeMsg = { role: 'assistant', content: WELCOME_MSG };
     if (savedMessages && savedMessages.length > 0) {
-      this.setData({ messages: savedMessages });
+      // 修复旧消息：为缺少 richNodes 的 AI 消息生成富文本，同时剥离推荐追问
+      const fixed = savedMessages.map(m => {
+        if (m.role === 'assistant' && !m.richNodes && m.content && !m.cardType) {
+          // 先剥离 content 中可能残留的推荐追问
+          const cleanContent = this._stripRecommendationBlock(m.content);
+          return {
+            ...m,
+            content: cleanContent,
+            richNodes: this._formatRichText(cleanContent),
+            displayContent: cleanContent
+          };
+        }
+        return m;
+      });
+      this.setData({ messages: fixed });
     } else {
       this.setData({ messages: [welcomeMsg] });
     }
@@ -50,6 +64,12 @@ Page({
     const savedAvatar = wx.getStorageSync('avatarUrl');
     if (savedAvatar) {
       this.setData({ userAvatar: savedAvatar });
+    }
+
+    // 恢复快捷提问（上次 AI 动态更新后的状态）
+    const savedQuickQuestions = wx.getStorageSync('aiChatQuickQuestions');
+    if (savedQuickQuestions && savedQuickQuestions.length > 0) {
+      this.setData({ quickQuestions: savedQuickQuestions });
     }
 
     try {
@@ -65,7 +85,7 @@ Page({
         this._externalDietData = dietData;
         this.buildKnowledgeBase();
       } catch (e) {
-        console.warn('解析饮食数据失败', e);
+        // console.warn('解析饮食数据失败', e);
       }
     }
 
@@ -133,7 +153,7 @@ Page({
       const res = await wx.cloud.callFunction({ name: 'getExercises', data: { limit: 20 } });
       this._exerciseRawData = res.result?.data || [];
     } catch (e) {
-      console.warn('加载运动数据失败', e);
+      // console.warn('加载运动数据失败', e);
     }
   },
 
@@ -152,7 +172,7 @@ Page({
         }
       }
     } catch (e) {
-      console.warn('刷新体重数据失败', e);
+      // console.warn('刷新体重数据失败', e);
     }
   },
 
@@ -355,7 +375,7 @@ Page({
     const exerciseSection = this._buildExerciseSection();
     if (exerciseSection) sections.push(exerciseSection);
     const kb = sections.join('\n\n');
-    console.log('[KB] 知识库长度:', kb.length, '内容预览:', kb.substring(0, 300));
+    // console.log('[KB] 知识库长度:', kb.length, '内容预览:', kb.substring(0, 300));
     this.setData({ knowledgeBase: kb });
     return kb;
   },
@@ -432,6 +452,21 @@ Page({
     return dateStr;
   },
 
+  // ===== 推荐追问剥离 =====
+
+  /**
+   * 从 AI 回复文本中剥离【推荐追问】区块，返回纯净的展示文本
+   * 该区块只用于快捷提问栏，不能在对话气泡中展示
+   */
+  _stripRecommendationBlock(text) {
+    if (!text) return text;
+    let cleaned = text;
+    cleaned = cleaned.replace(/【推荐追问】[\s\S]*$/, '');
+    cleaned = cleaned.replace(/[🌟💡⭐✨📌][ \t]*推荐追问[\s\S]*$/i, '');
+    cleaned = cleaned.replace(/^[^\n]*推荐追问[：:][\s\S]*$/im, '');
+    return cleaned.trim();
+  },
+
   // ===== 交互：快捷提问 / 输入 =====
 
   onQuickQuestion(e) {
@@ -472,81 +507,107 @@ Page({
           .filter(q => q.length > 1 && q.length <= 25);
 
         if (questions.length > 0) {
-          this.setData({ quickQuestions: questions.slice(0, 4) });
+          const qqs = questions.slice(0, 4);
+          this.setData({ quickQuestions: qqs });
+          wx.setStorageSync('aiChatQuickQuestions', qqs);
           return;
         }
       }
     }
 
-    // ===== 智能回退：AI 未输出推荐追问时，根据上下文动态生成 =====
-    const userMsg = [...msgs].reverse().find(m => m.role === 'user');
-    if (!userMsg || !userMsg.content) return;
+    // ===== 智能回退：AI 未输出推荐追问时，根据 AI 回复内容动态生成 =====
+    // 基于 AI 回复主题（而非用户问题），生成自然的关联追问
+    const cleanReply = this._stripRecommendationBlock(content);
+    if (!cleanReply) return;
 
-    const userText = userMsg.content;
-    let suggestions = [];
+    const suggestions = [];
 
-    // 根据用户问题主题生成关联追问
-    if (/午休|午睡|休息|睡眠|睡觉|失眠|熬夜/.test(userText)) {
-      suggestions = [
-        '晚上几点睡比较好',
-        '睡眠不好怎么改善',
-        '作息时间怎么调整',
-        '运动后能马上睡吗'
-      ];
-    } else if (/饮食|吃|食物|热量|卡路里|早餐|午餐|晚餐|加餐|减肥|减脂|瘦|胖|体重|BMI|目标|碳水|蛋白|脂肪|营养|蔬菜|水果|食谱|怎么吃|吃什么|该吃|能吃|摄入|消耗|缺口|超标|控制/.test(userText)) {
-      suggestions = [
-        '帮我制定饮食计划',
-        '适合我的运动是什么',
-        '我多久能达到目标',
-        '分析我的整体情况'
-      ];
-    } else if (/运动|锻炼|健身|跑步|走路|步数|有氧|无氧|力量|拉伸|瑜伽|普拉提|游泳|骑车|跳绳|HIIT|燃脂|心率/.test(userText)) {
-      suggestions = [
-        '今天运动消耗多少',
-        '运动后怎么吃',
-        '每周运动几次合适',
-        '居家运动推荐'
-      ];
-    } else if (/经期|月经|例假|生理期|排卵|痛经|周期|经血|流量/.test(userText)) {
-      suggestions = [
-        '经期饮食注意事项',
-        '经期可以运动吗',
-        '如何缓解痛经',
-        '预测下次经期'
-      ];
-    } else if (/水|喝水|饮水|补水|脱水/.test(userText)) {
-      suggestions = [
-        '每天要喝多少水',
-        '喝什么水最好',
-        '运动前后怎么补水',
-        '不爱喝水怎么办'
-      ];
-    } else if (/报告|周报|月报|总结|统计|数据|趋势|分析/.test(userText)) {
-      suggestions = [
-        '生成本周健康周报',
-        '本月饮食怎么样',
-        '体重变化趋势分析',
-        '给我个性化建议'
-      ];
-    } else if (/成就|勋章|打卡|坚持|连续|记录/.test(userText)) {
-      suggestions = [
-        '我有哪些成就',
-        '连续打卡多少天了',
-        '下一个解锁什么',
-        '怎么获得更多徽章'
-      ];
+    // 按优先级检测 AI 回复涉及的主题，只取最靠前的 2~3 个主题生成追问
+    const themeTests = [
+      {
+        test: /BMI|体质指数|bmi/,
+        questions: ['如何降低BMI', '我的体重标准范围是多少', '饮食上怎么调整BMI']
+      },
+      {
+        test: /体重.*斤|(?:kg|公斤)/,
+        questions: ['我的体重变化趋势', '如何更有效减重', '设定多少目标体重合适']
+      },
+      {
+        test: /热量.*缺口|能量.*不足|摄入.*不足|吃.*太少|节食/,
+        questions: ['今天还能吃什么', '如何健康增加摄入', '我需要补充哪些营养']
+      },
+      {
+        test: /热量.*超标|热量.*超|摄入.*过多|吃.*多|超标|高热量/,
+        questions: ['低热量食物推荐', '明天怎么控制饮食', '如何减少零食摄入']
+      },
+      {
+        test: /热量|kcal|千卡|卡路里/,
+        questions: ['今天的饮食分析', '我的热量目标合理吗', '如何平衡三餐热量']
+      },
+      {
+        test: /饮食.*计划|饮食.*建议|推荐.*吃|食谱|菜单/,
+        questions: ['帮我记录今天的饮食', '我的饮食结构合理吗', '推荐低卡食谱']
+      },
+      {
+        test: /运动.*建议|锻炼.*计划|运动.*推荐|适合.*运动/,
+        questions: ['居家运动有哪些推荐', '每周运动几次合适', '有氧和无氧怎么搭配']
+      },
+      {
+        test: /运动|锻炼|健身|消耗/,
+        questions: ['今日运动消耗多少', '什么运动燃脂最快', '运动后应该怎么吃']
+      },
+      {
+        test: /目标.*差|还差|距离.*目标|达成.*目标|达标/,
+        questions: ['帮我制定减重计划', '饮食上需要注意什么', '如何加快减重进度']
+      },
+      {
+        test: /碳水|蛋白质|脂肪|营养|维生素|纤维/,
+        questions: ['如何均衡三大营养素', '蛋白质怎么补充', '碳水应该吃多少']
+      },
+      {
+        test: /早餐|午餐|晚餐|加餐|三餐/,
+        questions: ['最近吃什么比较好', '每餐应该摄入多少热量', '餐间饿了怎么办']
+      },
+      {
+        test: /睡眠|睡觉|休息|熬夜/,
+        questions: ['睡眠不足影响减重吗', '如何改善睡眠质量', '运动后什么时候睡好']
+      },
+      {
+        test: /水|喝水|补水/,
+        questions: ['每天应该喝多少水', '喝水能帮助减重吗', '什么时间喝水最好']
+      },
+      {
+        test: /周报|总结|分析/,
+        questions: ['本周饮食总结', '下周的运动建议', '给我一些个性化建议']
+      }
+    ];
+
+    // 遍历主题检测，收集匹配的追问
+    for (const theme of themeTests) {
+      if (theme.test.test(cleanReply)) {
+        for (const q of theme.questions) {
+          if (!suggestions.includes(q)) suggestions.push(q);
+        }
+        if (suggestions.length >= 4) break;
+      }
     }
 
-    // 如果没有命中任何主题规则，从 AI 回复内容中提取关键词做通用追问
+    // 如果 AI 回复中没有命中任何已知主题，生成通用但有意义的追问
     if (suggestions.length === 0) {
-      const topics = ['详细说说怎么做', '有什么具体建议', '帮我制定一个计划', '还有其他注意事项吗'];
-      // 随机选3个，每次不完全一样
-      const shuffled = topics.sort(() => Math.random() - 0.5);
-      suggestions = shuffled.slice(0, 3);
+      const userMsg = [...msgs].reverse().find(m => m.role === 'user');
+      const userText = (userMsg && userMsg.content) ? userMsg.content : '';
+      // 尝试从用户问题中提取追问方向
+      if (userText.length > 0) {
+        suggestions.push('能展开详细说说吗');
+        suggestions.push('对我有什么具体建议');
+        suggestions.push('还有其他需要注意的吗');
+      }
     }
 
     if (suggestions.length > 0) {
-      this.setData({ quickQuestions: suggestions.slice(0, 4) });
+      const qqs = suggestions.slice(0, 4);
+      this.setData({ quickQuestions: qqs });
+      wx.setStorageSync('aiChatQuickQuestions', qqs);
     }
   },
 
@@ -589,18 +650,18 @@ Page({
 
     // 意图识别 → 模板优先
     const intent = this._detectIntent(text);
-    console.log('[Chat] 意图:', intent, '问题:', text.substring(0, 30));
+    // console.log('[Chat] 意图:', intent, '问题:', text.substring(0, 30));
 
     const templateReply = this._templateReply(intent);
     if (templateReply) {
       // 模板命中 → 用打字机效果展示
-      console.log('[Chat] 模板命中，流式展示');
+      // console.log('[Chat] 模板命中，流式展示');
       this._startStreamEffect(templateReply, messages);
       return;
     }
 
     // 走 AI
-    console.log('[Chat] 模板未命中，走 AI');
+    // console.log('[Chat] 模板未命中，走 AI');
     try {
       await Promise.all([this.loadDietData(), this.refreshWeightFromCloud(), this.loadExerciseData()]);
     } catch(e) {}
@@ -640,12 +701,8 @@ Page({
    */
   _formatRichText(text) {
     if (!text) return '';
-    let html = text;
     // 先剥离推荐追问区块（这部分给快捷推荐栏用，不在气泡里展示）
-    // 必须与 _updateDynamicQuickQuestions 的匹配规则保持一致
-    html = html.replace(/【推荐追问】[\s\S]*$/, '');           // 标准格式
-    html = html.replace(/[🌟💡⭐✨📌][ \t]*推荐追问[\s\S]*$/i, '');  // emoji格式
-    html = html.replace(/^[^\n]*推荐追问[：:][\s\S]*$/im, '');      // 其他冒号格式
+    let html = this._stripRecommendationBlock(text);
     // 转义 HTML（在格式标记处理之前）
     html = html.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
@@ -683,8 +740,8 @@ Page({
         continue;
       }
 
-      // 有序列表：1. 2. 3. 或 1）2）或 (1)(2)
-      const olMatch = line.match(/^(\d+)[\.\）、\s]\s*(.+)$/);
+      // 有序列表：1. 2. 3. 或 1）2）或 1、（必须紧跟标点，避免"9 乘以"被误判为列表）
+      const olMatch = line.match(/^(\d+)[.）、]\s*(.+)$/);
       if (olMatch) {
         if (inUl) { result.push('</ul>'); inUl = false; }
         if (!inOl) { inOl = true; result.push('<ol class="ai-ol">'); }
@@ -742,11 +799,8 @@ Page({
    */
   _detectCardType(userText, aiReply) {
     const ut = (userText || '').toLowerCase();
-    // 先剥离推荐追问区块，避免混入卡片内容（与 _formatRichText 保持一致）
-    let cleanReply = (aiReply || '');
-    cleanReply = cleanReply.replace(/【推荐追问】[\s\S]*$/, '');
-    cleanReply = cleanReply.replace(/[🌟💡⭐✨📌][ \t]*推荐追问[\s\S]*$/i, '');
-    cleanReply = cleanReply.replace(/^[^\n]*推荐追问[：:][\s\S]*$/im, '');
+    // 先剥离推荐追问区块，避免混入卡片内容
+    const cleanReply = this._stripRecommendationBlock(aiReply || '');
     if (/周报|本周分析|周报告|这周总结|上周分析/.test(ut)) {
       return { type: 'report', sections: this._parseReportSections(cleanReply) };
     }
@@ -886,9 +940,15 @@ Page({
    * 渲染结构化卡片消息（跳过流式，直接显示卡片）
    */
   _renderStructuredCard(cardInfo, baseMessages, fallbackText) {
+    // 1. 用原始 AI 回复文本解析推荐追问（必须在剥离之前）
+    if (fallbackText) {
+      const tempMsgs = [...baseMessages, { role: 'assistant', content: fallbackText }];
+      this._updateDynamicQuickQuestions(tempMsgs);
+    }
+
     // 兜底：解析出的内容为空时，降级为普通文本展示
     if (!cardInfo.sections || cardInfo.sections.length === 0) {
-      console.log('[Chat] 卡片解析为空，降级为文本展示');
+      // console.log('[Chat] 卡片解析为空，降级为文本展示');
       if (fallbackText) {
         this._startStreamEffect(fallbackText, baseMessages);
         return;
@@ -905,7 +965,6 @@ Page({
     const updated = [...baseMessages, cardMsg];
     this.setData({ messages: updated, isLoading: false, isStreaming: false });
     this.saveMessages(updated);
-    this._updateDynamicQuickQuestions(updated);
     this.scrollToBottom();
   },
 
@@ -915,8 +974,15 @@ Page({
   _startStreamEffect(fullText, baseMessages) {
     const aiIndex = baseMessages.length;
 
+    // 1. 先从原始回复中解析推荐追问（必须在剥离之前，否则丢失）
+    const tempMsgs = [...baseMessages, { role: 'assistant', content: fullText }];
+    this._updateDynamicQuickQuestions(tempMsgs);
+
+    // 2. 剥离推荐追问，只展示纯净回复给用户
+    const cleanText = this._stripRecommendationBlock(fullText);
+
     // 插入 streaming 状态的空消息
-    const streamMsg = { role: 'assistant', content: fullText, displayContent: '', streaming: true };
+    const streamMsg = { role: 'assistant', content: cleanText, displayContent: '', streaming: true };
     const updated = [...baseMessages, streamMsg];
 
     this.setData({
@@ -932,13 +998,13 @@ Page({
 
     let charPos = 0;
     // 加速打字机：每次多推几个字，间隔更短
-    const stepSize = fullText.length > 100 ? 4 : 2;
-    const intervalMs = fullText.length > 100 ? 8 : 14;
+    const stepSize = cleanText.length > 100 ? 4 : 2;
+    const intervalMs = cleanText.length > 100 ? 8 : 14;
 
     this._typingTimer = setInterval(() => {
       charPos += stepSize;
 
-      if (charPos >= fullText.length) {
+      if (charPos >= cleanText.length) {
         // 流式完成
         clearInterval(this._typingTimer);
         this._typingTimer = null;
@@ -946,18 +1012,17 @@ Page({
         // 最终态：关闭 streaming 标记和光标，生成富文本
         const finalMsgs = this.data.messages.map((m, i) =>
           i === aiIndex
-            ? { ...m, displayContent: fullText, richNodes: this._formatRichText(fullText), streaming: false }
+            ? { ...m, displayContent: cleanText, richNodes: this._formatRichText(cleanText), streaming: false }
             : m
         );
         this.setData({ messages: finalMsgs, isStreaming: false });
         this.saveMessages(finalMsgs);
-        this._updateDynamicQuickQuestions(finalMsgs);
         this.scrollToBottom();
         return;
       }
 
       // 推进显示内容
-      const partial = fullText.substring(0, charPos);
+      const partial = cleanText.substring(0, charPos);
 
       // 高效更新：只修改特定索引的 displayContent
       const keyPath = `messages[${aiIndex}].displayContent`;
@@ -1089,8 +1154,16 @@ Page({
             this._typingTimer = null;
           }
           const msgs = [{ role: 'assistant', content: WELCOME_MSG }];
-          this.setData({ messages: msgs, knowledgeBase: '', isStreaming: false });
+          const defaultQuestions = [
+            '分析我的整体情况',
+            '我的 BMI正常吗',
+            '今天吃得怎么样',
+            '生成周报',
+            '帮我制定饮食计划'
+          ];
+          this.setData({ messages: msgs, knowledgeBase: '', isStreaming: false, quickQuestions: defaultQuestions });
           this.saveMessages(msgs);
+          wx.setStorageSync('aiChatQuickQuestions', defaultQuestions);
         }
       }
     });

@@ -15,9 +15,9 @@ exports.main = async (event) => {
         // 集合不存在，尝试创建
         try {
           await db.createCollection('food_library');
-          console.log('集合 food_library 创建成功');
+          // console.log('集合 food_library 创建成功');
         } catch (createErr) {
-          console.log('创建集合失败，需要手动创建');
+          // console.log('创建集合失败，需要手动创建');
         }
       }
     }

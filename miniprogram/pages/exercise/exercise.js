@@ -244,7 +244,7 @@ Page({
         try {
           await wx.authorize({ scope: 'scope.werun' });
         } catch (e) {
-          console.log('用户拒绝微信运动授权');
+          // console.log('用户拒绝微信运动授权');
           wx.showModal({
             title: '步数同步需要授权',
             content: '授权微信运动后可以自动同步每日步数。是否前往设置开启？',
@@ -275,11 +275,11 @@ Page({
       // 已授权，先获取登录凭证 code（必须在 getWeRunData 之前调用，
       // 因为 wx.login 会刷新 session_key，getWeRunData 需要用最新的 session_key 加密）
       const loginRes = await wx.login();
-      console.log('[步数] login code 获取成功');
+      // console.log('[步数] login code 获取成功');
 
       // 获取加密数据（使用最新 session_key 加密）
       const weRunData = await wx.getWeRunData();
-      console.log('[步数] 获取到微信运动加密数据');
+      // console.log('[步数] 获取到微信运动加密数据');
 
       // 发送到云函数解密
       const res = await wx.cloud.callFunction({
@@ -291,7 +291,7 @@ Page({
         }
       });
 
-      console.log('[步数] 云函数返回:', JSON.stringify(res.result));
+      // console.log('[步数] 云函数返回:', JSON.stringify(res.result));
 
       if (res.result?.success) {
         const steps = res.result.steps || 0;

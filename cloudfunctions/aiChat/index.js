@@ -14,14 +14,14 @@ const SYSTEM_PROMPT = `你是轻体营养师。全程中文。
 - 要点用 - 开头的列表项（每条一项）
 - 重点词用 **加粗**
 - emoji 每段最多1个，放在句尾
-- 每次回复结尾必须附带3-4个推荐的追问问题，用特殊标记：
+- 每次回复结尾必须附带3-4个推荐的追问，用特殊标记，追问要像朋友聊天时自然的"接下来可以问什么"，贴合本次回复内容：
 
 【推荐追问】
 - 问题1
 - 问题2
 - 问题3
 
-这些追问要基于本次回复内容和用户数据，引导用户深入探索（如具体建议、下一步行动、相关话题）。
+追问要求：必须和本次回复高度相关，像话题的自然延伸（如"那XX应该怎么调整""帮我具体看看XX"），禁止不相关的宽泛提问。示例：若回复了BMI分析，可追问"如何降低BMI""我的体重标准范围"；若回复了饮食分析，可追问"推荐今天的晚餐""帮我制定饮食计划"。
 
 示例输出格式：
 *分析结果*
@@ -40,12 +40,12 @@ const SYSTEM_PROMPT = `你是轻体营养师。全程中文。
 禁止JSON、代码块、英文`;
 
 exports.main = async (event) => {
-  console.log('[AI] === 收到请求 ===');
+  // console.log('[AI] === 收到请求 ===');
   
   const { messages, knowledgeBase } = event;
-  console.log('[AI] messages 数量:', Array.isArray(messages) ? messages.length : '非数组');
-  console.log('[AI] knowledgeBase 长度:', (knowledgeBase || '').length);
-  console.log('[AI] knowledgeBase 内容预览:', (knowledgeBase || '').substring(0, 500));
+  // console.log('[AI] messages 数量:', Array.isArray(messages) ? messages.length : '非数组');
+  // console.log('[AI] knowledgeBase 长度:', (knowledgeBase || '').length);
+  // console.log('[AI] knowledgeBase 内容预览:', (knowledgeBase || '').substring(0, 500));
 
   if (!messages || !Array.isArray(messages) || messages.length === 0) {
     return { success: false, error: '请输入消息内容' };
@@ -56,7 +56,7 @@ exports.main = async (event) => {
   if (lastUserMsg && lastUserMsg.content) {
     const kbAnswer = matchKnowledge(lastUserMsg.content);
     if (kbAnswer) {
-      console.log('[AI] ✅ 命中知识库，直接返回');
+      // console.log('[AI] ✅ 命中知识库，直接返回');
       return { success: true, reply: kbAnswer, fromKB: true };
     }
   }
@@ -105,12 +105,12 @@ exports.main = async (event) => {
       stream: true
     });
 
-    console.log(`[AI] 尝试${model.label}: ${model.name}`);
-    console.log('[AI] 请求体大小:', requestBody.length, 'bytes');
+    // console.log(`[AI] 尝试${model.label}: ${model.name}`);
+    // console.log('[AI] 请求体大小:', requestBody.length, 'bytes');
 
     try {
       const reply = await callAPIStream(requestBody, model);
-      console.log(`[AI] ${model.label}成功，长度:`, reply.length);
+      // console.log(`[AI] ${model.label}成功，长度:`, reply.length);
       const cleanReply = stripMarkdown(reply);
       return { success: true, reply: cleanReply, model: model.name };
     } catch (err) {

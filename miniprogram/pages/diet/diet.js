@@ -409,8 +409,8 @@ Page({
         data: {}
       });
       
-      console.log('=== 云端食物库数据 ===');
-      console.log('原始返回:', res);
+      // console.log('=== 云端食物库数据 ===');
+      // console.log('原始返回:', res);
       
       if (res.result && res.result.foods && res.result.foods.length > 0) {
         // 保存到 data 中，搜索时使用
@@ -430,11 +430,11 @@ Page({
             addedCount++;
           }
         });
-        console.log(`=== 合并了 ${addedCount} 个新食物到本地 ===`);
-        console.log('当前 foodDatabase 长度:', foodDatabase.length);
+        // console.log(`=== 合并了 ${addedCount} 个新食物到本地 ===`);
+        // console.log('当前 foodDatabase 长度:', foodDatabase.length);
       } else {
         this.setData({ customFoods: [] });
-        console.log('云端食物库为空');
+        // console.log('云端食物库为空');
       }
     } catch (e) {
       console.error('加载自定义食物库失败', e);
@@ -452,7 +452,7 @@ Page({
     const localResults = foodDatabase.filter(food => 
       food.name.toLowerCase().includes(lowerKeyword)
     );
-    console.log('本地搜索结果:', localResults);
+    // console.log('本地搜索结果:', localResults);
     
     // 2. 搜索云端自定义食物库（直接调用云函数）
     let cloudResults = [];
@@ -462,7 +462,7 @@ Page({
         data: { keyword: keyword.trim() }
       });
       
-      console.log('云端搜索返回:', res);
+      // console.log('云端搜索返回:', res);
       
       if (res.result && res.result.foods && res.result.foods.length > 0) {
         cloudResults = res.result.foods.map(food => ({
@@ -471,7 +471,7 @@ Page({
           unit: food.unit || '',
           serving: food.calories
         }));
-        console.log('云端匹配的食物:', cloudResults);
+        // console.log('云端匹配的食物:', cloudResults);
       }
     } catch (e) {
       console.error('云端搜索失败:', e);
@@ -491,7 +491,7 @@ Page({
       }
     });
     
-    console.log('最终合并结果:', allResults);
+    // console.log('最终合并结果:', allResults);
     return allResults.slice(0, 6);
   },
 
@@ -746,8 +746,8 @@ Page({
 
     const totalCal = validFoods.reduce((sum, f) => sum + (parseInt(f.calories) || 0), 0);
     
-    console.log('=== 提交食物 ===');
-    console.log('validFoods:', validFoods);
+    // console.log('=== 提交食物 ===');
+    // console.log('validFoods:', validFoods);
     
     wx.showLoading({ title: '保存中...' });
     try {
@@ -768,12 +768,12 @@ Page({
       
       // 每次保存都将食物同步到云端食物库（云函数会自动判断是新增还是更新）
       try {
-        console.log('正在同步食物到云端:', validFoods);
+        // console.log('正在同步食物到云端:', validFoods);
         const libraryRes = await wx.cloud.callFunction({
           name: 'addToFoodLibrary',
           data: { foods: validFoods }
         });
-        console.log('云端食物库返回:', libraryRes);
+        // console.log('云端食物库返回:', libraryRes);
         
         // 如果返回了更新信息，更新本地数据库
         if (libraryRes.result && libraryRes.result.results) {
@@ -961,7 +961,7 @@ Page({
   
   // 下拉刷新
   onPullDownRefresh() {
-    console.log('饮食页面下拉刷新开始');
+    // console.log('饮食页面下拉刷新开始');
     
     // 加载数据
     this.loadRecords().then(() => {

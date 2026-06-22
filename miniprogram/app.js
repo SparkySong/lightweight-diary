@@ -163,7 +163,7 @@ App({
       // 基础库 2.21+ 支持 wx.onThemeChange
       if (typeof wx.onThemeChange === 'function') {
         wx.onThemeChange((res) => {
-          console.log('微信主题变化通知:', res.theme);
+          // console.log('微信主题变化通知:', res.theme);
           // 保存检测到的系统主题
           if (res.theme === 'dark' || res.theme === 'light') {
             wx.setStorageSync('lastSystemTheme', res.theme);
@@ -180,15 +180,15 @@ App({
             this.notifyThemeChange(res.theme);
           }
         });
-        console.log('已注册微信主题变化监听');
+        // console.log('已注册微信主题变化监听');
       } else {
-        console.log('当前版本不支持 wx.onThemeChange，将使用 onShow 检测');
+        // console.log('当前版本不支持 wx.onThemeChange，将使用 onShow 检测');
       }
       
       // 首次启动时保存检测到的系统主题
       const currentTheme = this.getSystemTheme();
       wx.setStorageSync('lastSystemTheme', currentTheme);
-      console.log('首次保存系统主题:', currentTheme);
+      // console.log('首次保存系统主题:', currentTheme);
     } catch (err) {
       console.error('监听微信主题变化失败:', err);
     }
@@ -365,7 +365,7 @@ App({
         }
       }
     } catch (error) {
-      console.log('更新自定义tabBar主题失败:', error);
+      // console.log('更新自定义tabBar主题失败:', error);
     }
   },
   

@@ -92,7 +92,7 @@ exports.main = async (event, context) => {
   // --- 消息处理（POST 请求）---
   const msg = event.body ? (typeof event.body === 'string' ? JSON.parse(event.body) : event.body) : event;
 
-  console.log('[customerService] 收到消息:', JSON.stringify(msg));
+  // console.log('[customerService] 收到消息:', JSON.stringify(msg));
 
   const msgType = msg.MsgType;
   const openid = msg.FromUserName;
@@ -138,7 +138,7 @@ exports.main = async (event, context) => {
         msgtype: 'text',
         text: { content: reply },
       });
-      console.log(`[customerService] 已自动回复: ${openid}`);
+      // console.log(`[customerService] 已自动回复: ${openid}`);
     } catch (e) {
       console.error('自动回复失败:', e);
     }
