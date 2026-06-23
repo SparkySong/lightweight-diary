@@ -90,10 +90,10 @@ exports.main = async (event) => {
     ...messages
   ];
 
-  // 主模型 + 备用模型降级策略
+  // 主模型 + 备用模型降级策略（快速切换，不等待）
   const models = [
-    { name: 'glm-4-flash', label: '主模型', host: 'open.bigmodel.cn', path: '/api/paas/v4/chat/completions', key: API_KEY },
-    { name: 'claude-opus-4-8', label: '备用模型', host: 'ai.loserbai.cn', path: '/v1/chat/completions', key: API_KEY_BACKUP }
+    { name: 'glm-4-flash', label: '主模型', host: 'open.bigmodel.cn', path: '/api/paas/v4/chat/completions', key: API_KEY, timeout: 15000, idleTimeout: 10000 },
+    { name: 'claude-opus-4-8', label: '备用模型', host: 'ai.loserbai.cn', path: '/v1/chat/completions', key: API_KEY_BACKUP, timeout: 12000, idleTimeout: 8000 }
   ];
 
   for (const model of models) {
@@ -105,22 +105,16 @@ exports.main = async (event) => {
       stream: true
     });
 
-    // console.log(`[AI] 尝试${model.label}: ${model.name}`);
-    // console.log('[AI] 请求体大小:', requestBody.length, 'bytes');
-
     try {
       const reply = await callAPIStream(requestBody, model);
-      // console.log(`[AI] ${model.label}成功，长度:`, reply.length);
       const cleanReply = stripMarkdown(reply);
       return { success: true, reply: cleanReply, model: model.name };
     } catch (err) {
       console.error(`[AI] ${model.label}失败:`, err.message);
-      // 主模型失败才尝试备用，备用模型失败直接返回
       if (model === models[models.length - 1]) {
         return { success: false, error: err.message };
       }
-      // 短暂等待再切备用
-      await new Promise(r => setTimeout(r, 1000));
+      // 立即切换备用模型，不等待
     }
   }
   return { success: false, error: 'AI 服务暂时不可用，请稍后重试' };
@@ -145,9 +139,10 @@ function stripMarkdown(text) {
 
 // ====== SSE 流式调用 API（支持多模型不同地址）======
 function callAPIStream(body, modelConfig) {
+  const ABSOLUTE_TIMEOUT = modelConfig.timeout || 15000;
+  const IDLE_TIMEOUT = modelConfig.idleTimeout || 10000;
+
   return new Promise((resolve, reject) => {
-    // 绝对超时：不管有没有数据都在指定时间后强制终止（避免流式数据持续到达导致无限等待）
-    const ABSOLUTE_TIMEOUT = 20000; // 20秒绝对超时
     const options = {
       hostname: modelConfig.host,
       path: modelConfig.path,
@@ -164,16 +159,39 @@ function callAPIStream(body, modelConfig) {
     let resolved = false;
     let destroyed = false;
 
+    // 空闲超时：若持续无数据则提前返回已有内容
+    let idleTimer = null;
+    const resetIdleTimer = () => {
+      if (idleTimer) clearTimeout(idleTimer);
+      if (resolved || destroyed) return;
+      idleTimer = setTimeout(() => {
+        if (!resolved && !destroyed) {
+          destroyed = true;
+          // 如果已经收到了一些数据，返回部分结果而不报错
+          if (fullText.trim()) {
+            resolve(fullText);
+          } else {
+            reject(new Error(`AI 响应超时，模型 ${modelConfig.name} 无数据返回`));
+          }
+        }
+      }, IDLE_TIMEOUT);
+    };
+
     // 绝对超时定时器
     const absoluteTimer = setTimeout(() => {
       if (!resolved && !destroyed) {
         destroyed = true;
-        reject(new Error(`请求超时(${ABSOLUTE_TIMEOUT / 1000}s)，模型 ${modelConfig.name} 无响应`));
+        if (fullText.trim()) {
+          resolve(fullText); // 超时但有部分数据，也返回
+        } else {
+          reject(new Error(`请求超时(${ABSOLUTE_TIMEOUT / 1000}s)，模型 ${modelConfig.name} 无响应`));
+        }
       }
     }, ABSOLUTE_TIMEOUT);
 
     const cleanup = () => {
       clearTimeout(absoluteTimer);
+      clearTimeout(idleTimer);
       resolved = true;
     };
 
@@ -186,12 +204,22 @@ function callAPIStream(body, modelConfig) {
       }
 
       res.on('data', (chunk) => {
+        if (destroyed) return;
+        resetIdleTimer();
         const text = chunk.toString();
         const lines = text.split('\n');
         for (const line of lines) {
           if (!line.startsWith('data: ')) continue;
           const payload = line.slice(6).trim();
-          if (payload === '[DONE]') continue;
+          if (payload === '[DONE]') {
+            // 收到结束信号，立即返回
+            if (!resolved) {
+              cleanup();
+              destroyed = true;
+              resolve(fullText);
+            }
+            return;
+          }
           try {
             const parsed = JSON.parse(payload);
             const delta = parsed.choices?.[0]?.delta?.content;
@@ -209,17 +237,27 @@ function callAPIStream(body, modelConfig) {
       });
     });
 
-    req.on('error', (err) => { if (!resolved) { cleanup(); reject(new Error(`网络错误: ${err.message}`)); } });
-    
-    // 空闲超时作为额外保障
-    req.setTimeout(15000, () => { 
-      if (!destroyed) {
-        destroyed = true; 
-        req.destroy(); 
+    req.on('error', (err) => {
+      if (!resolved) {
+        cleanup();
+        // 如果有部分数据，不报错直接返回
+        if (fullText.trim()) { resolve(fullText); }
+        else { reject(new Error(`网络错误: ${err.message}`)); }
       }
     });
-    
+
+    // 底层 socket 空闲超时
+    req.setTimeout(ABSOLUTE_TIMEOUT, () => {
+      if (!destroyed) {
+        destroyed = true;
+        req.destroy();
+      }
+    });
+
     req.write(body);
     req.end();
+
+    // 启动第一个空闲定时器
+    resetIdleTimer();
   });
 }

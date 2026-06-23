@@ -2,5 +2,5 @@
   "permissions": {
     "openapi": []
   },
-  "timeout": 90
+  "timeout": 30
 }

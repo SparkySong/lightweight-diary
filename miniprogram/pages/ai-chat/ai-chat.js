@@ -14,6 +14,7 @@ Page({
     isLoading: false,
     isStreaming: false,       // 流式输出进行中
     scrollToView: '',
+    scrollTop: 0,            // 流式输出时强制滚动到底部
     knowledgeBase: '',
     userAvatar: DEFAULT_AVATAR,
     copiedIndex: -1,
@@ -74,6 +75,7 @@ Page({
 
     try {
       await Promise.all([this.loadDietData(), this.refreshWeightFromCloud(), this.loadExerciseData()]);
+      this._lastDataLoadTime = Date.now();
     } catch (e) {
       console.warn('预加载数据失败，使用缓存:', e);
     }
@@ -661,10 +663,15 @@ Page({
     }
 
     // 走 AI
-    // console.log('[Chat] 模板未命中，走 AI');
-    try {
-      await Promise.all([this.loadDietData(), this.refreshWeightFromCloud(), this.loadExerciseData()]);
-    } catch(e) {}
+    // 智能加载：缓存未过期则跳过数据重新加载（避免每次AI调用都读数据库）
+    const cacheAge = Date.now() - (this._lastDataLoadTime || 0);
+    if (cacheAge > 30000) {
+      // 超过30秒才重新加载
+      try {
+        await Promise.all([this.loadDietData(), this.refreshWeightFromCloud(), this.loadExerciseData()]);
+        this._lastDataLoadTime = Date.now();
+      } catch(e) {}
+    }
     const kb = this.buildKnowledgeBase();
     const recentMsgs = messages.slice(-10).map(m => ({ role: m.role, content: m.content }));
 
@@ -989,6 +996,9 @@ Page({
       messages: updated,
       isStreaming: true,
       isLoading: false   // 关闭点点点，改用光标闪烁
+    }, () => {
+      // 立即滚动到底部（不重置 scrollTop，不干扰 scrollToBottom 的结果）
+      this._queryScrollToBottom();
     });
 
     this.saveMessages(updated);
@@ -997,9 +1007,8 @@ Page({
     if (this._typingTimer) clearInterval(this._typingTimer);
 
     let charPos = 0;
-    // 加速打字机：每次多推几个字，间隔更短
-    const stepSize = cleanText.length > 100 ? 4 : 2;
-    const intervalMs = cleanText.length > 100 ? 8 : 14;
+    const stepSize = cleanText.length > 100 ? 6 : 3;
+    const intervalMs = cleanText.length > 100 ? 5 : 10;
 
     this._typingTimer = setInterval(() => {
       charPos += stepSize;
@@ -1009,26 +1018,40 @@ Page({
         clearInterval(this._typingTimer);
         this._typingTimer = null;
 
-        // 最终态：关闭 streaming 标记和光标，生成富文本
         const finalMsgs = this.data.messages.map((m, i) =>
           i === aiIndex
             ? { ...m, displayContent: cleanText, richNodes: this._formatRichText(cleanText), streaming: false }
             : m
         );
-        this.setData({ messages: finalMsgs, isStreaming: false });
+        this.setData({ messages: finalMsgs, isStreaming: false }, () => {
+          this._queryScrollToBottom();
+        });
         this.saveMessages(finalMsgs);
-        this.scrollToBottom();
         return;
       }
 
-      // 推进显示内容
+      // 推进显示内容，每 tick 都滚动到底部
       const partial = cleanText.substring(0, charPos);
-
-      // 高效更新：只修改特定索引的 displayContent
       const keyPath = `messages[${aiIndex}].displayContent`;
-      this.setData({ [keyPath]: partial });
-      this.scrollToBottom();
+      this.setData({ [keyPath]: partial }, () => {
+        this._queryScrollToBottom();
+      });
     }, intervalMs);
+  },
+
+  /**
+   * 用 createSelectorQuery 测量真实内容高度并滚动到底部（微信小程序最可靠的滚动方案）
+   */
+  _queryScrollToBottom() {
+    wx.createSelectorQuery()
+      .select('.chat-messages').scrollOffset()
+      .select('.chat-list').boundingClientRect()
+      .exec((res) => {
+        if (res && res[1] && res[1].height) {
+          // 设一个远大于内容高度的值，框架自动 clamp 到最大可滚动位置
+          this.setData({ scrollTop: res[1].height + 2000 });
+        }
+      });
   },
 
   // ===== 消息操作：编辑重发 & 长按复制 =====
@@ -1106,8 +1129,8 @@ Page({
   },
 
   scrollToBottom() {
-    const msgs = this.data.messages;
-    if (msgs.length > 0) this.setData({ scrollToView: `msg-${msgs.length - 1}` });
+    // 统一用真实高度查询滚动，不再用 scroll-into-view（避免与后续 setData 冲突）
+    this._queryScrollToBottom();
   },
 
   saveMessages(msgs) {
