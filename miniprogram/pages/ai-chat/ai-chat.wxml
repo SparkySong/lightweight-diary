@@ -128,6 +128,7 @@
             <view class="typing-dot"></view>
             <view class="typing-dot"></view>
           </view>
+          <view class="typing-text">正在思考...</view>
         </view>
       </view>
 
@@ -168,12 +169,12 @@
           confirm-type="send"
           bindinput="onInput"
           bindconfirm="onSend"
-          disabled="{{isLoading}}"
+          disabled="{{isLoading || isStreaming}}"
           adjust-position="{{true}}"
           cursor-spacing="20"
         />
       </view>
-      <view class="send-btn {{inputValue.trim() && !isLoading ? 'send-active' : ''}}" bindtap="onSend">
+      <view class="send-btn {{inputValue.trim() && !isLoading && !isStreaming ? 'send-active' : ''}}" bindtap="onSend">
         <text class="send-icon">➤</text>
       </view>
     </view>

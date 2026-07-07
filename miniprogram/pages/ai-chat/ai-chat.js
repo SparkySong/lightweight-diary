@@ -45,7 +45,7 @@ Page({
     if (savedMessages && savedMessages.length > 0) {
       // 修复旧消息：为缺少 richNodes 的 AI 消息生成富文本，同时剥离推荐追问
       const fixed = savedMessages.map(m => {
-        if (m.role === 'assistant' && !m.richNodes && m.content && !m.cardType) {
+        if (m.role === 'assistant' && m.content && !m.cardType) {
           // 先剥离 content 中可能残留的推荐追问
           const cleanContent = this._stripRecommendationBlock(m.content);
           return {
@@ -456,19 +456,24 @@ Page({
 
   // ===== 推荐追问剥离 =====
 
-  /**
-   * 从 AI 回复文本中剥离【推荐追问】区块，返回纯净的展示文本
-   * 该区块只用于快捷提问栏，不能在对话气泡中展示
+    /**
+   * 剥离【推荐追问】区块（气泡不展示，只给快捷栏用）
+   * 支持：【推荐追问】/ **相关追问** / **追问** / 追问： 等多种格式
    */
   _stripRecommendationBlock(text) {
     if (!text) return text;
     let cleaned = text;
+    // 标准格式
     cleaned = cleaned.replace(/【推荐追问】[\s\S]*$/, '');
     cleaned = cleaned.replace(/[🌟💡⭐✨📌][ \t]*推荐追问[\s\S]*$/i, '');
-    cleaned = cleaned.replace(/^[^\n]*推荐追问[：:][\s\S]*$/im, '');
+    // markdown 加粗格式 + 任何"追问"变体
+    cleaned = cleaned.replace(/\n\*\*(?:推荐追问|相关追问|追问)\*\*[：:][\s\S]*$/i, '');
+    // 纯文本格式
+    cleaned = cleaned.replace(/\n(?:推荐追问|相关追问|追问)[：:][\s\S]*$/i, '');
+    // 兜底：行首的推荐追问
+    cleaned = cleaned.replace(/^[^\n]*(?:推荐追问|相关追问|追问)[：:][\s\S]*$/im, '');
     return cleaned.trim();
   },
-
   // ===== 交互：快捷提问 / 输入 =====
 
   onQuickQuestion(e) {
@@ -477,142 +482,66 @@ Page({
     this.sendMessage(q);
   },
 
-  /**
+    /**
    * 从 AI 回复中解析推荐追问区块，更新快捷推荐
-   * 推荐由 AI 动态生成，而非前端硬编码关键词匹配
-   * 支持多种格式：【推荐追问】/ 🌟推荐追问 / 💡推荐追问 等
+   * 支持：【推荐追问】/ **相关追问** / 追问： 等多种格式
    */
   _updateDynamicQuickQuestions(messages) {
     const msgs = messages || this.data.messages;
     if (!msgs || msgs.length === 0) return;
 
-    // 取最后一条 AI 回复，解析推荐追问
     const lastAiReply = [...msgs].reverse().find(m => m.role === 'assistant' && m.content);
     if (!lastAiReply) return;
 
     const content = lastAiReply.content;
 
-    // 匹配多种格式的推荐追问区块
-    const patterns = [
-      /【推荐追问】\s*\n([\s\S]*?)(?=\n\n|\n*$)/,           // 【推荐追问】标准格式
-      /[🌟💡⭐✨📌][ \t]*推荐追问\s*\n([\s\S]*?)(?=\n\n|\n*$)/, // emoji + 推荐追问
-      /^[^\n]*推荐追问[：:]\s*\n([\s\S]*?)(?=\n\n|\n*$)/im     // 其他"推荐追问："格式
-    ];
+    // 统一的"追问"关键词正则，匹配所有变体
+    const headerRe = /(?:【推荐追问】|[🌟💡⭐✨📌][ \t]*推荐追问|\*\*(?:推荐追问|相关追问|追问)\*\*|推荐追问|相关追问|追问)[：:]?\s*\n/;
 
-    for (const pattern of patterns) {
-      const match = content.match(pattern);
-      if (match && match[1]) {
-        // 提取问题：支持 - 开头、数字开头、或纯文本行
-        const questions = match[1]
-          .split('\n')
-          .map(line => line.replace(/^[-\d\.\)、\s]+/, '').trim())
-          .filter(q => q.length > 1 && q.length <= 25);
+    const match = content.match(headerRe);
+    if (match) {
+      const afterHeader = content.substring(content.indexOf(match[0]) + match[0].length);
+      // 贪婪匹配到字符串末尾，确保所有问题都被捕获
+      const questions = afterHeader
+        .split('\n')
+        .map(line => line.replace(/^[-\d\.\)、\s*]+/, '').trim())
+        .filter(q => q.length > 1 && q.length <= 30);
 
-        if (questions.length > 0) {
-          const qqs = questions.slice(0, 4);
-          this.setData({ quickQuestions: qqs });
-          wx.setStorageSync('aiChatQuickQuestions', qqs);
-          return;
-        }
+      if (questions.length > 0) {
+        const qqs = questions.slice(0, 4);
+        this.setData({ quickQuestions: qqs });
+        wx.setStorageSync('aiChatQuickQuestions', qqs);
+        return;
       }
     }
 
     // ===== 智能回退：AI 未输出推荐追问时，根据 AI 回复内容动态生成 =====
-    // 基于 AI 回复主题（而非用户问题），生成自然的关联追问
-    const cleanReply = this._stripRecommendationBlock(content);
-    if (!cleanReply) return;
-
     const suggestions = [];
-
-    // 按优先级检测 AI 回复涉及的主题，只取最靠前的 2~3 个主题生成追问
     const themeTests = [
-      {
-        test: /BMI|体质指数|bmi/,
-        questions: ['如何降低BMI', '我的体重标准范围是多少', '饮食上怎么调整BMI']
-      },
-      {
-        test: /体重.*斤|(?:kg|公斤)/,
-        questions: ['我的体重变化趋势', '如何更有效减重', '设定多少目标体重合适']
-      },
-      {
-        test: /热量.*缺口|能量.*不足|摄入.*不足|吃.*太少|节食/,
-        questions: ['今天还能吃什么', '如何健康增加摄入', '我需要补充哪些营养']
-      },
-      {
-        test: /热量.*超标|热量.*超|摄入.*过多|吃.*多|超标|高热量/,
-        questions: ['低热量食物推荐', '明天怎么控制饮食', '如何减少零食摄入']
-      },
-      {
-        test: /热量|kcal|千卡|卡路里/,
-        questions: ['今天的饮食分析', '我的热量目标合理吗', '如何平衡三餐热量']
-      },
-      {
-        test: /饮食.*计划|饮食.*建议|推荐.*吃|食谱|菜单/,
-        questions: ['帮我记录今天的饮食', '我的饮食结构合理吗', '推荐低卡食谱']
-      },
-      {
-        test: /运动.*建议|锻炼.*计划|运动.*推荐|适合.*运动/,
-        questions: ['居家运动有哪些推荐', '每周运动几次合适', '有氧和无氧怎么搭配']
-      },
-      {
-        test: /运动|锻炼|健身|消耗/,
-        questions: ['今日运动消耗多少', '什么运动燃脂最快', '运动后应该怎么吃']
-      },
-      {
-        test: /目标.*差|还差|距离.*目标|达成.*目标|达标/,
-        questions: ['帮我制定减重计划', '饮食上需要注意什么', '如何加快减重进度']
-      },
-      {
-        test: /碳水|蛋白质|脂肪|营养|维生素|纤维/,
-        questions: ['如何均衡三大营养素', '蛋白质怎么补充', '碳水应该吃多少']
-      },
-      {
-        test: /早餐|午餐|晚餐|加餐|三餐/,
-        questions: ['最近吃什么比较好', '每餐应该摄入多少热量', '餐间饿了怎么办']
-      },
-      {
-        test: /睡眠|睡觉|休息|熬夜/,
-        questions: ['睡眠不足影响减重吗', '如何改善睡眠质量', '运动后什么时候睡好']
-      },
-      {
-        test: /水|喝水|补水/,
-        questions: ['每天应该喝多少水', '喝水能帮助减重吗', '什么时间喝水最好']
-      },
-      {
-        test: /周报|总结|分析/,
-        questions: ['本周饮食总结', '下周的运动建议', '给我一些个性化建议']
-      }
+      { test: /BMI|体质指数|bmi/, questions: ['如何降低BMI', '我的体重标准范围是多少', '饮食上怎么调整BMI'] },
+      { test: /体重.*斤|(?:kg|公斤)/, questions: ['我的体重变化趋势', '如何更有效减重', '设定多少目标体重合适'] },
+      { test: /热量|kcal|卡路里|能量/, questions: ['低热量食物推荐', '明天怎么控制饮食', '如何减少零食摄入'] },
+      { test: /运动|锻炼|健身|步数|骑行|跑步|步行/, questions: ['推荐适合的运动', '运动后吃什么恢复', '每天运动多久合适'] },
+      { test: /饮食|吃|食物|营养|早餐|午餐|晚餐|零食/, questions: ['如何搭配三餐', '蛋白质怎么补充', '哪些食物热量低'] },
+      { test: /减[重肥脂瘦]|瘦身|塑形|体脂/, questions: ['减脂期怎么吃', '如何突破平台期', '增肌减脂怎么平衡'] },
+      { test: /经期|月经|生理期/, questions: ['经期饮食注意什么', '经期能运动吗', '经期如何缓解不适'] },
+      { test: /健康|养生|睡眠|喝水/, questions: ['如何改善睡眠', '每天喝多少水合适', '养成哪些好习惯'] },
+      { test: /报告|分析|总结/, questions: ['详细分析我的数据', '下周怎么调整', '我的进步如何'] },
     ];
 
-    // 遍历主题检测，收集匹配的追问
-    for (const theme of themeTests) {
-      if (theme.test.test(cleanReply)) {
-        for (const q of theme.questions) {
-          if (!suggestions.includes(q)) suggestions.push(q);
-        }
-        if (suggestions.length >= 4) break;
+    for (const t of themeTests) {
+      if (t.test.test(content)) {
+        suggestions.push(...t.questions);
+        if (suggestions.length >= 3) break;
       }
     }
 
-    // 如果 AI 回复中没有命中任何已知主题，生成通用但有意义的追问
     if (suggestions.length === 0) {
-      const userMsg = [...msgs].reverse().find(m => m.role === 'user');
-      const userText = (userMsg && userMsg.content) ? userMsg.content : '';
-      // 尝试从用户问题中提取追问方向
-      if (userText.length > 0) {
-        suggestions.push('能展开详细说说吗');
-        suggestions.push('对我有什么具体建议');
-        suggestions.push('还有其他需要注意的吗');
-      }
+      suggestions.push('今天吃了什么', '今天运动了吗', '本周体重变化', '热量缺口怎么算');
     }
 
-    if (suggestions.length > 0) {
-      const qqs = suggestions.slice(0, 4);
-      this.setData({ quickQuestions: qqs });
-      wx.setStorageSync('aiChatQuickQuestions', qqs);
-    }
+    this.setData({ quickQuestions: suggestions.slice(0, 4) });
   },
-
   onInput(e) {
     this.setData({ inputValue: e.detail.value });
   },
@@ -673,7 +602,7 @@ Page({
       } catch(e) {}
     }
     const kb = this.buildKnowledgeBase();
-    const recentMsgs = messages.slice(-10).map(m => ({ role: m.role, content: m.content }));
+    const recentMsgs = messages.slice(-3).map(m => ({ role: m.role, content: m.content }));
 
     try {
       const res = await wx.cloud.callFunction({
