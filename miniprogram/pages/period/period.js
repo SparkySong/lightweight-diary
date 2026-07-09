@@ -40,7 +40,8 @@ Page({
     avgCycleLength: 28,
     nextPeriodDate: '',
     ovulationDate: '',
-    cycleDay: 0,
+    cycleDay: 0, // 月经干净天数（日常口语）
+    cycleDayMedical: 0, // 周期第X天（医学标准）
     // UI
     showRecordPopup: false,
     recordAction: 'start', // 'start' | 'edit'
@@ -180,7 +181,8 @@ Page({
       // 预测下次经期和排卵日
       let nextPeriodDate = '';
       let ovulationDate = '';
-      let cycleDay = 0;
+      let cycleDay = 0; // 月经干净天数（日常口语）
+      let cycleDayMedical = 0; // 周期第X天（医学标准）
       if (periods.length > 0) {
         const lastStart = new Date(periods[0].startDate);
         if (!hasOngoing) {
@@ -192,23 +194,25 @@ Page({
           ovDate.setDate(ovDate.getDate() - 14);
           ovulationDate = formatDateStr(ovDate);
         }
-        // 当前周期第几天
+        // 计算两个周期天数
         const todayDate = new Date();
         const todayStr = formatDateStr(todayDate);
+        const startStr = periods[0].startDate;
+        // 医学标准：从经期开始日计算（周期第X天）
+        cycleDayMedical = Math.floor((new Date(todayStr) - new Date(startStr)) / (1000 * 60 * 60 * 24)) + 1;
         if (periods[0].endDate) {
-          // 经期已结束，从经期结束日开始计算（July 3结束，July 4就是第1天）
+          // 经期已结束，月经干净天数从结束日开始计算
           const endStr = periods[0].endDate;
           cycleDay = Math.floor((new Date(todayStr) - new Date(endStr)) / (1000 * 60 * 60 * 24));
         } else {
-          // 经期进行中，从开始日计算经期第几天
-          const startStr = periods[0].startDate;
-          cycleDay = Math.floor((new Date(todayStr) - new Date(startStr)) / (1000 * 60 * 60 * 24)) + 1;
+          // 经期进行中，月经干净天数为0
+          cycleDay = 0;
         }
       }
 
       this.setData({
         periods, hasOngoing, ongoingRecord,
-        avgCycleLength, nextPeriodDate, ovulationDate, cycleDay,
+        avgCycleLength, nextPeriodDate, ovulationDate, cycleDay, cycleDayMedical,
         loading: false
       });
       this.markCalendarDays();

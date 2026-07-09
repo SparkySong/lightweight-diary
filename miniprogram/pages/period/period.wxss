@@ -19,10 +19,12 @@
   background: #FFF; border-color: rgba(0,0,0,0.06); box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.04);
 }
 .cycle-info { display: flex; margin-bottom: 20rpx; }
-.cycle-stat { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6rpx; }
-.cycle-value { font-size: 36rpx; font-weight: 700; color: #E8878C; }
+.cycle-stat { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4rpx; }
+.cycle-value { font-size: 48rpx; font-weight: 700; color: #E8878C; line-height: 1.1; }
 .theme-light .cycle-value { color: #D4707A; }
-.cycle-label { font-size: 22rpx; color: #6B7280; }
+.cycle-ongoing { font-size: 32rpx; }
+.cycle-label { font-size: 20rpx; color: #6B7280; }
+.cycle-sublabel { font-size: 18rpx; color: #9CA3AF; }
 .cycle-predict { border-top: 1rpx solid rgba(255,255,255,0.06); padding-top: 16rpx; text-align: center; }
 .theme-light .cycle-predict { border-top-color: rgba(0,0,0,0.06); }
 .predict-text { font-size: 26rpx; color: #9CA3AF; display: block; }

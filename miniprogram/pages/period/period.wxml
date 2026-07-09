@@ -15,11 +15,14 @@
   <view class="cycle-card">
     <view class="cycle-info">
       <view class="cycle-stat">
-        <text class="cycle-value">{{cycleDay > 0 ? cycleDay : '--'}}</text>
-        <text class="cycle-label">当前周期第{{cycleDay > 0 ? cycleDay : '0'}}天</text>
+        <text class="cycle-value" wx:if="{{!hasOngoing && cycleDay > 0}}">{{cycleDay}}</text>
+        <text class="cycle-value cycle-ongoing" wx:elif="{{hasOngoing}}">经期中</text>
+        <text class="cycle-value" wx:else>--</text>
+        <text class="cycle-label">{{hasOngoing ? '进行中' : '经期已结束'}}</text>
+        <text class="cycle-sublabel" wx:if="{{!hasOngoing && cycleDayMedical > 0}}">标准周期{{cycleDayMedical}}天</text>
       </view>
       <view class="cycle-stat">
-        <text class="cycle-value">{{avgCycleLength}}天</text>
+        <text class="cycle-value">{{avgCycleLength}}</text>
         <text class="cycle-label">平均周期</text>
       </view>
     </view>
