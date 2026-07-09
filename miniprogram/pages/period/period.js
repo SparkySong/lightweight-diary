@@ -192,11 +192,18 @@ Page({
           ovDate.setDate(ovDate.getDate() - 14);
           ovulationDate = formatDateStr(ovDate);
         }
-        // 当前周期第几天（按纯日期差计算）
+        // 当前周期第几天
         const todayDate = new Date();
         const todayStr = formatDateStr(todayDate);
-        const startStr = periods[0].startDate;
-        cycleDay = Math.floor((new Date(todayStr) - new Date(startStr)) / (1000 * 60 * 60 * 24)) + 1;
+        if (periods[0].endDate) {
+          // 经期已结束，从经期结束日开始计算（July 3结束，July 4就是第1天）
+          const endStr = periods[0].endDate;
+          cycleDay = Math.floor((new Date(todayStr) - new Date(endStr)) / (1000 * 60 * 60 * 24));
+        } else {
+          // 经期进行中，从开始日计算经期第几天
+          const startStr = periods[0].startDate;
+          cycleDay = Math.floor((new Date(todayStr) - new Date(startStr)) / (1000 * 60 * 60 * 24)) + 1;
+        }
       }
 
       this.setData({
