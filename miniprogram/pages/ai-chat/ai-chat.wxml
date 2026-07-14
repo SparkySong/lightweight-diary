@@ -10,6 +10,9 @@
 />
 <page class="{{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}} {{hidePage ? 'page-hiding' : ''}}">
 
+<!-- Vant Toast -->
+<van-toast id="van-toast" />
+
 <view class="chat-page {{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}}">
 
   <!-- 消息列表区域 -->

@@ -64,7 +64,7 @@
 }
 
 .tab-bar-item.active .tab-text {
-  color: var(--color-tab-icon-active, #5FA895);
+  color: var(--color-tab-icon-active, #22C55E);
 }
 
 /* 点击反馈效果 */

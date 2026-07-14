@@ -10,10 +10,10 @@
   --color-text-secondary: #9CA3AF;    /* 次要文字：柔和灰 */
   --color-text-tertiary: #6B7280;     /* 辅助文字 */
   
-  /* 品牌主色 - 低饱和度薄荷绿/灰蓝色 */
-  --color-accent-primary: #5FA895;    /* 主色调：薄荷绿 */
-  --color-accent-secondary: #6B8E9F;  /* 辅助色：灰蓝色 */
-  --color-accent-tertiary: #7C9A8F;   /* 第三色：柔和绿 */
+  /* 品牌主色 - 清新薄荷绿 */
+  --color-accent-primary: #22C55E;    /* 主色调：薄荷绿 */
+  --color-accent-secondary: #4ADE80;  /* 辅助色：浅薄荷绿 */
+  --color-accent-tertiary: #16A34A;   /* 第三色：深薄荷绿 */
   
   --color-border: #2D2D2D;            /* 边框色 */
   
@@ -22,11 +22,11 @@
   --color-chart-bg: #1E1E1E;
   --color-input-bg: #2D2D2D;
   --color-input-border: #3D3D3D;
-  --color-button-primary: #5FA895;
+  --color-button-primary: #22C55E;
   --color-button-secondary: #2D2D2D;
   
   /* 状态颜色 - 低饱和度 */
-  --color-success: #5FA895;           /* 薄荷绿 */
+  --color-success: #22C55E;           /* 薄荷绿 */
   --color-warning: #D4A574;           /* 暖橙色替代高饱和 */
   --color-danger: #C98B8B;            /* 柔和红 */
   --color-info: #8B9DC3;              /* 淡紫色 */
@@ -34,7 +34,7 @@
   /* BMI 颜色 - 低饱和度 */
   --color-bmi-bg: #4B5563;
   --color-bmi-underweight: #6B7280;
-  --color-bmi-healthy: #5FA895;
+  --color-bmi-healthy: #22C55E;
   --color-bmi-overweight: #D4A574;
   --color-bmi-obese: #C98B8B;
   
@@ -42,11 +42,11 @@
   --color-nav-bg: #121212;
   --color-tab-bar-bg: #121212;
   --color-tab-icon: #6B7280;
-  --color-tab-icon-active: #5FA895;
+  --color-tab-icon-active: #22C55E;
   
   /* 趋势图颜色 */
-  --color-trend-line: #5FA895;
-  --color-trend-fill: rgba(95, 168, 149, 0.1);
+  --color-trend-line: #22C55E;
+  --color-trend-fill: rgba(34, 197, 94, 0.1);
   --color-grid-line: rgba(156, 163, 175, 0.15);
 }
 
@@ -60,10 +60,10 @@
   --color-text-secondary: #6B7280;    /* 次要文字 */
   --color-text-tertiary: #9CA3AF;     /* 辅助文字 */
   
-  /* 品牌主色 - 低饱和度 */
-  --color-accent-primary: #4A9B8A;    /* 主色调：薄荷绿 */
-  --color-accent-secondary: #5A7D8C;  /* 辅助色：灰蓝色 */
-  --color-accent-tertiary: #6B9080;   /* 第三色 */
+  /* 品牌主色 - 清新薄荷绿 */
+  --color-accent-primary: #22C55E;    /* 主色调：薄荷绿 */
+  --color-accent-secondary: #4ADE80;  /* 辅助色：浅薄荷绿 */
+  --color-accent-tertiary: #16A34A;   /* 第三色 */
   
   --color-border: #E5E7EB;            /* 边框色 */
   
@@ -72,11 +72,11 @@
   --color-chart-bg: #FFFFFF;
   --color-input-bg: #F0F4F3;
   --color-input-border: #E5E7EB;
-  --color-button-primary: #4A9B8A;
+  --color-button-primary: #22C55E;
   --color-button-secondary: #FFFFFF;
   
   /* 状态颜色 */
-  --color-success: #4A9B8A;
+  --color-success: #22C55E;
   --color-warning: #C49A6C;
   --color-danger: #B87B7B;
   --color-info: #7A8FB8;
@@ -84,7 +84,7 @@
   /* BMI 颜色 */
   --color-bmi-bg: #D1D5DB;
   --color-bmi-underweight: #9CA3AF;
-  --color-bmi-healthy: #4A9B8A;
+  --color-bmi-healthy: #22C55E;
   --color-bmi-overweight: #C49A6C;
   --color-bmi-obese: #B87B7B;
   
@@ -92,11 +92,11 @@
   --color-nav-bg: #F8FAF9;
   --color-tab-bar-bg: #F8FAF9;
   --color-tab-icon: #9CA3AF;
-  --color-tab-icon-active: #4A9B8A;
+  --color-tab-icon-active: #22C55E;
   
   /* 趋势图颜色 */
-  --color-trend-line: #4A9B8A;
-  --color-trend-fill: rgba(74, 155, 138, 0.1);
+  --color-trend-line: #22C55E;
+  --color-trend-fill: rgba(34, 197, 94, 0.1);
   --color-grid-line: rgba(156, 163, 175, 0.2);
 }
 

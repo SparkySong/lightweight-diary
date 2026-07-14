@@ -1,0 +1,183 @@
+@import '../common/index.wxss';
+.van-popup {
+  -webkit-overflow-scrolling: touch;
+  animation: ease both;
+  background-color: var(--van-background-2, var(--bg-card, #1E1E1E)) !important;
+  box-sizing: border-box;
+  max-height: 100%;
+  overflow-y: auto;
+  position: fixed;
+  transition-timing-function: ease;
+  color: var(--van-text-color, var(--text-primary, #F5F5F5)) !important;
+  border-radius: 24rpx !important;
+  box-shadow: 0 -8rpx 32rpx rgba(0, 0, 0, 0.2) !important;
+}
+
+.van-popup--center {
+  left: 50%;
+  top: 50%;
+  transform: translate3d(-50%, -50%, 0);
+  border-radius: 24rpx !important;
+}
+
+.van-popup--center.van-popup--round {
+  border-radius: 24rpx !important;
+}
+
+.van-popup--top {
+  left: 0;
+  top: 0;
+  width: 100%;
+}
+
+.van-popup--top.van-popup--round {
+  border-radius: 0 0 var(--popup-round-border-radius, 16px) var(--popup-round-border-radius, 16px);
+}
+
+.van-popup--right {
+  right: 0;
+  top: 50%;
+  transform: translate3d(0, -50%, 0);
+}
+
+.van-popup--right.van-popup--round {
+  border-radius: var(--popup-round-border-radius, 16px) 0 0 var(--popup-round-border-radius, 16px);
+}
+
+.van-popup--bottom {
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  border-radius: 24rpx 24rpx 0 0 !important;
+}
+
+.van-popup--bottom.van-popup--round {
+  border-radius: 24rpx 24rpx 0 0 !important;
+}
+
+.van-popup--left {
+  left: 0;
+  top: 50%;
+  transform: translate3d(0, -50%, 0);
+}
+
+.van-popup--left.van-popup--round {
+  border-radius: 0 var(--popup-round-border-radius, 16px) var(--popup-round-border-radius, 16px) 0;
+}
+
+.van-popup--bottom.van-popup--safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.van-popup--bottom.van-popup--safeTabBar,
+.van-popup--top.van-popup--safeTabBar {
+  bottom: var(--tabbar-height, 50px);
+}
+
+.van-popup--safeTop {
+  padding-top: env(safe-area-inset-top);
+}
+
+.van-popup__close-icon {
+  color: var(--text-tertiary, #6B6B6B) !important;
+  font-size: var(--popup-close-icon-size, 18px);
+  position: absolute;
+  z-index: var(--popup-close-icon-z-index, 1);
+  right: 24rpx !important;
+  top: 24rpx !important;
+  width: 48rpx !important;
+  height: 48rpx !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: var(--bg-card-secondary, #252525) !important;
+  border-radius: 50% !important;
+}
+
+.van-popup__close-icon--top-left {
+  left: var(--popup-close-icon-margin, 16px);
+  top: var(--popup-close-icon-margin, 16px);
+}
+
+.van-popup__close-icon--top-right {
+  right: var(--popup-close-icon-margin, 16px);
+  top: var(--popup-close-icon-margin, 16px);
+}
+
+.van-popup__close-icon--bottom-left {
+  left: var(--popup-close-icon-margin, 16px);
+  bottom: var(--popup-close-icon-margin, 16px);
+}
+
+.van-popup__close-icon--bottom-right {
+  right: var(--popup-close-icon-margin, 16px);
+  bottom: var(--popup-close-icon-margin, 16px);
+}
+
+/* Action Sheet 样式适配 */
+.van-popup .van-action-sheet {
+  background: var(--bg-card, #1E1E1E) !important;
+  color: var(--text-primary, #F5F5F5) !important;
+}
+
+.van-popup .van-action-sheet__header {
+  color: var(--text-primary, #F5F5F5) !important;
+  background: var(--bg-card, #1E1E1E) !important;
+}
+
+.van-popup .van-action-sheet__item {
+  color: var(--text-primary, #F5F5F5) !important;
+  background: var(--bg-card, #1E1E1E) !important;
+}
+
+.van-popup .van-action-sheet__cancel {
+  color: var(--text-secondary, #A0A0A0) !important;
+  background: var(--bg-card, #1E1E1E) !important;
+}
+
+/* 浅色主题下弹窗 - 通过page类名 */
+page.theme-light .van-popup {
+  background-color: var(--bg-card, #FFFFFF);
+  color: var(--text-primary, #1F2937);
+}
+
+page.theme-light .van-popup .van-action-sheet {
+  background: var(--bg-card, #FFFFFF) !important;
+  color: var(--text-primary, #1F2937) !important;
+}
+
+page.theme-light .van-popup .van-action-sheet__header {
+  color: var(--text-primary, #1F2937) !important;
+  background: var(--bg-card, #FFFFFF) !important;
+}
+
+page.theme-light .van-popup .van-action-sheet__item {
+  color: var(--text-primary, #1F2937) !important;
+  background: var(--bg-card, #FFFFFF) !important;
+}
+
+/* 浅色主题下弹窗 - 通过Vant theme属性 */
+.van-popup--light {
+  background-color: var(--bg-card, #FFFFFF) !important;
+  color: var(--text-primary, #1F2937) !important;
+}
+
+.van-popup--light .van-action-sheet {
+  background: var(--bg-card, #FFFFFF) !important;
+  color: var(--text-primary, #1F2937) !important;
+}
+
+.van-popup--light .van-action-sheet__header {
+  color: var(--text-primary, #1F2937) !important;
+  background: var(--bg-card, #FFFFFF) !important;
+}
+
+.van-popup--light .van-action-sheet__item {
+  color: var(--text-primary, #1F2937) !important;
+  background: var(--bg-card, #FFFFFF) !important;
+}
+
+.van-popup--light .van-popup__close-icon {
+  color: var(--text-tertiary, #9CA3AF) !important;
+  background: var(--bg-card-secondary, #F5F5F5) !important;
+}

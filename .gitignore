@@ -1,5 +1,5 @@
-cloudfunctions/*/node_modules/
-cloudfunctions/*/package-lock.json
+**/node_modules/
+**/package-lock.json
 .cloudbase/
 .qoder/
 .codebuddy/

@@ -1,6 +1,7 @@
 // pages/index/index.js
 const db = wx.cloud.database();
 const _ = db.command;
+const Toast = require('../../vant/toast/toast');
 
 const app = getApp();
 
@@ -552,7 +553,7 @@ Page({
     }
     else if (bmi < 24) { 
       category = '正常'; 
-      color = isDark ? '#5FA895' : '#4A9B8A'; 
+      color = isDark ? '#22C55E' : '#22C55E'; 
       bgColor = isDark ? 'rgba(95, 168, 149, 0.2)' : 'rgba(74, 155, 138, 0.15)';
     }
     else if (bmi < 28) { 
@@ -831,7 +832,7 @@ Page({
     const totalDiff = latest.weight - first.weight;
     const isDark = this.data.currentTheme === 'dark';
     let totalLost = '0.0', totalLostColor = isDark ? '#9CA3AF' : '#6B7280';
-    if (totalDiff < 0) { totalLost = Math.abs(totalDiff).toFixed(1); totalLostColor = isDark ? '#5FA895' : '#4A9B8A'; }
+    if (totalDiff < 0) { totalLost = Math.abs(totalDiff).toFixed(1); totalLostColor = isDark ? '#22C55E' : '#22C55E'; }
     else if (totalDiff > 0) { totalLost = `+${totalDiff.toFixed(1)}`; totalLostColor = isDark ? '#C98B8B' : '#B87B7B'; }
 
     // latest.weight 已经是正确的显示值（已经过 formatRecordsForDisplay 转换）
@@ -1018,7 +1019,7 @@ Page({
     ctx.fill();
 
     // Line - 使用 Catmull-Rom 样条曲线，确保经过每个数据点
-    ctx.setStrokeStyle(isDark ? '#5FA895' : '#4A9B8A'); 
+    ctx.setStrokeStyle(isDark ? '#22C55E' : '#22C55E'); 
     ctx.setLineWidth(2.5); 
     ctx.setLineJoin('round');
     ctx.setLineCap('round');
@@ -1060,7 +1061,7 @@ Page({
       // 内圈
       ctx.beginPath(); 
       ctx.arc(p.x, p.y, 3.5, 0, Math.PI * 2);
-      ctx.setFillStyle(isDark ? '#5FA895' : '#4A9B8A'); 
+      ctx.setFillStyle(isDark ? '#22C55E' : '#22C55E'); 
       ctx.fill();
     });
 
@@ -1253,8 +1254,7 @@ Page({
   },
 
   showToast(msg) {
-    this.setData({ toastMsg: msg, toastShow: true });
-    setTimeout(() => this.setData({ toastShow: false }), 2000);
+    Toast({ message: msg, duration: 2000 });
   },
   
   // 主题相关方法

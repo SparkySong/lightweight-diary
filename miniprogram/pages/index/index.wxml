@@ -55,50 +55,46 @@
     </view>
   </view>
 
-  <!-- Stats Cards - 简化为三列核心数据 -->
+  <!-- Stats Cards - Vant组件版 -->
   <view class="stats">
-    <view class="stat-card" bindtap="openWeightPopup" data-type="current">
-      <text class="stat-label">当前体重</text>
+    <view class="stat-card mint-card" bindtap="openWeightPopup" data-type="current">
+      <text class="stat-label mint-text-secondary">当前体重</text>
       <view class="stat-value-wrap">
-        <text class="stat-value">{{currentWeight}}</text>
-        <text class="stat-unit" wx:if="{{currentWeight !== '--'}}">{{weightUnitLabel}}</text>
+        <text class="stat-value mint-text-primary">{{currentWeight}}</text>
+        <text class="stat-unit mint-text-tertiary" wx:if="{{currentWeight !== '--'}}">{{weightUnitLabel}}</text>
       </view>
       <text class="stat-change {{lastChangeClass}}">{{lastChange}}</text>
     </view>
-    <view class="stat-card" bindtap="openWeightPopup" data-type="target">
-      <text class="stat-label">目标体重</text>
+    <view class="stat-card mint-card" bindtap="openWeightPopup" data-type="target">
+      <text class="stat-label mint-text-secondary">目标体重</text>
       <view class="stat-value-wrap">
-        <text class="stat-value">{{goalWeight || '--'}}</text>
-        <text class="stat-unit" wx:if="{{goalWeight}}">{{weightUnitLabel}}</text>
+        <text class="stat-value mint-text-primary">{{goalWeight || '--'}}</text>
+        <text class="stat-unit mint-text-tertiary" wx:if="{{goalWeight}}">{{weightUnitLabel}}</text>
       </view>
-      <text class="stat-change neutral" wx:if="{{!goalWeight}}">未设置</text>
+      <text class="stat-change mint-text-tertiary" wx:if="{{!goalWeight}}">未设置</text>
       <text class="stat-change {{goalReached ? 'down' : 'neutral'}}" wx:else>{{goalRemaining}}</text>
     </view>
-    <view class="stat-card">
-      <text class="stat-label">已减</text>
+    <view class="stat-card mint-card">
+      <text class="stat-label mint-text-secondary">已减</text>
       <view class="stat-value-wrap">
-        <text class="stat-value" style="color:{{totalLostColor}}">{{totalLost}}</text>
-        <text class="stat-unit" wx:if="{{totalLost !== '--'}}">{{weightUnitLabel}}</text>
+        <text class="stat-value mint-text-primary" style="color:{{totalLostColor}}">{{totalLost}}</text>
+        <text class="stat-unit mint-text-tertiary" wx:if="{{totalLost !== '--'}}">{{weightUnitLabel}}</text>
       </view>
-      <text class="stat-change neutral">{{daysCount}} 天</text>
+      <text class="stat-change mint-text-tertiary">{{daysCount}} 天</text>
     </view>
   </view>
 
-  <!-- BMI Card - 优化进度条设计 -->
-  <view class="card bmi-card">
+  <!-- BMI Card - Vant组件版 -->
+  <view class="mint-card bmi-card">
     <view class="card-header">
-      <view class="card-title-wrap">
-        <view class="title-icon icon-chart"></view>
-        <text class="card-title">BMI 指数</text>
-      </view>
-      <text class="bmi-badge" style="background:{{bmiBgColor}};color:{{bmiColor}}">{{bmiCategory}}</text>
+      <text class="card-title mint-text-primary">BMI 指数</text>
+      <van-tag type="{{bmiCategory === '正常' ? 'success' : 'warning'}}" size="medium">{{bmiCategory}}</van-tag>
     </view>
     <view class="bmi-content">
       <view class="bmi-value-wrap">
         <text class="bmi-number" style="color:{{bmiColor}}">{{bmiValue}}</text>
-        <text class="bmi-range">正常范围 18.5-24</text>
+        <text class="bmi-range mint-text-tertiary">正常范围 18.5-24</text>
       </view>
-      <!-- 优化后的BMI分段进度条 -->
       <view class="bmi-track">
         <view class="bmi-segment underweight"></view>
         <view class="bmi-segment normal"></view>
@@ -107,27 +103,28 @@
         <view class="bmi-indicator" wx:if="{{bmiValue !== '--'}}" style="left: {{bmiIndicatorLeft}}%;"></view>
       </view>
       <view class="bmi-labels">
-        <text class="bmi-label" data-range="偏瘦">偏瘦</text>
-        <text class="bmi-label" data-range="正常">正常</text>
-        <text class="bmi-label" data-range="偏胖">偏胖</text>
-        <text class="bmi-label" data-range="肥胖">肥胖</text>
+        <text class="bmi-label mint-text-tertiary">偏瘦</text>
+        <text class="bmi-label mint-text-tertiary">正常</text>
+        <text class="bmi-label mint-text-tertiary">偏胖</text>
+        <text class="bmi-label mint-text-tertiary">肥胖</text>
       </view>
     </view>
     <!-- Height Setting -->
     <view class="height-section">
       <view wx:if="{{height && !showHeightInput}}" class="height-display">
-        <text class="height-val">身高: {{height}} cm</text>
-        <text class="height-edit" bindtap="onEditHeight">修改</text>
+        <text class="mint-text-secondary">身高: {{height}} cm</text>
+        <text class="mint-text-accent" bindtap="onEditHeight">修改</text>
       </view>
       <view wx:else class="height-input-wrap" catchtap="stopPropagation">
-        <input id="height-input" class="height-input" type="digit" placeholder="身高 (cm)" value="{{inputHeight}}" bindinput="onHeightInput" />
-        <button id="height-btn" class="btn-sm" bindtap="onSetHeight">保存</button>
+        <van-field type="digit" placeholder="身高 (cm)" value="{{inputHeight}}" bind:input="onHeightInput" use-button-slot>
+          <van-button slot="button" size="small" type="primary" bindtap="onSetHeight">保存</van-button>
+        </van-field>
       </view>
     </view>
   </view>
 
-  <!-- 今日能量概览 -->
-  <view class="card energy-overview-card" bindtap="goToExercise">
+  <!-- 今日能量概览 - Vant组件版 -->
+  <view class="mint-card energy-overview-card" bindtap="goToExercise">
     <view class="card-header">
       <view class="card-title-wrap">
         <view class="title-icon icon-calorie-balance"></view>
@@ -168,8 +165,8 @@
     </view>
   </view>
 
-  <!-- Chart - 优化趋势图 -->
-  <view class="card chart-card">
+  <!-- Chart - Vant组件版 -->
+  <view class="mint-card chart-card">
     <view class="card-header">
       <view class="card-title-wrap">
         <view class="title-icon icon-trend"></view>
@@ -184,8 +181,8 @@
     <canvas canvas-id="chart" id="chart" class="chart-canvas" />
   </view>
 
-  <!-- Checkin - 优化打卡区域 -->
-  <view class="card checkin-card">
+  <!-- Checkin - Vant组件版 -->
+  <view class="mint-card checkin-card">
     <view class="card-title-wrap">
       <view class="title-icon icon-edit"></view>
       <text class="card-title">今日打卡</text>
@@ -200,13 +197,11 @@
       </view>
     </view>
     <!-- 打卡按钮 -->
-<button class="btn-primary btn-capsule" bindtap="onCheckin">
-  <text>打卡记录</text>
-</button>
+<van-button type="primary" round block bindtap="onCheckin">打卡记录</van-button>
   </view>
 
-  <!-- Goal - 优化目标卡片 -->
-  <view class="card goal-card" >
+  <!-- Goal - Vant组件版 -->
+  <view class="mint-card goal-card" >
     <view class="goal-header">
       <view class="card-title-wrap">
         <view class="title-icon icon-target"></view>
@@ -259,15 +254,14 @@
     </view>
   </view>
 
-  <!-- History - 优化记录列表 -->
-  <view class="card history-card">
+  <!-- History - Vant组件版 -->
+  <view class="mint-card history-card">
     <view class="card-title-wrap">
       <view class="title-icon icon-list"></view>
       <text class="card-title">打卡记录</text>
     </view>
     <view class="empty-state" wx:if="{{records.length === 0}}">
-      <view class="empty-icon icon-inbox"></view>
-      <text class="empty-text">还没有记录，开始你的第一次打卡吧</text>
+      <van-empty description="还没有记录，开始你的第一次打卡吧" />
     </view>
     
     <!-- 记录列表滚动容器 -->
@@ -311,15 +305,15 @@
       
       <!-- 加载更多提示 -->
       <view class="load-more" wx:if="{{hasMoreRecords || isLoadingMore}}">
-        <view class="loading-spinner" wx:if="{{isLoadingMore}}"></view>
-        <text class="load-more-text" wx:if="{{isLoadingMore}}">加载中...</text>
-        <text class="load-more-text" wx:elif="{{!hasMoreRecords}}">— 已加载全部 —</text>
+        <van-loading wx:if="{{isLoadingMore}}" size="24" />
+        <text class="load-more-text mint-text-tertiary" wx:if="{{isLoadingMore}}">加载中...</text>
+        <text class="load-more-text mint-text-tertiary" wx:elif="{{!hasMoreRecords}}">— 已加载全部 —</text>
       </view>
     </scroll-view>
   </view>
 
   <view class="footer">
-    <text>每天进步一点点</text>
+    <text class="mint-text-tertiary">每天进步一点点</text>
   </view>
 </view>
 
@@ -351,53 +345,57 @@
 
 <!-- 身高编辑已改为内联模式，不再需要全屏遮罩层 -->
 
-<!-- 编辑体重弹窗 -->
-<view class="edit-panel-mask {{showEditPanel ? 'show' : ''}} {{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}}" bindtap="closeEditPanel"></view>
-<view class="edit-panel {{showEditPanel ? 'show' : ''}} {{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}}">
-  <view class="edit-panel-header">
-    <view class="panel-title-wrap">
-      <view class="title-icon icon-edit"></view>
-      <text class="edit-panel-title">修改体重</text>
-    </view>
-    <text class="edit-panel-date">{{editDate}}</text>
+<!-- 编辑体重弹窗 - Vant Dialog -->
+<van-dialog
+  show="{{showEditPanel}}"
+  title="修改体重"
+  show-cancel-button
+  use-slot
+  theme="{{currentTheme === 'light' ? 'light' : 'default'}}"
+  bind:confirm="onSaveEdit"
+  bind:cancel="closeEditPanel"
+  bind:close="closeEditPanel"
+>
+  <view class="dialog-form">
+    <van-field
+      type="digit"
+      placeholder="体重 ({{weightUnitLabel}})"
+      value="{{editWeight}}"
+      bind:input="onEditWeightInput"
+      theme="{{currentTheme === 'light' ? 'light' : 'default'}}"
+    />
+    <text class="mint-text-tertiary" style="font-size: 24rpx; padding: 0 32rpx;">{{editDate}}</text>
   </view>
-  <view class="edit-panel-content">
-    <input class="edit-weight-input" type="digit" placeholder="体重 ({{weightUnitLabel}})" value="{{editWeight}}" bindinput="onEditWeightInput" confirm-type="done" bindconfirm="onSaveEdit" />
-  </view>
-  <view class="edit-panel-actions">
-    <button class="btn-cancel" bindtap="closeEditPanel">取消</button>
-    <button class="btn-save" bindtap="onSaveEdit">保存</button>
-  </view>
-</view>
+</van-dialog>
 
 <!-- Toast -->
-<view class="toast {{toastShow ? 'show' : ''}}">{{toastMsg}}</view>
+<van-toast id="van-toast" />
 </page>
 
-<!-- 体重编辑弹框 -->
-<view class="weight-popup-overlay {{weightPopupShow ? 'show' : ''}} {{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}}" bindtap="closeWeightPopup"></view>
-<view class="weight-popup {{weightPopupShow ? 'show' : ''}} {{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}}">
-  <view class="weight-popup-header">
-    <view class="popup-title-wrap">
-      <view class="title-icon {{weightPopupType === 'current' ? 'icon-edit' : 'icon-target'}}"></view>
-      <text class="weight-popup-title">{{weightPopupType === 'current' ? (currentWeight !== '--' ? '编辑当前体重' : '记录当前体重') : (goalWeight ? '编辑目标体重' : '设置目标体重')}}</text>
-    </view>
-    <view class="weight-popup-close" bindtap="closeWeightPopup">
-      <view class="icon-close"></view>
+<!-- 体重编辑弹框 - Vant Dialog -->
+<van-dialog
+  show="{{weightPopupShow}}"
+  title="{{weightPopupType === 'current' ? (currentWeight !== '--' ? '编辑当前体重' : '记录当前体重') : (goalWeight ? '编辑目标体重' : '设置目标体重')}}"
+  show-cancel-button
+  use-slot
+  theme="{{currentTheme === 'light' ? 'light' : 'default'}}"
+  bind:confirm="saveWeightPopup"
+  bind:cancel="closeWeightPopup"
+  bind:close="closeWeightPopup"
+>
+  <view class="dialog-form">
+    <van-field
+      type="digit"
+      label="{{weightPopupType === 'current' ? '当前体重' : '目标体重'}}"
+      placeholder="请输入体重"
+      value="{{weightInputValue}}"
+      bind:input="onWeightPopupInput"
+      theme="{{currentTheme === 'light' ? 'light' : 'default'}}"
+    >
+      <text slot="button" class="mint-text-tertiary">{{weightUnitLabel}}</text>
+    </van-field>
+    <view wx:if="{{weightPopupError}}" style="padding: 16rpx 32rpx;">
+      <text style="color: var(--color-error); font-size: 24rpx;">{{weightPopupError}}</text>
     </view>
   </view>
-  <view class="weight-popup-body">
-    <view class="weight-popup-input-group">
-      <text class="weight-popup-label">{{weightPopupType === 'current' ? '当前体重' : '目标体重'}}</text>
-      <view class="weight-popup-input-row">
-        <input class="weight-popup-input" type="digit" value="{{weightInputValue}}" bindinput="onWeightPopupInput" placeholder="请输入体重" />
-        <text class="weight-popup-unit">{{weightUnitLabel}}</text>
-      </view>
-    </view>
-    <view class="weight-popup-error" wx:if="{{weightPopupError}}">{{weightPopupError}}</view>
-  </view>
-  <view class="weight-popup-footer">
-    <button class="weight-popup-btn-cancel" bindtap="closeWeightPopup">取消</button>
-    <button class="weight-popup-btn-confirm" bindtap="saveWeightPopup">确认</button>
-  </view>
-</view>
+</van-dialog>

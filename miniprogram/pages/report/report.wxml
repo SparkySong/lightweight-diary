@@ -9,6 +9,9 @@
 />
 <page class="{{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}}">
 
+<!-- Vant Toast -->
+<van-toast id="van-toast" />
+
 <view class="page-container {{currentTheme === 'light' ? 'theme-light' : ''}}">
 
   <!-- Tab 切换 + 生成按钮 -->

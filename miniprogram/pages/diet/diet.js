@@ -1,5 +1,6 @@
 // pages/diet/diet.js
 const app = getApp();
+const Toast = require('../../vant/toast/toast');
 
 // 分页配置
 const PAGE_SIZE = 10;
@@ -881,8 +882,7 @@ Page({
   },
 
   showToast(msg) {
-    this.setData({ toastMsg: msg, toastShow: true });
-    setTimeout(() => this.setData({ toastShow: false }), 2000);
+    Toast({ message: msg, duration: 2000 });
   },
   
   // 跳转到热量分析页面

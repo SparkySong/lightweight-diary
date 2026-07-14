@@ -27,7 +27,7 @@
   left: 0;
   right: 0;
   height: 4rpx;
-  background: linear-gradient(90deg, #5FA895, #7BB5AD);
+  background: linear-gradient(90deg, #22C55E, #7BB5AD);
 }
 
 .intro-header {
@@ -48,7 +48,7 @@
 }
 
 .intro-icon {
-  color: #5FA895;
+  color: #22C55E;
   width: 36rpx;
   height: 36rpx;
   display: flex;
@@ -120,7 +120,7 @@
 }
 
 .category-card-lunch::before {
-  background: linear-gradient(90deg, #5FA895, #7BB5AD);
+  background: linear-gradient(90deg, #22C55E, #7BB5AD);
 }
 
 .category-card-dinner::before {
@@ -183,7 +183,7 @@
 /* 每日展示数量标签 */
 .daily-count-badge {
   font-size: 20rpx;
-  color: var(--accent-green, #5FA895);
+  color: var(--accent-green, #22C55E);
   background: rgba(95, 168, 149, 0.1);
   padding: 3rpx 12rpx;
   border-radius: 8rpx;
@@ -288,7 +288,7 @@
 }
 
 .tag-protein {
-  color: #5FA895;
+  color: #22C55E;
   background: rgba(95, 168, 149, 0.1);
 }
 
@@ -341,12 +341,12 @@
 .recipe-cal-num {
   font-size: 28rpx;
   font-weight: 700;
-  color: #5FA895;
+  color: #22C55E;
   line-height: 1;
 }
 
 .cal-wrap-breakfast .recipe-cal-num { color: #D4A574; }
-.cal-wrap-lunch .recipe-cal-num { color: #5FA895; }
+.cal-wrap-lunch .recipe-cal-num { color: #22C55E; }
 .cal-wrap-dinner .recipe-cal-num { color: #8B9EAF; }
 .cal-wrap-snack .recipe-cal-num { color: #C98B8B; }
 
@@ -359,7 +359,7 @@
 /* ========== 🎲 随机推荐按钮 ========== */
 .btn-random {
   width: 100%;
-  background: linear-gradient(135deg, #5FA895, #4A9B8A);
+  background: linear-gradient(135deg, #22C55E, #22C55E);
   border: none;
   border-radius: 50rpx;
   color: white;
@@ -453,7 +453,7 @@
   left: 0;
   right: 0;
   height: 4rpx;
-  background: linear-gradient(90deg, #5FA895, #D4A574, #8B9EAF, #C98B8B);
+  background: linear-gradient(90deg, #22C55E, #D4A574, #8B9EAF, #C98B8B);
 }
 
 /* 方案头部 */
@@ -548,7 +548,7 @@
 .plan-total-num {
   font-size: 36rpx;
   font-weight: 800;
-  color: #5FA895;
+  color: #22C55E;
   line-height: 1;
 }
 
@@ -567,7 +567,7 @@
 }
 
 .hint-good {
-  color: #5FA895;
+  color: #22C55E;
   background: rgba(95, 168, 149, 0.12);
 }
 
@@ -595,7 +595,7 @@
 }
 
 .meal-item-breakfast { border-left-color: #D4A574; }
-.meal-item-lunch { border-left-color: #5FA895; }
+.meal-item-lunch { border-left-color: #22C55E; }
 .meal-item-dinner { border-left-color: #8B9EAF; }
 .meal-item-snack { border-left-color: #C98B8B; }
 
@@ -672,12 +672,12 @@
 .plan-cal-num {
   font-size: 26rpx;
   font-weight: 700;
-  color: #5FA895;
+  color: #22C55E;
   line-height: 1;
 }
 
 .cal-dot-breakfast .plan-cal-num { color: #D4A574; }
-.cal-dot-lunch .plan-cal-num { color: #5FA895; }
+.cal-dot-lunch .plan-cal-num { color: #22C55E; }
 .cal-dot-dinner .plan-cal-num { color: #8B9EAF; }
 .cal-dot-snack .plan-cal-num { color: #C98B8B; }
 
@@ -707,7 +707,7 @@
 .reshuffle-text {
   font-size: 20rpx;
   font-weight: 600;
-  color: #5FA895;
+  color: #22C55E;
 }
 
 .reshuffle-icon {
@@ -721,7 +721,7 @@
 .icon-refresh-sm {
   width: 16rpx;
   height: 16rpx;
-  border: 2rpx solid #5FA895;
+  border: 2rpx solid #22C55E;
   border-radius: 50%;
   border-top-color: transparent;
   transform: rotate(0deg);
@@ -798,8 +798,8 @@
   left: 50%;
   transform: translate(-50%, -50%) scale(0.8);
   background: var(--card-bg, #1E1E1E);
-  border: 1rpx solid #5FA895;
-  color: #5FA895;
+  border: 1rpx solid #22C55E;
+  color: #22C55E;
   padding: 24rpx 48rpx;
   border-radius: 16rpx;
   font-size: 28rpx;
@@ -842,15 +842,15 @@
 }
 
 .theme-light .intro-icon {
-  color: #4A9B8A;
+  color: #22C55E;
 }
 
 .theme-light .icon-leaf {
-  color: #4A9B8A;
+  color: #22C55E;
 }
 
 .theme-light .intro-card::before {
-  background: linear-gradient(90deg, #4A9B8A, #6BADA0);
+  background: linear-gradient(90deg, #22C55E, #6BADA0);
 }
 
 /* 分类卡片浅色 */
@@ -868,7 +868,7 @@
 
 .theme-light .daily-count-badge {
   background: rgba(74, 155, 138, 0.08);
-  color: #4A9B8A;
+  color: #22C55E;
 }
 
 .theme-light .category-toggle {
@@ -892,7 +892,7 @@
 
 /* 标签浅色 */
 .theme-light .tag-protein {
-  color: #4A9B8A;
+  color: #22C55E;
   background: rgba(74, 155, 138, 0.08);
 }
 
@@ -923,7 +923,7 @@
 .theme-light .cal-wrap-snack { background: rgba(184, 123, 123, 0.08); }
 
 .theme-light .cal-wrap-breakfast .recipe-cal-num { color: #C49A6C; }
-.theme-light .cal-wrap-lunch .recipe-cal-num { color: #4A9B8A; }
+.theme-light .cal-wrap-lunch .recipe-cal-num { color: #22C55E; }
 .theme-light .cal-wrap-dinner .recipe-cal-num { color: #7A8E9F; }
 .theme-light .cal-wrap-snack .recipe-cal-num { color: #B87B7B; }
 
@@ -933,7 +933,7 @@
 }
 
 .theme-light .category-card-lunch::before {
-  background: linear-gradient(90deg, #4A9B8A, #6BADA0);
+  background: linear-gradient(90deg, #22C55E, #6BADA0);
 }
 
 .theme-light .category-card-dinner::before {
@@ -946,7 +946,7 @@
 
 /* 随机推荐按钮浅色 */
 .theme-light .btn-random {
-  background: linear-gradient(135deg, #4A9B8A, #3D8B7A);
+  background: linear-gradient(135deg, #22C55E, #3D8B7A);
   box-shadow: 0 6rpx 24rpx rgba(74, 155, 138, 0.25);
 }
 
@@ -974,11 +974,11 @@
 }
 
 .theme-light .plan-total-num {
-  color: #4A9B8A;
+  color: #22C55E;
 }
 
 .theme-light .hint-good {
-  color: #4A9B8A;
+  color: #22C55E;
   background: rgba(74, 155, 138, 0.1);
 }
 
@@ -1006,11 +1006,11 @@
 }
 
 .theme-light .reshuffle-text {
-  color: #4A9B8A;
+  color: #22C55E;
 }
 
 .theme-light .icon-refresh-sm {
-  border-color: #4A9B8A;
+  border-color: #22C55E;
 }
 
 .theme-light .cal-dot-breakfast { background: rgba(196, 154, 108, 0.07); }
@@ -1019,15 +1019,15 @@
 .theme-light .cal-dot-snack { background: rgba(184, 123, 123, 0.07); }
 
 .theme-light .cal-dot-breakfast .plan-cal-num { color: #C49A6C; }
-.theme-light .cal-dot-lunch .plan-cal-num { color: #4A9B8A; }
+.theme-light .cal-dot-lunch .plan-cal-num { color: #22C55E; }
 .theme-light .cal-dot-dinner .plan-cal-num { color: #7A8E9F; }
 .theme-light .cal-dot-snack .plan-cal-num { color: #B87B7B; }
 
 /* Toast 浅色 */
 .theme-light .toast {
   background: #FFFFFF;
-  border-color: #4A9B8A;
-  color: #4A9B8A;
+  border-color: #22C55E;
+  color: #22C55E;
   box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.1);
 }
 

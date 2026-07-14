@@ -9,7 +9,10 @@
     "pages/exercise/exercise",
     "pages/achievements/achievements",
     "pages/report/report",
-    "pages/period/period"
+    "pages/period/period",
+    "pages/test-theme/test-theme",
+    "pages/test-dialog-theme/test-dialog-theme",
+    "pages/test-inline-theme/test-inline-theme"
   ],
   "window": {
     "navigationBarBackgroundColor": "#121212",
@@ -22,7 +25,7 @@
   },
   "tabBar": {
     "color": "#6B7280",
-    "selectedColor": "#5FA895",
+    "selectedColor": "#22C55E",
     "backgroundColor": "#0f0f13",
     "borderStyle": "black",
     "list": [
@@ -48,5 +51,27 @@
   },
   "cloud": true,
   "sitemapLocation": "sitemap.json",
-  "darkmode": true
+  "darkmode": true,
+  "usingComponents": {
+    "van-button": "/vant/button/index",
+    "van-icon": "/vant/icon/index",
+    "van-toast": "/vant/toast/index",
+    "van-dialog": "/vant/dialog/index",
+    "van-popup": "/vant/popup/index",
+    "van-field": "/vant/field/index",
+    "van-cell": "/vant/cell/index",
+    "van-cell-group": "/vant/cell-group/index",
+    "van-tag": "/vant/tag/index",
+    "van-loading": "/vant/loading/index",
+    "van-empty": "/vant/empty/index",
+    "van-switch": "/vant/switch/index",
+    "van-slider": "/vant/slider/index",
+    "van-overlay": "/vant/overlay/index",
+    "van-transition": "/vant/transition/index",
+    "van-progress": "/vant/progress/index",
+    "van-picker": "/vant/picker/index",
+    "van-datetime-picker": "/vant/datetime-picker/index",
+    "van-stepper": "/vant/stepper/index",
+    "van-action-sheet": "/vant/action-sheet/index"
+  }
 }

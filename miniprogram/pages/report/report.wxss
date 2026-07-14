@@ -45,7 +45,7 @@
 .tab-item.tab-active {
   background: rgba(95,168,149,0.15);
   border-color: rgba(95,168,149,0.4);
-  color: #5FA895;
+  color: #22C55E;
   font-weight: 600;
 }
 
@@ -58,7 +58,7 @@
 .theme-light .tab-item.tab-active {
   background: rgba(74,155,138,0.1);
   border-color: rgba(74,155,138,0.3);
-  color: #4A9B8A;
+  color: #22C55E;
 }
 
 .generate-btn {
@@ -70,7 +70,7 @@
 
 .generate-btn text {
   font-size: 24rpx;
-  color: #5FA895;
+  color: #22C55E;
   font-weight: 500;
 }
 
@@ -79,7 +79,7 @@
 }
 
 .theme-light .generate-btn text {
-  color: #4A9B8A;
+  color: #22C55E;
 }
 
 /* 加载和空状态 */
@@ -157,7 +157,7 @@
 }
 
 .selector-active .selector-date {
-  color: #5FA895;
+  color: #22C55E;
 }
 
 .selector-type {
@@ -167,7 +167,7 @@
 }
 
 .selector-active .selector-type {
-  color: #5FA895;
+  color: #22C55E;
   font-weight: 600;
 }
 
@@ -202,11 +202,11 @@
 .report-title {
   font-size: 32rpx;
   font-weight: 600;
-  color: #5FA895;
+  color: #22C55E;
 }
 
 .theme-light .report-title {
-  color: #4A9B8A;
+  color: #22C55E;
 }
 
 .report-date {
@@ -236,7 +236,7 @@
 }
 
 .stat-value.stat-green {
-  color: #5FA895;
+  color: #22C55E;
 }
 
 .stat-value.stat-red {
@@ -248,7 +248,7 @@
 }
 
 .theme-light .stat-value.stat-green {
-  color: #4A9B8A;
+  color: #22C55E;
 }
 
 .theme-light .stat-value.stat-red {
@@ -303,12 +303,12 @@
 
 .highlight-dot {
   font-size: 20rpx;
-  color: #5FA895;
+  color: #22C55E;
   flex-shrink: 0;
 }
 
 .theme-light .highlight-dot {
-  color: #4A9B8A;
+  color: #22C55E;
 }
 
 .highlight-text {

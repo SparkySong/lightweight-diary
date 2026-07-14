@@ -61,8 +61,8 @@
 .cal-day-num { font-size: 26rpx; color: #D1D5DB; }
 .theme-light .cal-day-num { color: #4B5563; }
 .cal-empty .cal-day-num { color: transparent; }
-.cal-today .cal-day-num { color: #5FA895; font-weight: 700; }
-.theme-light .cal-today .cal-day-num { color: #4A9B8A; }
+.cal-today .cal-day-num { color: #22C55E; font-weight: 700; }
+.theme-light .cal-today .cal-day-num { color: #22C55E; }
 
 .cal-period { background: rgba(232,135,140,0.15); border-radius: 8rpx; }
 .cal-period .cal-day-num { color: #E8878C; }

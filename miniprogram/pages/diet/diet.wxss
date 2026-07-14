@@ -1,8 +1,7 @@
-/* pages/diet/diet.wxss - 现代简约健康App风格 */
+/* pages/diet/diet.wxss - Vant组件版 */
 @import "/styles/simple-theme.wxss";
 @import "/styles/theme.wxss";
 
-/* 容器基础样式 */
 .container {
   padding: 30rpx;
   padding-bottom: 100rpx;
@@ -10,7 +9,6 @@
   min-height: 100vh;
 }
 
-/* 自定义导航栏 */
 .custom-nav-area {
   position: fixed;
   top: 0;
@@ -21,11 +19,18 @@
   z-index: 9999;
 }
 
-/* Header */
+.theme-light .custom-nav-area,
+page.theme-light {
+  --nav-bg: #F8FAF9;
+}
+
+.theme-dark .custom-nav-area,
+page.theme-dark {
+  --nav-bg: #121212;
+}
+
 .header {
-  position: relative;
   padding: 20rpx 0 30rpx;
-  margin-top: 0;
 }
 
 .header-title-row {
@@ -35,574 +40,150 @@
   margin-bottom: 12rpx;
 }
 
-.header-actions {
-  display: flex;
-  gap: 20rpx;
-}
-
-.refresh-btn {
-  width: 64rpx;
-  height: 64rpx;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.08);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1rpx solid rgba(255, 255, 255, 0.12);
-  transition: all 0.2s;
-}
-
-.refresh-btn:active {
-  background: rgba(255, 255, 255, 0.12);
-  transform: scale(0.95);
-}
-
-.refresh-icon {
-  width: 24rpx;
-  height: 24rpx;
-  border: 2rpx solid currentColor;
-  border-radius: 50%;
-  border-top-color: transparent;
-  color: #9CA3AF;
-  animation: none;
-}
-
-.refresh-btn.refreshing .refresh-icon {
-  animation: rotate 1s linear infinite;
-}
-
-@keyframes rotate {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
 .title {
   font-size: 40rpx;
   font-weight: 700;
-  color: #F5F5F5;
   letter-spacing: -0.02em;
 }
 
 .subtitle {
   font-size: 24rpx;
-  color: #9CA3AF;
 }
 
-/* 热量分析入口卡片 - 优化设计 */
-.calorie-analysis-card {
+/* 入口卡片 */
+.entry-card {
   display: flex;
   align-items: center;
-  background: linear-gradient(135deg, rgba(95, 168, 149, 0.12), rgba(107, 142, 159, 0.08));
-  border: 1rpx solid rgba(95, 168, 149, 0.2);
-  border-radius: 16rpx;
-  padding: 24rpx;
-  margin-bottom: 24rpx;
-  transition: all 0.2s ease;
+  gap: 20rpx;
 }
 
-.calorie-analysis-card:active {
-  background: linear-gradient(135deg, rgba(95, 168, 149, 0.18), rgba(107, 142, 159, 0.12));
-  transform: scale(0.98);
-}
-
-.analysis-icon {
-  width: 48rpx;
-  height: 48rpx;
-  margin-right: 20rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #5FA895;
-}
-
-.icon-chart-bar {
-  width: 28rpx;
-  height: 24rpx;
-  border: 2rpx solid currentColor;
-  border-top: none;
-  border-right: none;
-  position: relative;
-}
-
-.icon-chart-bar::before {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 4rpx;
-  width: 2rpx;
-  height: 10rpx;
-  background: currentColor;
-}
-
-.icon-chart-bar::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 10rpx;
-  width: 2rpx;
-  height: 16rpx;
-  background: currentColor;
-}
-
-.analysis-content {
+.entry-content {
   flex: 1;
 }
 
-.analysis-title {
-  font-size: 28rpx;
-  font-weight: 600;
-  color: #5FA895;
-  display: block;
-  margin-bottom: 6rpx;
-}
-
-.analysis-desc {
-  font-size: 22rpx;
-  color: #9CA3AF;
-}
-
-.analysis-arrow {
-  font-size: 36rpx;
-  color: #5FA895;
-  margin-left: 16rpx;
-  font-weight: 300;
-}
-
-/* Add Section */
-.add-section {
-  margin-bottom: 24rpx;
-}
-
-.btn-add {
-  width: 100%;
-  background: #5FA895;
-  border: none;
-  border-radius: 50rpx;
-  color: white;
+.entry-title {
   font-size: 30rpx;
-  font-weight: 500;
-  padding: 24rpx 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12rpx;
-  box-shadow: 0 4rpx 16rpx rgba(95, 168, 149, 0.25);
-  transition: all 0.2s ease;
-}
-
-.btn-add::after { border: none; }
-
-.btn-add:active {
-  opacity: 0.85;
-  transform: scale(0.98);
-}
-
-.btn-icon {
-  width: 24rpx;
-  height: 24rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.icon-plus {
-  width: 20rpx;
-  height: 20rpx;
-  position: relative;
-}
-
-.icon-plus::before,
-.icon-plus::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: white;
-  border-radius: 1rpx;
-}
-
-.icon-plus::before {
-  width: 20rpx;
-  height: 3rpx;
-}
-
-.icon-plus::after {
-  width: 3rpx;
-  height: 20rpx;
-}
-
-.icon-check {
-  width: 20rpx;
-  height: 12rpx;
-  border-left: 3rpx solid white;
-  border-bottom: 3rpx solid white;
-  transform: rotate(-45deg);
-  margin-top: -4rpx;
-}
-
-/* Card */
-.card {
-  background: rgba(30, 30, 30, 0.85);
-  border-radius: 16rpx;
-  padding: 28rpx 24rpx;
-  border: 1rpx solid rgba(255, 255, 255, 0.06);
-  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.15);
-  margin-bottom: 20rpx;
-}
-
-.card-title {
-  font-size: 28rpx;
   font-weight: 600;
-  color: #F5F5F5;
+  display: block;
 }
 
-/* Add Panel */
+.entry-desc {
+  font-size: 22rpx;
+  display: block;
+  margin-top: 4rpx;
+}
+
+/* 添加区域 */
+.add-section {
+  margin: 30rpx 0;
+}
+
+/* 添加面板 */
 .add-panel {
-  border-color: rgba(212, 165, 116, 0.25);
+  margin: 20rpx 0;
 }
 
 .panel-header {
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20rpx;
+  margin-bottom: 24rpx;
 }
 
-.panel-title-wrap {
-  display: flex;
-  align-items: center;
-  gap: 12rpx;
+.panel-title {
+  font-size: 32rpx;
+  font-weight: 600;
 }
 
-.title-icon {
-  width: 32rpx;
-  height: 32rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #9CA3AF;
-}
-
-.icon-edit {
-  width: 20rpx;
-  height: 20rpx;
-  border: 2rpx solid currentColor;
-  border-radius: 2rpx;
-  position: relative;
-}
-
-.icon-edit::before {
-  content: '';
-  position: absolute;
-  top: -4rpx;
-  right: -4rpx;
-  width: 8rpx;
-  height: 8rpx;
-  background: #1E1E1E;
-  border-left: 2rpx solid currentColor;
-  transform: rotate(45deg);
-}
-
-.icon-document {
-  width: 20rpx;
-  height: 24rpx;
-  border: 2rpx solid currentColor;
-  border-radius: 2rpx;
-  position: relative;
-}
-
-.icon-document::before {
-  content: '';
-  position: absolute;
-  top: 6rpx;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 10rpx;
-  height: 2rpx;
-  background: currentColor;
-  box-shadow: 0 5rpx 0 currentColor;
-}
-
-.close-btn {
-  width: 48rpx;
-  height: 48rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  transition: all 0.2s;
-}
-
-.close-btn:active {
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.icon-close {
-  width: 20rpx;
-  height: 20rpx;
-  position: relative;
-}
-
-.icon-close::before,
-.icon-close::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 20rpx;
-  height: 2rpx;
-  background: #6B7280;
-  border-radius: 1rpx;
-}
-
-.icon-close::before { transform: translate(-50%, -50%) rotate(45deg); }
-.icon-close::after { transform: translate(-50%, -50%) rotate(-45deg); }
-
-/* Date Picker */
-.date-picker {
-  background: #2D2D2D;
-  border: 1rpx solid #3D3D3D;
-  border-radius: 12rpx;
-  padding: 18rpx 20rpx;
-  color: #F5F5F5;
-  font-size: 26rpx;
-  text-align: center;
-  margin-bottom: 20rpx;
-  font-weight: 500;
-}
-
-/* Meal Types */
+/* 餐次选择 */
 .meal-types {
   display: flex;
-  gap: 12rpx;
-  margin-bottom: 20rpx;
+  gap: 16rpx;
+  padding: 16rpx 0;
+  flex-wrap: wrap;
 }
 
-.meal-type {
-  flex: 1;
-  background: #2D2D2D;
-  border: 1rpx solid #3D3D3D;
-  border-radius: 12rpx;
-  padding: 16rpx 8rpx;
-  text-align: center;
-  font-size: 24rpx;
-  color: #9CA3AF;
-  font-weight: 500;
-  transition: all 0.2s;
-}
-
-.meal-type.selected {
-  background: rgba(212, 165, 116, 0.15);
-  border-color: #D4A574;
-  color: #D4A574;
-}
-
-/* Food List */
+/* 食物列表 */
 .food-list {
-  margin-bottom: 16rpx;
+  margin: 16rpx 0;
 }
 
 .food-item-row {
-  margin-bottom: 12rpx;
+  margin-bottom: 16rpx;
 }
 
 .food-item {
   display: flex;
-  gap: 12rpx;
   align-items: center;
+  gap: 12rpx;
 }
 
-.food-name {
-  flex: 2;
-  background: #2D2D2D;
-  border: 1rpx solid #3D3D3D;
-  border-radius: 12rpx;
-  padding: 16rpx 18rpx;
-  color: #F5F5F5;
+.cal-unit {
+  font-size: 24rpx;
+  flex-shrink: 0;
+}
+
+.add-food-btn {
   font-size: 26rpx;
+  text-align: center;
+  padding: 16rpx;
 }
 
-.food-name::placeholder { 
-  color: #6B7280; 
-  font-size: 24rpx; 
-}
-
-/* 食物搜索建议面板 */
+/* 搜索面板 */
 .food-search-panel {
-  background: #1E1E1E;
-  border: 1rpx solid rgba(212, 165, 116, 0.25);
-  border-radius: 12rpx;
+  background: var(--bg-card);
+  border: 1rpx solid var(--border-color);
+  border-radius: var(--radius-md);
   padding: 16rpx;
   margin-top: 8rpx;
-  z-index: 100;
 }
 
 .search-hint {
   font-size: 22rpx;
-  color: #6B7280;
   margin-bottom: 12rpx;
-  text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8rpx;
-}
-
-.hint-icon {
-  width: 20rpx;
-  height: 20rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.icon-hand {
-  width: 14rpx;
-  height: 18rpx;
-  border: 2rpx solid currentColor;
-  border-radius: 4rpx 4rpx 8rpx 8rpx;
-  border-top: none;
-  position: relative;
-  color: #6B7280;
-}
-
-.icon-hand::before {
-  content: '';
-  position: absolute;
-  top: -4rpx;
-  left: 2rpx;
-  width: 6rpx;
-  height: 4rpx;
-  border: 2rpx solid currentColor;
-  border-bottom: none;
-  border-radius: 3rpx 3rpx 0 0;
 }
 
 .search-results {
-  display: flex;
-  flex-direction: column;
-  gap: 8rpx;
+  max-height: 300rpx;
+  overflow-y: auto;
 }
 
 .search-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16rpx 18rpx;
-  background: #2D2D2D;
-  border-radius: 10rpx;
-  border: 1rpx solid #3D3D3D;
-  transition: all 0.2s;
+  padding: 12rpx 8rpx;
+  border-bottom: 1rpx solid var(--divider);
 }
 
-.search-item:active {
-  background: rgba(212, 165, 116, 0.12);
-  border-color: #D4A574;
+.search-item:last-child {
+  border-bottom: none;
 }
 
 .search-item-name {
   font-size: 26rpx;
-  color: #F5F5F5;
-  flex: 1;
 }
 
 .search-item-cal {
   font-size: 24rpx;
-  color: #D4A574;
-  font-weight: 600;
-  margin-left: 16rpx;
-}
-
-.food-cal {
-  flex: 1;
-  background: #2D2D2D;
-  border: 1rpx solid #3D3D3D;
-  border-radius: 12rpx;
-  padding: 16rpx 18rpx;
-  color: #F5F5F5;
-  font-size: 26rpx;
-  text-align: center;
-}
-
-.food-cal::placeholder { 
-  color: #6B7280; 
-  font-size: 24rpx; 
-}
-
-.cal-unit {
-  font-size: 24rpx;
-  color: #D4A574;
-  font-weight: 600;
-  margin-left: 8rpx;
-  white-space: nowrap;
-}
-
-.remove-food {
-  width: 48rpx;
-  height: 48rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  font-size: 32rpx;
-  color: #C98B8B;
-  transition: all 0.2s;
-}
-
-.remove-food:active {
-  background: rgba(201, 139, 139, 0.15);
-}
-
-.add-food-btn {
-  text-align: center;
-  color: #5FA895;
-  font-size: 24rpx;
-  padding: 14rpx;
-  border: 1rpx dashed #3D3D3D;
-  border-radius: 12rpx;
-  margin-top: 8rpx;
   font-weight: 500;
-  transition: all 0.2s;
-}
-
-.add-food-btn:active {
-  border-color: #5FA895;
-  background: rgba(95, 168, 149, 0.08);
 }
 
 /* 热量预览 */
 .cal-preview {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  gap: 10rpx;
-  padding: 18rpx;
-  background: rgba(212, 165, 116, 0.1);
-  border: 1rpx solid rgba(212, 165, 116, 0.2);
-  border-radius: 12rpx;
-  margin-bottom: 20rpx;
+  margin: 16rpx 0;
 }
 
-.cal-preview-label {
-  font-size: 24rpx;
-  color: #9CA3AF;
-}
-
-.cal-preview-value {
-  font-size: 30rpx;
-  color: #D4A574;
-  font-weight: 700;
-}
-
-/* Quick Add */
+/* 快捷添加 */
 .quick-add {
-  margin-bottom: 20rpx;
+  margin: 16rpx 0;
 }
 
 .quick-label {
-  font-size: 22rpx;
-  color: #6B7280;
+  font-size: 24rpx;
   display: block;
   margin-bottom: 12rpx;
 }
@@ -610,721 +191,84 @@
 .quick-items {
   display: flex;
   flex-wrap: wrap;
-  gap: 10rpx;
+  gap: 12rpx;
 }
 
-.quick-item {
-  background: #2D2D2D;
-  border: 1rpx solid #3D3D3D;
-  border-radius: 24rpx;
-  padding: 12rpx 20rpx;
-  font-size: 22rpx;
-  color: #F5F5F5;
-  font-weight: 500;
-  transition: all 0.2s;
+/* 记录列表 */
+.records-scroll {
+  margin-top: 20rpx;
 }
 
-.quick-item:active {
-  background: rgba(212, 165, 116, 0.12);
-  border-color: #D4A574;
-  color: #D4A574;
-}
-
-/* Submit */
-.btn-submit {
-  width: 100%;
-  background: #5FA895;
-  border: none;
-  border-radius: 50rpx;
-  color: white;
-  font-size: 30rpx;
-  font-weight: 500;
-  padding: 24rpx 0;
-  box-shadow: 0 4rpx 16rpx rgba(95, 168, 149, 0.25);
-  transition: all 0.2s ease;
-}
-
-.btn-submit::after { border: none; }
-
-.btn-submit:active {
-  opacity: 0.85;
-  transform: scale(0.98);
-}
-
-/* Day Group */
 .day-group {
-  margin-bottom: 24rpx;
+  margin-bottom: 30rpx;
 }
 
 .day-header {
   display: flex;
   justify-content: space-between;
-  align-items: baseline;
-  padding: 8rpx 4rpx 12rpx;
+  align-items: center;
+  padding: 16rpx 0;
 }
 
 .day-date {
-  font-size: 26rpx;
+  font-size: 28rpx;
   font-weight: 600;
-  color: #F5F5F5;
-  letter-spacing: 0.5rpx;
 }
 
 .day-total {
   font-size: 24rpx;
-  color: #D4A574;
-  font-weight: 600;
-  letter-spacing: 0.3rpx;
+  font-weight: 500;
 }
 
-/* Meal Card */
 .meal-card {
-  padding: 20rpx 24rpx;
-  margin-bottom: 12rpx;
-  background: rgba(30, 30, 30, 0.85);
-  border-radius: 16rpx;
-  border: 1rpx solid rgba(255, 255, 255, 0.06);
-  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.15);
+  margin-bottom: 16rpx;
 }
 
 .meal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12rpx;
-}
-
-.meal-type-label {
-  font-size: 26rpx;
-  font-weight: 600;
-  color: #F5F5F5;
+  margin-bottom: 16rpx;
 }
 
 .meal-actions {
   display: flex;
   align-items: center;
-  gap: 8rpx;
+  gap: 16rpx;
 }
 
 .meal-cal {
-  font-size: 22rpx;
-  color: #D4A574;
-  font-weight: 600;
-}
-
-.delete-btn {
-  width: 48rpx;
-  height: 48rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  transition: all 0.2s;
-}
-
-.delete-btn:active { 
-  background: rgba(201, 139, 139, 0.15);
-}
-
-.icon-delete {
-  width: 16rpx;
-  height: 16rpx;
-  position: relative;
-}
-
-.icon-delete::before,
-.icon-delete::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 16rpx;
-  height: 2rpx;
-  background: #6B7280;
-  border-radius: 1rpx;
-}
-
-.icon-delete::before { transform: translate(-50%, -50%) rotate(45deg); }
-.icon-delete::after { transform: translate(-50%, -50%) rotate(-45deg); }
-
-.delete-btn:active .icon-delete::before,
-.delete-btn:active .icon-delete::after {
-  background: #C98B8B;
-}
-
-/* 编辑图标 */
-.edit-icon {
-  width: 48rpx;
-  height: 48rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  transition: all 0.2s;
-}
-
-.edit-icon:active { 
-  background: rgba(95, 168, 149, 0.15);
-}
-
-.icon-edit-small {
-  width: 18rpx;
-  height: 18rpx;
-  border: 2rpx solid #6B7280;
-  border-radius: 2rpx;
-  position: relative;
-}
-
-.icon-edit-small::before {
-  content: '';
-  position: absolute;
-  top: -4rpx;
-  right: -4rpx;
-  width: 8rpx;
-  height: 8rpx;
-  background: #1E1E1E;
-  border-left: 2rpx solid #6B7280;
-  transform: rotate(45deg);
-}
-
-.edit-icon:active .icon-edit-small {
-  border-color: #5FA895;
-}
-
-.edit-icon:active .icon-edit-small::before {
-  border-left-color: #5FA895;
-  background: rgba(95, 168, 149, 0.15);
-}
-
-/* Food Tags */
-.food-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10rpx;
-}
-
-.food-tag {
-  display: flex;
-  align-items: center;
-  gap: 6rpx;
-  background: #2D2D2D;
-  border: 1rpx solid #3D3D3D;
-  border-radius: 20rpx;
-  padding: 8rpx 16rpx;
-  font-size: 22rpx;
-  color: #F5F5F5;
-}
-
-.food-tag-cal {
-  font-size: 18rpx;
-  color: #6B7280;
-}
-
-/* Empty */
-.empty-state {
-  text-align: center;
-  padding: 80rpx 20rpx;
-}
-
-.empty-icon {
-  width: 80rpx;
-  height: 80rpx;
-  margin: 0 auto 20rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0.5;
-}
-
-.icon-bowl {
-  width: 48rpx;
-  height: 40rpx;
-  border: 3rpx solid #6B7280;
-  border-radius: 0 0 24rpx 24rpx;
-  border-top: none;
-  position: relative;
-}
-
-.icon-bowl::before {
-  content: '';
-  position: absolute;
-  top: -8rpx;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 32rpx;
-  height: 8rpx;
-  border: 3rpx solid #6B7280;
-  border-bottom: none;
-  border-radius: 16rpx 16rpx 0 0;
-}
-
-.empty-text {
-  font-size: 28rpx;
-  color: #F5F5F5;
-  display: block;
-  margin-bottom: 8rpx;
+  font-size: 26rpx;
   font-weight: 500;
 }
 
-.empty-hint {
-  font-size: 24rpx;
-  color: #6B7280;
+.food-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8rpx;
 }
 
-/* Footer */
-.footer {
-  text-align: center;
-  padding: 40rpx 0 20rpx;
-  font-size: 24rpx;
-  color: #4B5563;
-}
-
-/* 记录列表滚动容器 - 隐藏滚动条 */
-.records-scroll {
-  height: calc(100vh - 400rpx);
-  margin-bottom: 20rpx;
-}
-
-/* 隐藏滚动条 */
-.records-scroll::-webkit-scrollbar {
-  display: none;
-}
-.records-scroll {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+/* 空状态 */
+.empty-state {
+  margin-top: 100rpx;
 }
 
 /* 加载更多 */
 .load-more {
   display: flex;
-  justify-content: center;
   align-items: center;
-  padding: 30rpx 0;
+  justify-content: center;
   gap: 12rpx;
+  padding: 30rpx 0;
 }
 
 .load-more-text {
   font-size: 24rpx;
-  color: #6B7280;
 }
 
-.loading-spinner {
-  width: 32rpx;
-  height: 32rpx;
-  border: 3rpx solid rgba(255, 255, 255, 0.1);
-  border-top-color: #5FA895;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-/* Toast */
-.toast {
-  position: fixed;
-  top: calc(env(safe-area-inset-top) + 100rpx);
-  left: 50%;
-  transform: translateX(-50%) translateY(-200rpx);
-  background: #1E1E1E;
-  border: 1rpx solid rgba(95, 168, 149, 0.3);
-  color: #5FA895;
-  padding: 20rpx 40rpx;
-  border-radius: 50rpx;
-  font-size: 28rpx;
-  font-weight: 500;
-  z-index: 100;
-  transition: transform 0.3s ease;
-  box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.3);
-}
-
-.toast.show { 
-  transform: translateX(-50%) translateY(0); 
-}
-
-/* ========== 浅色主题样式 ========== */
-
-/* 页面背景 */
-.theme-light {
-  --color-bg-primary: #F8FAF9;
-  --color-bg-secondary: #FFFFFF;
-  --color-bg-tertiary: #F0F4F3;
-  --color-text-primary: #1F2937;
-  --color-text-secondary: #6B7280;
-  --color-border: #E5E7EB;
-  --nav-bg: #F8FAF9;
-}
-
-/* 页面背景色 */
-.theme-light page,
-.theme-light .container {
-  background-color: #F8FAF9;
-}
-
-/* 自定义导航栏 */
-.theme-light .custom-nav-area {
-  background-color: #F8FAF9;
-}
-
-/* 通用卡片样式 */
-.theme-light .card {
-  background: #FFFFFF;
-  border-color: rgba(0, 0, 0, 0.06);
-  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.06);
-}
-
-.theme-light .meal-card {
-  background: #FFFFFF;
-  border-color: rgba(0, 0, 0, 0.06);
-  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.06);
-}
-
-/* 刷新按钮 */
-.theme-light .refresh-btn {
-  background: rgba(0, 0, 0, 0.06);
-  border-color: rgba(0, 0, 0, 0.1);
-}
-
-.theme-light .refresh-icon {
-  color: #6B7280;
-}
-
-.theme-light .add-panel {
-  border-color: rgba(196, 154, 108, 0.25);
-}
-
-.theme-light .date-picker {
-  background: #F0F4F3;
-  border-color: #E5E7EB;
-  color: #1F2937;
-}
-
-.theme-light .meal-type {
-  background: #F0F4F3;
-  border-color: #E5E7EB;
-  color: #6B7280;
-}
-
-.theme-light .meal-type.selected {
-  background: rgba(196, 154, 108, 0.12);
-  border-color: #C49A6C;
-  color: #C49A6C;
-}
-
-.theme-light .food-name {
-  background: #F0F4F3;
-  border-color: #E5E7EB;
-  color: #1F2937;
-}
-
-.theme-light .food-name::placeholder {
-  color: #9CA3AF;
-}
-
-.theme-light .food-cal {
-  background: #F0F4F3;
-  border-color: #E5E7EB;
-  color: #1F2937;
-}
-
-.theme-light .food-cal::placeholder {
-  color: #9CA3AF;
-}
-
-.theme-light .add-food-btn {
-  color: #4A9B8A;
-  border-color: #E5E7EB;
-}
-
-.theme-light .add-food-btn:active {
-  background: rgba(74, 155, 138, 0.08);
-  border-color: #4A9B8A;
-}
-
-.theme-light .food-search-panel {
-  background: #FFFFFF;
-  border-color: rgba(196, 154, 108, 0.25);
-}
-
-.theme-light .search-hint {
-  color: #6B7280;
-}
-
-.theme-light .search-results .search-item {
-  background: #F0F4F3;
-  border-color: #E5E7EB;
-}
-
-.theme-light .search-results .search-item:active {
-  background: rgba(196, 154, 108, 0.1);
-  border-color: #C49A6C;
-}
-
-.theme-light .search-item-name {
-  color: #1F2937;
-}
-
-.theme-light .search-item-cal {
-  color: #C49A6C;
-}
-
-.theme-light .cal-preview {
-  background: rgba(196, 154, 108, 0.08);
-  border-color: rgba(196, 154, 108, 0.2);
-}
-
-.theme-light .cal-preview-label {
-  color: #6B7280;
-}
-
-.theme-light .cal-preview-value {
-  color: #C49A6C;
-}
-
-.theme-light .food-tag {
-  background: #F0F4F3;
-  border-color: #E5E7EB;
-  color: #1F2937;
-}
-
-.theme-light .food-tag-cal {
-  color: #6B7280;
-}
-
-.theme-light .empty-text {
-  color: #1F2937;
-}
-
-.theme-light .empty-hint {
-  color: #6B7280;
-}
-
-.theme-light .title {
-  color: #1F2937;
-}
-
-.theme-light .subtitle {
-  color: #6B7280;
-}
-
-/* 浅色主题热量分析卡片 */
-.theme-light .calorie-analysis-card {
-  background: linear-gradient(135deg, rgba(74, 155, 138, 0.1), rgba(90, 125, 140, 0.06));
-  border-color: rgba(74, 155, 138, 0.2);
-}
-
-.theme-light .calorie-analysis-card:active {
-  background: linear-gradient(135deg, rgba(74, 155, 138, 0.15), rgba(90, 125, 140, 0.1));
-}
-
-.theme-light .analysis-title {
-  color: #4A9B8A;
-}
-
-.theme-light .analysis-arrow {
-  color: #4A9B8A;
-}
-
-.theme-light .day-date {
-  color: #1F2937;
-}
-
-.theme-light .day-total {
-  color: #C49A6C;
-}
-
-.theme-light .meal-type-label {
-  color: #1F2937;
-}
-
-.theme-light .meal-cal {
-  color: #C49A6C;
-}
-
-.theme-light .remove-food {
-  color: #B87B7B;
-}
-
-.theme-light .remove-food:active {
-  background: rgba(184, 123, 123, 0.1);
-}
-
-.theme-light .quick-item {
-  background: #F0F4F3;
-  border-color: #E5E7EB;
-  color: #1F2937;
-}
-
-.theme-light .quick-item:active {
-  background: rgba(196, 154, 108, 0.1);
-  border-color: #C49A6C;
-  color: #C49A6C;
-}
-
-.theme-light .close-btn {
-  color: #6B7280;
-}
-
-.theme-light .close-btn:active {
-  background: rgba(0, 0, 0, 0.06);
-  color: #9CA3AF;
-}
-
-.theme-light .footer {
-  color: #9CA3AF;
-}
-
-.theme-light .toast {
-  background: #FFFFFF;
-  border-color: rgba(74, 155, 138, 0.3);
-  color: #4A9B8A;
-  box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.1);
-}
-
-/* 浅色主题加载更多 */
-.theme-light .load-more-text {
-  color: #6B7280;
-}
-
-.theme-light .loading-spinner {
-  border-color: rgba(0, 0, 0, 0.1);
-  border-top-color: #4A9B8A;
-}
-
-/* 浅色主题按钮 */
-.theme-light .btn-add {
-  background: #4A9B8A;
-  box-shadow: 0 4rpx 16rpx rgba(74, 155, 138, 0.2);
-}
-
-.theme-light .btn-submit {
-  background: #4A9B8A;
-  box-shadow: 0 4rpx 16rpx rgba(74, 155, 138, 0.2);
-}
-
-/* 浅色主题删除/编辑按钮 */
-.theme-light .delete-btn {
-  color: #9CA3AF;
-}
-
-.theme-light .delete-btn:active {
-  background: rgba(184, 123, 123, 0.1);
-  color: #B87B7B;
-}
-
-.theme-light .edit-icon {
-  color: #9CA3AF;
-}
-
-.theme-light .edit-icon:active {
-  background: rgba(74, 155, 138, 0.1);
-  color: #4A9B8A;
-}
-
-/* 浅色主题输入框 placeholder */
-.theme-light .food-name::-webkit-input-placeholder {
-  color: #9CA3AF;
-}
-
-.theme-light .food-cal::-webkit-input-placeholder {
-  color: #9CA3AF;
-}
-
-/* 浅色主题记录相关 */
-.theme-light .cal-unit {
-  color: #C49A6C;
-}
-
-/* ========== AI 营养师入口卡片 ========== */
-.ai-chat-entry-card {
-  display: flex;
-  align-items: center;
-  background: linear-gradient(135deg, rgba(107, 142, 159, 0.12), rgba(95, 168, 149, 0.08));
-  border: 1rpx solid rgba(107, 142, 159, 0.2);
-  border-radius: 16rpx;
-  padding: 24rpx;
-  margin-bottom: 24rpx;
-  transition: all 0.2s;
-}
-
-.ai-chat-entry-card:active {
-  background: linear-gradient(135deg, rgba(107, 142, 159, 0.18), rgba(95, 168, 149, 0.12));
-  transform: scale(0.98);
-}
-
-.ai-entry-icon {
-  width: 48rpx;
-  height: 48rpx;
-  margin-right: 20rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-/* 简约线条 AI 图标 */
-.ai-entry-icon-line {
-  position: relative;
-  width: 44rpx; height: 44rpx;
-  display: flex; align-items: center; justify-content: center;
-}
-.ai-entry-circle {
-  position: absolute;
-  width: 40rpx; height: 40rpx;
-  border-radius: 50%;
-  border: 2rpx solid #5FA895;
-  box-sizing: border-box;
-}
-.ai-entry-l1, .ai-entry-l2 {
-  position: absolute;
-  width: 16rpx; height: 1.5rpx;
-  background: #5FA895; border-radius: 1rpx;
-}
-.ai-entry-l1 { top: 18rpx; left: 11rpx; transform: rotate(-20deg); }
-.ai-entry-l2 { bottom: 16rpx; right: 12rpx; transform: rotate(-15deg); width: 13rpx; }
-.ai-entry-d {
-  position: absolute;
-  width: 5rpx; height: 5rpx;
-  border-radius: 50%;
-  background: #5FA895;
-  bottom: 14rpx; left: 21rpx;
-}
-
-.ai-entry-content {
-  flex: 1;
-  min-width: 0;
-}
-
-.ai-entry-title {
-  font-size: 28rpx;
-  font-weight: 600;
-  color: #5FA895;
-  display: block;
-  margin-bottom: 6rpx;
-}
-
-.ai-entry-desc {
-  font-size: 22rpx;
-  color: #9CA3AF;
-  display: block;
-}
-
-/* 浅色主题 AI 卡片 */
-.theme-light .ai-chat-entry-card {
-  background: linear-gradient(135deg, rgba(90, 125, 140, 0.08), rgba(74, 155, 138, 0.06));
-  border-color: rgba(90, 125, 140, 0.15);
-}
-
-.theme-light .ai-chat-entry-card:active {
-  background: linear-gradient(135deg, rgba(90, 125, 140, 0.12), rgba(74, 155, 138, 0.1));
-}
-
-.theme-light .ai-entry-title {
-  color: #4A9B8A;
-}
-
-.theme-light .ai-entry-desc {
-  color: #6B7280;
+/* 底部 */
+.footer {
+  text-align: center;
+  padding: 40rpx 0;
+  font-size: 24rpx;
 }

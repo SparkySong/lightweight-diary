@@ -244,7 +244,7 @@ App({
     const theme = this.getTheme();
     const tabBarConfig = {
       color: theme === 'dark' ? '#8888a0' : '#868e96',
-      selectedColor: theme === 'dark' ? '#5FA895' : '#4A9B8A',
+      selectedColor: theme === 'dark' ? '#22C55E' : '#22C55E',
       backgroundColor: theme === 'dark' ? '#0f0f13' : '#ffffff',
       borderStyle: theme === 'dark' ? 'black' : 'white'
     };

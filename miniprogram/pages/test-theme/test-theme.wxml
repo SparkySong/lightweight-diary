@@ -1,0 +1,98 @@
+<page class="{{currentTheme === 'light' ? 'theme-light' : ''}}">
+  <view class="page-container">
+    <view class="header">
+      <text class="title">弹框主题测试</text>
+      <text class="subtitle">当前主题：{{currentTheme === 'dark' ? '深色' : '浅色'}}</text>
+      <view class="theme-indicator {{currentTheme === 'dark' ? 'dark' : 'light'}}">
+        <view class="indicator-dot"></view>
+      </view>
+    </view>
+
+    <view class="test-section">
+      <text class="section-title">主题切换</text>
+      <van-button type="primary" bind:click="switchTheme" block>
+        切换到{{currentTheme === 'dark' ? '浅色' : '深色'}}主题
+      </van-button>
+    </view>
+
+    <view class="test-section">
+      <text class="section-title">Dialog 弹框</text>
+      <view class="button-group">
+        <van-button type="default" bind:click="showConfirmDialog" block>
+          确认对话框
+        </van-button>
+        <van-button type="default" bind:click="showInputDialog" block>
+          输入对话框
+        </van-button>
+      </view>
+    </view>
+
+    <view class="test-section">
+      <text class="section-title">Popup 弹窗</text>
+      <van-button type="default" bind:click="showPopup" block>
+        底部弹窗
+      </van-button>
+    </view>
+
+    <view class="test-section">
+      <text class="section-title">ActionSheet</text>
+      <van-button type="default" bind:click="showActionSheet" block>
+        操作菜单
+      </van-button>
+    </view>
+
+    <!-- 确认对话框 -->
+    <van-dialog
+      show="{{showDialog && dialogType === 'confirm'}}"
+      title="确认删除"
+      message="确定要删除这条记录吗？此操作不可撤销。"
+      show-cancel-button
+      theme="{{currentTheme === 'light' ? 'light' : 'default'}}"
+      bind:confirm="onConfirmDialog"
+      bind:cancel="onCancelDialog"
+    />
+
+    <!-- 输入对话框 -->
+    <van-dialog
+      show="{{showDialog && dialogType === 'input'}}"
+      title="编辑体重"
+      show-input
+      input-type="digit"
+      placeholder="请输入体重(kg)"
+      show-cancel-button
+      theme="{{currentTheme === 'light' ? 'light' : 'default'}}"
+      bind:confirm="onCloseDialog"
+      bind:cancel="onCloseDialog"
+    />
+
+    <!-- Popup弹窗 -->
+    <van-popup
+      show="{{showPopup}}"
+      position="bottom"
+      round
+      custom-style="height: 50vh;"
+      bind:close="onClosePopup"
+    >
+      <view class="popup-content">
+        <view class="popup-header">
+          <text class="popup-title">选择操作</text>
+          <van-icon name="cross" bind:click="onClosePopup" class="close-icon" />
+        </view>
+        <view class="popup-body">
+          <van-cell title="编辑记录" is-link icon="edit" />
+          <van-cell title="分享记录" is-link icon="share" />
+          <van-cell title="删除记录" is-link icon="delete" />
+        </view>
+      </view>
+    </van-popup>
+
+    <!-- ActionSheet -->
+    <van-action-sheet
+      show="{{showActionSheet}}"
+      title="选择操作"
+      actions="{{actions}}"
+      bind:select="onActionSheetSelect"
+      bind:close="onCloseActionSheet"
+    />
+  </view>
+</page>

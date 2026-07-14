@@ -31,12 +31,12 @@
 .stats-number {
   font-size: 80rpx;
   font-weight: 700;
-  color: #5FA895;
+  color: #22C55E;
   letter-spacing: -0.03em;
 }
 
 .theme-light .stats-number {
-  color: #4A9B8A;
+  color: #22C55E;
 }
 
 .stats-total {
@@ -65,13 +65,13 @@
 
 .stats-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, #5FA895, #4A9B8A);
+  background: linear-gradient(90deg, #22C55E, #22C55E);
   border-radius: 4rpx;
   transition: width 0.5s ease;
 }
 
 .theme-light .stats-bar-fill {
-  background: linear-gradient(90deg, #4A9B8A, #3D8B7A);
+  background: linear-gradient(90deg, #22C55E, #3D8B7A);
 }
 
 /* 加载状态 */
@@ -220,13 +220,13 @@
 
 .progress-fill {
   height: 100%;
-  background: #5FA895;
+  background: #22C55E;
   border-radius: 3rpx;
   transition: width 0.5s ease;
 }
 
 .theme-light .progress-fill {
-  background: #4A9B8A;
+  background: #22C55E;
 }
 
 .progress-text {
@@ -241,12 +241,12 @@
 
 .done-text {
   font-size: 22rpx;
-  color: #5FA895;
+  color: #22C55E;
   font-weight: 500;
 }
 
 .theme-light .done-text {
-  color: #4A9B8A;
+  color: #22C55E;
 }
 
 /* 徽章解锁弹窗 */
@@ -288,7 +288,7 @@
 }
 
 .unlock-title {
-  font-size: 28rpx; color: #5FA895;
+  font-size: 28rpx; color: #22C55E;
   font-weight: 600; margin-bottom: 16rpx;
 }
 
@@ -307,13 +307,13 @@
 .unlock-btn {
   width: 360rpx; height: 80rpx;
   display: flex; align-items: center; justify-content: center;
-  background: linear-gradient(135deg, #5FA895, #4A9B8A);
+  background: linear-gradient(135deg, #22C55E, #22C55E);
   border-radius: 40rpx;
   font-size: 28rpx; color: #FFF; font-weight: 600;
 }
 
 .theme-light .unlock-btn {
-  background: linear-gradient(135deg, #4A9B8A, #3D8B7A);
+  background: linear-gradient(135deg, #22C55E, #3D8B7A);
 }
 
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }

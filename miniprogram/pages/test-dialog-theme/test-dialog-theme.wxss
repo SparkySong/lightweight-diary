@@ -1,0 +1,55 @@
+/* pages/test-dialog-theme/test-dialog-theme.wxss */
+.container {
+  padding: 40rpx;
+}
+
+.header {
+  margin-bottom: 60rpx;
+}
+
+.title {
+  font-size: 48rpx;
+  font-weight: bold;
+  color: var(--text-primary);
+  display: block;
+  margin-bottom: 16rpx;
+}
+
+.subtitle {
+  font-size: 28rpx;
+  color: var(--text-secondary);
+  display: block;
+}
+
+.test-section {
+  margin-bottom: 60rpx;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: block;
+  margin-bottom: 32rpx;
+}
+
+.theme-info {
+  background: var(--bg-card-secondary);
+  padding: 32rpx;
+  border-radius: 16rpx;
+}
+
+.info-text {
+  display: block;
+  font-size: 28rpx;
+  color: var(--text-secondary);
+  margin-bottom: 16rpx;
+}
+
+.dialog-form {
+  padding: 16rpx 0;
+}
+
+.test-text {
+  padding: 16rpx 32rpx;
+}

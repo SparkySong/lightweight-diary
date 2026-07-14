@@ -1,0 +1,149 @@
+.page-container {
+  min-height: 100vh;
+  background: var(--bg-page);
+  padding: 32rpx;
+  padding-top: 120rpx;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 48rpx;
+  position: relative;
+}
+
+.title {
+  display: block;
+  font-size: 40rpx;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 16rpx;
+}
+
+.subtitle {
+  display: block;
+  font-size: 28rpx;
+  color: var(--text-secondary);
+  margin-bottom: 16rpx;
+}
+
+.theme-indicator {
+  width: 120rpx;
+  height: 60rpx;
+  border-radius: 30rpx;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  padding: 8rpx;
+  transition: all 0.3s ease;
+}
+
+.theme-indicator.dark {
+  background: #1E1E1E;
+  border: 2rpx solid #333333;
+}
+
+.theme-indicator.light {
+  background: #FFFFFF;
+  border: 2rpx solid #E5E7EB;
+}
+
+.indicator-dot {
+  width: 44rpx;
+  height: 44rpx;
+  border-radius: 50%;
+  background: var(--color-primary);
+  transition: all 0.3s ease;
+}
+
+.theme-indicator.dark .indicator-dot {
+  transform: translateX(0);
+}
+
+.theme-indicator.light .indicator-dot {
+  transform: translateX(60rpx);
+}
+
+.test-section {
+  margin-bottom: 40rpx;
+}
+
+.section-title {
+  display: block;
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 24rpx;
+  padding-left: 16rpx;
+  border-left: 6rpx solid var(--color-primary);
+}
+
+.button-group {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.popup-content {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-card);
+}
+
+.popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 32rpx;
+  border-bottom: 1rpx solid var(--divider);
+}
+
+.popup-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.close-icon {
+  font-size: 40rpx;
+  color: var(--text-tertiary);
+  padding: 16rpx;
+  background: var(--bg-card-secondary);
+  border-radius: 50%;
+}
+
+.popup-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16rpx 0;
+}
+
+/* 浅色主题样式 */
+.theme-light .page-container {
+  background: var(--bg-page);
+}
+
+.theme-light .title {
+  color: var(--text-primary);
+}
+
+.theme-light .subtitle {
+  color: var(--text-secondary);
+}
+
+.theme-light .section-title {
+  color: var(--text-primary);
+}
+
+.theme-light .popup-content {
+  background: var(--bg-card);
+}
+
+.theme-light .popup-title {
+  color: var(--text-primary);
+}
+
+.theme-light .close-icon {
+  color: var(--text-tertiary);
+  background: var(--bg-card-secondary);
+}

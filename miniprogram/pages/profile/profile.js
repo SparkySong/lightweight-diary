@@ -1,5 +1,6 @@
 // pages/profile/profile.js
 const app = getApp();
+const Toast = require('../../vant/toast/toast');
 
 // 🔥 导入版本配置（统一管理）
 const { VERSION: CONFIG_VERSION } = require('../../config/version');
@@ -963,7 +964,6 @@ loadStats(goalWeight) {
 
   // ========== Toast ==========
   showToast(msg) {
-    this.setData({ toastMsg: msg, toastShow: true });
-    setTimeout(() => this.setData({ toastShow: false }), 2000);
+    Toast({ message: msg, duration: 2000 });
   }
 });

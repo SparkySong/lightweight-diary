@@ -212,5 +212,5 @@
 </view>
 
 <!-- Toast -->
-<view class="toast {{toastShow ? 'show' : ''}}">{{toastMsg}}</view>
+<van-toast id="van-toast" />
 </page>

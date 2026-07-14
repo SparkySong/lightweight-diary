@@ -84,12 +84,12 @@
   width: 60rpx;
   height: 60rpx;
   border-radius: 50%;
-  border: 3rpx solid #5FA895;
+  border: 3rpx solid #22C55E;
   box-sizing: border-box;
 }
 
 .theme-light .ai-icon-circle {
-  border-color: #4A9B8A;
+  border-color: #22C55E;
 }
 
 /* 内部线条：模拟"大脑/对话"的简约线条 */
@@ -98,13 +98,13 @@
   position: absolute;
   width: 22rpx;
   height: 2rpx;
-  background: #5FA895;
+  background: #22C55E;
   border-radius: 1rpx;
 }
 
 .theme-light .ai-icon-line-1,
 .theme-light .ai-icon-line-2 {
-  background: #4A9B8A;
+  background: #22C55E;
 }
 
 .ai-icon-line-1 {
@@ -126,13 +126,13 @@
   width: 6rpx;
   height: 6rpx;
   border-radius: 50%;
-  background: #5FA895;
+  background: #22C55E;
   bottom: 19rpx;
   left: 27rpx;
 }
 
 .theme-light .ai-icon-dot {
-  background: #4A9B8A;
+  background: #22C55E;
 }
 
 .user-avatar-img {
@@ -209,7 +209,7 @@
 }
 
 .bubble-user {
-  background: linear-gradient(135deg, #5FA895, #4A9B8A);
+  background: linear-gradient(135deg, #22C55E, #22C55E);
   border-radius: 24rpx 4rpx 24rpx 24rpx;
 }
 
@@ -248,22 +248,22 @@
 .bubble-rich h3 {
   font-size: 30rpx;
   font-weight: 700;
-  color: #5FA895;
+  color: #22C55E;
   margin: 20rpx 0 12rpx 0;
   padding-left: 16rpx;
-  border-left: 5rpx solid #5FA895;
+  border-left: 5rpx solid #22C55E;
   line-height: 1.4;
 }
 
 .theme-light .bubble-rich h3 {
   color: #3A8A76;
-  border-left-color: #4A9B8A;
+  border-left-color: #22C55E;
 }
 
 /* 加粗 */
 .bubble-rich strong {
   font-weight: 700;
-  color: #5FA895;
+  color: #22C55E;
 }
 .theme-light .bubble-rich strong {
   color: #3A8A76;
@@ -292,7 +292,7 @@
   width: 36rpx;
   height: 36rpx;
   background: rgba(95,168,149,0.15);
-  color: #5FA895;
+  color: #22C55E;
   font-size: 22rpx;
   font-weight: 700;
   border-radius: 50%;
@@ -328,13 +328,13 @@
   top: 18rpx;
   width: 12rpx;
   height: 12rpx;
-  background: #5FA895;
+  background: #22C55E;
   border-radius: 50%;
   opacity: 0.7;
 }
 
 .theme-light .bubble-rich .ai-ul li::before {
-  background: #4A9B8A;
+  background: #22C55E;
 }
 
 /* ========== 编辑模式 — 清晰可读 ========== */
@@ -409,7 +409,7 @@
 
 .edit-send {
   color: #fff;
-  background: linear-gradient(135deg, #5FA895, #4A9B8A);
+  background: linear-gradient(135deg, #22C55E, #22C55E);
   box-shadow: 0 4rpx 16rpx rgba(95,168,149,0.3);
 }
 
@@ -417,7 +417,7 @@
 .stream-cursor {
   display: inline-block;
   animation: cursorBlink 0.8s step-end infinite;
-  color: #5FA895;
+  color: #22C55E;
   font-weight: bold;
   margin-left: 2rpx;
 }
@@ -464,8 +464,8 @@
 
 .copy-icon-check {
   width: 16rpx; height: 10rpx;
-  border-left: 3rpx solid #5FA895;
-  border-bottom: 3rpx solid #5FA895;
+  border-left: 3rpx solid #22C55E;
+  border-bottom: 3rpx solid #22C55E;
   transform: rotate(-45deg);
 }
 
@@ -483,7 +483,7 @@
 .typing-dot {
   width: 14rpx; height: 14rpx;
   border-radius: 50%;
-  background: #5FA895;
+  background: #22C55E;
   animation: typingBounce 1.2s infinite ease-in-out;
 }
 
@@ -517,7 +517,7 @@
   border: 1rpx solid rgba(95,168,149,0.25);
   border-radius: 32rpx;
   font-size: 24rpx;
-  color: #5FA895;
+  color: #22C55E;
   white-space: nowrap;
   transition: all 0.2s;
 }
@@ -530,7 +530,7 @@
 .theme-light .quick-chip {
   background: rgba(74,155,138,0.08);
   border-color: rgba(74,155,138,0.2);
-  color: #4A9B8A;
+  color: #22C55E;
 }
 
 /* ========== 免责提示 ========== */
@@ -597,7 +597,7 @@
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0; transition: all 0.25s;
 }
-.send-btn.send-active { background: linear-gradient(135deg, #5FA895, #4A9B8A); }
+.send-btn.send-active { background: linear-gradient(135deg, #22C55E, #22C55E); }
 .send-btn:active { transform: scale(0.92); }
 .send-icon { font-size: 32rpx; color: #6B7280; transition: color 0.25s; }
 .send-active .send-icon { color: #fff; }
@@ -621,7 +621,7 @@
 .card-report-title {
   font-size: 32rpx;
   font-weight: 700;
-  color: #5FA895;
+  color: #22C55E;
 }
 
 .theme-light .card-report-title { color: #3A8A76; }
@@ -631,18 +631,18 @@
   padding: 20rpx 24rpx;
   background: rgba(95,168,149,0.06);
   border-radius: 16rpx;
-  border-left: 4rpx solid #5FA895;
+  border-left: 4rpx solid #22C55E;
 }
 
 .theme-light .card-report-section {
   background: rgba(74,155,138,0.05);
-  border-left-color: #4A9B8A;
+  border-left-color: #22C55E;
 }
 
 .card-section-title {
   font-size: 28rpx;
   font-weight: 700;
-  color: #5FA895;
+  color: #22C55E;
   margin-bottom: 12rpx;
 }
 
@@ -676,7 +676,7 @@
 .card-dietplan-title {
   font-size: 32rpx;
   font-weight: 700;
-  color: #5FA895;
+  color: #22C55E;
 }
 
 .theme-light .card-dietplan-title { color: #3A8A76; }
@@ -714,7 +714,7 @@
 .card-day-title {
   font-size: 28rpx;
   font-weight: 700;
-  color: #5FA895;
+  color: #22C55E;
   margin-bottom: 16rpx;
   padding-bottom: 12rpx;
   border-bottom: 1rpx solid rgba(95,168,149,0.15);

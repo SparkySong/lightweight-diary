@@ -1,3 +1,4 @@
+const Toast = require("../../vant/toast/toast");
 // pages/calorie-detail/calorie-detail.js
 const app = getApp();
 
@@ -727,8 +728,7 @@ Page({
   },
 
   showToast(msg) {
-    this.setData({ toastMsg: msg, toastShow: true });
-    setTimeout(() => this.setData({ toastShow: false }), 2000);
+    Toast({ message: msg, duration: 2000 });
   },
 
   // 下拉刷新

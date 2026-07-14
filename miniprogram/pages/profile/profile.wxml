@@ -10,20 +10,20 @@
 />
 <page class="{{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}} {{hidePage ? 'page-hiding' : ''}}">
 
-<!-- 全屏固定背景遮罩层：覆盖 app.json 默认底色，消除 tab 切换闪烁 -->
+<!-- 全屏固定背景遮罩层 -->
 <view class="theme-bg-fixed {{currentTheme === 'light' ? 'theme-light' : ''}}"></view>
 
 <!-- 自定义导航栏区域 -->
 <view class="custom-nav-area"></view>
 
-<view class="container {{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}}">
+<view class="container">
   <!-- 页面标题 -->
   <view class="header">
-    <text class="title">我的</text>
+    <text class="title mint-text-primary">我的</text>
   </view>
 
   <!-- 个人信息卡片 -->
-  <view class="profile-card">
+  <view class="profile-card mint-card">
     <!-- 上半部分：头像 + 昵称 + 箭头 -->
     <view class="profile-top" bindtap="onMenuItemTap" data-action="profile">
       <button class="avatar-btn" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar" catchtap="stopPropagation">
@@ -31,457 +31,280 @@
       </button>
       <view class="profile-info">
         <view class="nickname-row" catchtap="onNicknameTap">
-          <text class="profile-nickname">{{nickname}}</text>
+          <text class="profile-nickname mint-text-primary">{{nickname}}</text>
         </view>
-        <text class="profile-subtitle">点击管理个人信息</text>
+        <text class="profile-subtitle mint-text-tertiary">点击管理个人信息</text>
       </view>
-      <text class="profile-arrow">›</text>
+      <van-icon name="arrow" color="var(--text-tertiary)" size="20" />
     </view>
     <!-- 下半部分：统计数据 -->
     <view class="profile-stats">
       <view class="profile-stat-item">
-        <text class="profile-stat-value">{{daysCount}}</text>
-        <text class="profile-stat-label">打卡天数</text>
+        <text class="profile-stat-value mint-text-primary">{{daysCount}}</text>
+        <text class="profile-stat-label mint-text-tertiary">打卡天数</text>
       </view>
       <view class="profile-stat-divider"></view>
       <view class="profile-stat-item">
-        <text class="profile-stat-value">{{totalLost}}</text>
-        <text class="profile-stat-label">已减({{weightUnit === 'kg' ? 'kg' : '斤'}})</text>
+        <text class="profile-stat-value mint-text-primary">{{totalLost}}</text>
+        <text class="profile-stat-label mint-text-tertiary">已减({{weightUnit === 'kg' ? 'kg' : '斤'}})</text>
       </view>
       <view class="profile-stat-divider"></view>
       <view class="profile-stat-item">
-        <text class="profile-stat-value">{{goalRemaining}}</text>
-        <text class="profile-stat-label">距目标({{weightUnit === 'kg' ? 'kg' : '斤'}})</text>
+        <text class="profile-stat-value mint-text-primary">{{goalRemaining}}</text>
+        <text class="profile-stat-label mint-text-tertiary">距目标({{weightUnit === 'kg' ? 'kg' : '斤'}})</text>
       </view>
     </view>
   </view>
 
   <!-- 功能入口列表 -->
   <view class="menu-section">
-    <view class="menu-card">
+    <view class="mint-card" style="padding: 0; overflow: hidden;">
       <!-- 个人信息设置 -->
-      <view class="menu-item" bindtap="onMenuItemTap" data-action="profile">
-        <view class="menu-item-left">
-          <view class="menu-icon menu-icon-profile"></view>
-          <text class="menu-text">个人信息</text>
+      <van-cell title="个人信息" is-link bindtap="onMenuItemTap" data-action="profile">
+        <view slot="right-icon" class="mint-text-tertiary">
+          <text wx:if="{{currentWeight}}">{{height}}cm · {{currentWeight}}{{weightUnit === 'kg' ? 'kg' : '斤'}}</text>
+          <text wx:elif="{{height}}">{{height}}cm</text>
+          <text wx:else>未设置</text>
         </view>
-        <view class="menu-item-right">
-          <text class="menu-desc" wx:if="{{currentWeight}}">{{height}}cm · {{currentWeight}}{{weightUnit === 'kg' ? 'kg' : '斤'}}</text>
-          <text class="menu-desc" wx:elif="{{height}}">{{height}}cm</text>
-          <text class="menu-desc" wx:else>未设置</text>
-          <text class="menu-arrow">›</text>
-        </view>
-      </view>
+      </van-cell>
 
       <!-- 每日热量目标 -->
-      <view class="menu-item" bindtap="onMenuItemTap" data-action="calorieGoal">
-        <view class="menu-item-left">
-          <view class="menu-icon menu-icon-calorie"></view>
-          <text class="menu-text">热量目标</text>
-        </view>
-        <view class="menu-item-right">
-          <text class="menu-desc">{{calorieGoalDisplay}}</text>
-          <text class="menu-arrow">›</text>
-        </view>
-      </view>
+      <van-cell title="热量目标" is-link value="{{calorieGoalDisplay}}" bindtap="onMenuItemTap" data-action="calorieGoal" />
 
       <!-- 单位与偏好设置 -->
-      <view class="menu-item" bindtap="onMenuItemTap" data-action="preferences">
-        <view class="menu-item-left">
-          <view class="menu-icon menu-icon-settings"></view>
-          <text class="menu-text">偏好设置</text>
-        </view>
-        <view class="menu-item-right">
-          <text class="menu-desc">{{weightUnit === 'kg' ? '千克' : '斤'}} </text>
-          <text class="menu-arrow">›</text>
-        </view>
-      </view>
+      <van-cell title="偏好设置" is-link value="{{weightUnit === 'kg' ? '千克' : '斤'}}" bindtap="onMenuItemTap" data-action="preferences" />
 
       <!-- 深色模式设置 -->
-      <view class="menu-item" bindtap="onMenuItemTap" data-action="theme">
-        <view class="menu-item-left">
-          <view class="menu-icon menu-icon-theme"></view>
-          <text class="menu-text">主题设置</text>
-        </view>
-        <view class="menu-item-right">
-          <text class="menu-desc">{{themeDesc}}</text>
-          <text class="menu-arrow">›</text>
-        </view>
-      </view>
+      <van-cell title="主题设置" is-link value="{{themeDesc}}" bindtap="onMenuItemTap" data-action="theme" />
 
       <!-- 健康问答 -->
-      <view class="menu-item" bindtap="onMenuItemTap" data-action="aiChat">
-        <view class="menu-item-left">
-          <view class="menu-icon menu-icon-ai"></view>
-          <text class="menu-text">健康问答</text>
-        </view>
-        <view class="menu-item-right">
-          <text class="menu-desc">饮食健康分析</text>
-          <text class="menu-arrow">›</text>
-        </view>
-      </view>
+      <van-cell title="健康问答" is-link value="饮食健康分析" bindtap="onMenuItemTap" data-action="aiChat" />
 
       <!-- 我的成就 -->
-      <view class="menu-item" bindtap="onMenuItemTap" data-action="achievements">
-        <view class="menu-item-left">
-          <view class="menu-icon menu-icon-achievement">🏆</view>
-          <text class="menu-text">我的成就</text>
-        </view>
-        <view class="menu-item-right">
-          <text class="menu-desc">解锁徽章</text>
-          <text class="menu-arrow">›</text>
-        </view>
-      </view>
+      <van-cell title="我的成就" is-link value="解锁徽章" bindtap="onMenuItemTap" data-action="achievements" />
 
       <!-- 健康报告 -->
-      <view class="menu-item" bindtap="onMenuItemTap" data-action="report">
-        <view class="menu-item-left">
-          <view class="menu-icon menu-icon-report">📊</view>
-          <text class="menu-text">健康报告</text>
-        </view>
-        <view class="menu-item-right">
-          <text class="menu-desc">周报月报</text>
-          <text class="menu-arrow">›</text>
-        </view>
-      </view>
+      <van-cell title="健康报告" is-link value="周报月报" bindtap="onMenuItemTap" data-action="report" />
 
       <!-- 经期记录 -->
-      <view class="menu-item" bindtap="onMenuItemTap" data-action="period">
-        <view class="menu-item-left">
-          <view class="menu-icon menu-icon-period">🌙</view>
-          <text class="menu-text">经期记录</text>
-        </view>
-        <view class="menu-item-right">
-          <text class="menu-desc">私密健康</text>
-          <text class="menu-arrow">›</text>
-        </view>
-      </view>
+      <van-cell title="经期记录" is-link value="私密健康" bindtap="onMenuItemTap" data-action="period" />
     </view>
 
-    <view class="menu-card">
+    <view class="mint-card mint-mt-md" style="padding: 0; overflow: hidden;">
       <!-- 数据管理 -->
-      <view class="menu-item" bindtap="onMenuItemTap" data-action="dataManage">
-        <view class="menu-item-left">
-          <view class="menu-icon menu-icon-data"></view>
-          <text class="menu-text">数据管理</text>
-        </view>
-        <view class="menu-item-right">
-          <text class="menu-arrow">›</text>
-        </view>
-      </view>
+      <van-cell title="数据管理" is-link bindtap="onMenuItemTap" data-action="dataManage" />
 
       <!-- 帮助与反馈 -->
-      <view class="menu-item" bindtap="onMenuItemTap" data-action="help">
-        <view class="menu-item-left">
-          <view class="menu-icon menu-icon-help"></view>
-          <text class="menu-text">帮助与反馈</text>
-        </view>
-        <view class="menu-item-right">
-          <text class="menu-arrow">›</text>
-        </view>
-      </view>
+      <van-cell title="帮助与反馈" is-link bindtap="onMenuItemTap" data-action="help" />
 
       <!-- 关于 -->
-      <view class="menu-item" bindtap="onMenuItemTap" data-action="about">
-        <view class="menu-item-left">
-          <view class="menu-icon menu-icon-about"></view>
-          <text class="menu-text">关于我们</text>
-        </view>
-        <view class="menu-item-right">
-          <text class="menu-desc">v{{version}}</text>
-          <text class="menu-arrow">›</text>
-        </view>
-      </view>
+      <van-cell title="关于我们" is-link value="v{{version}}" bindtap="onMenuItemTap" data-action="about" />
     </view>
   </view>
 
   <!-- 底部信息 -->
   <view class="footer">
-    <text class="footer-version">轻体日记 v{{version}}</text>
+    <text class="footer-version mint-text-tertiary">轻体日记 v{{version}}</text>
     <view class="footer-links">
-      <text class="footer-link" bindtap="onLinkTap" data-url="agreement">用户协议</text>
-      <text class="footer-divider">|</text>
-      <text class="footer-link" bindtap="onLinkTap" data-url="privacy">隐私政策</text>
+      <text class="footer-link mint-text-accent" bindtap="onLinkTap" data-url="agreement">用户协议</text>
+      <text class="footer-divider mint-text-tertiary">|</text>
+      <text class="footer-link mint-text-accent" bindtap="onLinkTap" data-url="privacy">隐私政策</text>
     </view>
   </view>
 </view>
 
-<!-- ========== 弹窗区域（放在 container 外避免被遮挡） ========== -->
+<!-- ========== Vant Dialog 弹窗 ========== -->
 
 <!-- 昵称编辑弹窗 -->
-<view class="popup-overlay" wx:if="{{showNicknameEdit}}" bindtap="onCloseNicknameEdit" catchtouchmove="preventTouchMove">
-  <view class="popup-panel nickname-popup" catchtap="stopPropagation">
-    <view class="popup-header">
-      <text class="popup-title">设置昵称</text>
-      <view class="popup-close" bindtap="onCloseNicknameEdit">
-        <view class="icon-close"></view>
-      </view>
-    </view>
-    <view class="popup-body">
-      <view class="form-group">
-        <input class="form-input" type="nickname" value="{{editNickname}}" bindinput="onEditNicknameInput" placeholder="点击获取微信昵称" focus="{{showNicknameEdit}}" adjust-position="true" cursor-spacing="150" />
-      </view>
-    </view>
-    <view class="popup-footer">
-      <button class="popup-btn popup-btn-cancel" bindtap="onCloseNicknameEdit">取消</button>
-      <button class="popup-btn popup-btn-confirm" bindtap="onSaveNickname">保存</button>
-    </view>
-  </view>
-</view>
+<van-dialog
+  theme="{{currentTheme === 'light' ? 'light' : 'default'}}"
+  show="{{showNicknameEdit}}"
+  title="设置昵称"
+  show-cancel-button
+  use-slot
+  bind:confirm="onSaveNickname"
+  bind:cancel="onCloseNicknameEdit"
+  bind:close="onCloseNicknameEdit"
+>
+  <van-field
+    type="nickname"
+    value="{{editNickname}}"
+    bind:input="onEditNicknameInput"
+    placeholder="点击获取微信昵称"
+    autofocus="{{showNicknameEdit}}"
+  />
+</van-dialog>
 
 <!-- 个人信息编辑弹窗 -->
-<view class="popup-overlay" wx:if="{{showProfileEdit}}" bindtap="onPopupOverlayTap" catchtouchmove="preventTouchMove">
-  <view class="popup-panel" catchtap="stopPropagation">
-    <view class="popup-header">
-      <text class="popup-title">编辑个人信息</text>
-      <view class="popup-close" bindtap="onClosePopup">
-        <view class="icon-close"></view>
+<van-dialog
+  theme="{{currentTheme === 'light' ? 'light' : 'default'}}"
+  show="{{showProfileEdit}}"
+  title="编辑个人信息"
+  show-cancel-button
+  use-slot
+  bind:confirm="onSaveProfile"
+  bind:cancel="onClosePopup"
+  bind:close="onClosePopup"
+>
+  <view class="dialog-form">
+    <van-field label="昵称" value="{{editNickname}}" bind:input="onNicknameInput" placeholder="请输入昵称" maxlength="20" />
+    <view class="dialog-form-item">
+      <text class="dialog-label">性别</text>
+      <view class="gender-options">
+        <van-tag size="large" type="{{editGender === 'male' ? 'primary' : 'default'}}" bindtap="onGenderSelect" data-gender="male">👨 男</van-tag>
+        <van-tag size="large" type="{{editGender === 'female' ? 'primary' : 'default'}}" bindtap="onGenderSelect" data-gender="female" style="margin-left: 16rpx;">👩 女</van-tag>
       </view>
     </view>
-    <view class="popup-body">
-      <view class="form-group">
-        <text class="form-label">昵称</text>
-        <input class="form-input" value="{{editNickname}}" bindinput="onNicknameInput" placeholder="请输入昵称" maxlength="20" adjust-position="true" cursor-spacing="150" />
-      </view>
-      <view class="form-group">
-        <text class="form-label">性别</text>
-        <view class="gender-options">
-          <view class="gender-option {{editGender === 'male' ? 'gender-active' : ''}}" bindtap="onGenderSelect" data-gender="male">
-            <text>👨 男</text>
-          </view>
-          <view class="gender-option {{editGender === 'female' ? 'gender-active' : ''}}" bindtap="onGenderSelect" data-gender="female">
-            <text>👩 女</text>
-          </view>
-        </view>
-      </view>
-      <view class="form-group">
-        <text class="form-label">身高 (cm)</text>
-        <input class="form-input" type="digit" value="{{editHeight}}" bindinput="onHeightInput" placeholder="请输入身高" adjust-position="false" cursor-spacing="80" />
-      </view>
-      <view class="form-group">
-        <text class="form-label">当前体重 ({{weightUnit === 'jin' ? '斤' : 'kg'}})</text>
-        <input class="form-input" type="digit" value="{{editCurrentWeight}}" bindinput="onCurrentWeightInput" placeholder="请输入当前体重" adjust-position="false" cursor-spacing="80" />
-      </view>
-      <view class="form-group">
-        <text class="form-label">目标体重 ({{weightUnit === 'jin' ? '斤' : 'kg'}})</text>
-        <input class="form-input" type="digit" value="{{editGoalWeight}}" bindinput="onGoalWeightInput" placeholder="请输入目标体重" adjust-position="false" cursor-spacing="80" />
-      </view>
-    </view>
-    <view class="popup-footer">
-      <button class="popup-btn popup-btn-cancel" bindtap="onClosePopup">取消</button>
-      <button class="popup-btn popup-btn-confirm" bindtap="onSaveProfile">保存</button>
-    </view>
+    <van-field label="身高(cm)" type="digit" value="{{editHeight}}" bind:input="onHeightInput" placeholder="请输入身高" />
+    <van-field label="当前体重" type="digit" value="{{editCurrentWeight}}" bind:input="onCurrentWeightInput" placeholder="请输入当前体重" />
+    <van-field label="目标体重" type="digit" value="{{editGoalWeight}}" bind:input="onGoalWeightInput" placeholder="请输入目标体重" />
   </view>
-</view>
+</van-dialog>
 
 <!-- 热量目标弹窗 -->
-<view class="popup-overlay" wx:if="{{showCalorieGoal}}" bindtap="onPopupOverlayTap" catchtouchmove="preventTouchMove">
-  <view class="popup-panel" catchtap="stopPropagation">
-    <view class="popup-header">
-      <text class="popup-title">设置每日热量目标</text>
-      <view class="popup-close" bindtap="onClosePopup">
-        <view class="icon-close"></view>
-      </view>
-    </view>
-    <view class="popup-body">
-      <view class="form-group">
-        <text class="form-label">每日热量上限 (kcal)</text>
-        <input class="form-input" type="number" value="{{editCalorieGoal}}" bindinput="onCalorieGoalInput" placeholder="如 1800" adjust-position="false" cursor-spacing="80" />
-      </view>
-      <view class="form-tips">
-        <text class="form-tip">一般建议：减脂 1200-1500kcal，维持 1500-2000kcal</text>
-      </view>
-    </view>
-    <view class="popup-footer">
-      <button class="popup-btn popup-btn-cancel" bindtap="onClosePopup">取消</button>
-      <button class="popup-btn popup-btn-confirm" bindtap="onSaveCalorieGoal">保存</button>
+<van-dialog
+  theme="{{currentTheme === 'light' ? 'light' : 'default'}}"
+  show="{{showCalorieGoal}}"
+  title="设置每日热量目标"
+  show-cancel-button
+  use-slot
+  bind:confirm="onSaveCalorieGoal"
+  bind:cancel="onClosePopup"
+  bind:close="onClosePopup"
+>
+  <view class="dialog-form">
+    <van-field label="热量上限" type="number" value="{{editCalorieGoal}}" bind:input="onCalorieGoalInput" placeholder="如 1800" />
+    <view class="dialog-tips">
+      <text class="mint-text-tertiary" style="font-size: 24rpx;">一般建议：减脂 1200-1500kcal，维持 1500-2000kcal</text>
     </view>
   </view>
-</view>
+</van-dialog>
 
 <!-- 偏好设置弹窗 -->
-<view class="popup-overlay" wx:if="{{showPreferences}}" bindtap="onPopupOverlayTap" catchtouchmove="preventTouchMove">
-  <view class="popup-panel" catchtap="stopPropagation">
-    <view class="popup-header">
-      <text class="popup-title">偏好设置</text>
-      <view class="popup-close" bindtap="onClosePopup">
-        <view class="icon-close"></view>
+<van-action-sheet
+  show="{{showPreferences}}"
+  title="偏好设置"
+  bind:close="onClosePopup"
+  close-on-click-overlay
+>
+  <view class="sheet-content">
+    <view class="sheet-section">
+      <text class="sheet-label mint-text-secondary">体重单位</text>
+      <view class="sheet-options">
+        <van-tag size="large" type="{{weightUnit === 'kg' ? 'primary' : 'default'}}" bindtap="onWeightUnitChange" data-unit="kg">千克 (kg)</van-tag>
+        <van-tag size="large" type="{{weightUnit === 'jin' ? 'primary' : 'default'}}" bindtap="onWeightUnitChange" data-unit="jin" style="margin-left: 16rpx;">斤</van-tag>
       </view>
-    </view>
-    <view class="popup-body">
-      <view class="setting-group">
-        <text class="setting-label">体重单位</text>
-        <view class="setting-options">
-          <view class="setting-option {{weightUnit === 'kg' ? 'active' : ''}}" bindtap="onWeightUnitChange" data-unit="kg">
-            <text>千克 (kg)</text>
-          </view>
-          <view class="setting-option {{weightUnit === 'jin' ? 'active' : ''}}" bindtap="onWeightUnitChange" data-unit="jin">
-            <text>斤 (1斤=0.5kg)</text>
-          </view>
-        </view>
-      </view>
-    </view>
-    <view class="popup-footer">
-      <button class="popup-btn popup-btn-confirm" bindtap="onClosePopup">完成</button>
     </view>
   </view>
-</view>
+</van-action-sheet>
 
 <!-- 主题设置弹窗 -->
-<view class="popup-overlay" wx:if="{{showThemeSetting}}" bindtap="onPopupOverlayTap" catchtouchmove="preventTouchMove">
-  <view class="popup-panel" catchtap="stopPropagation">
-    <view class="popup-header">
-      <text class="popup-title">主题设置</text>
-      <view class="popup-close" bindtap="onClosePopup">
-        <view class="icon-close"></view>
-      </view>
-    </view>
-    <view class="popup-body">
-      <view class="theme-options">
-        <view class="theme-option {{themeSetting === 'system' ? 'active' : ''}}" bindtap="onSwitchTheme" data-theme="system">
-          <image class="theme-option-img" src="/images/theme-system.png" mode="aspectFit"></image>
-          <text class="theme-option-text">跟随系统</text>
-          <text class="theme-option-check" wx:if="{{themeSetting === 'system'}}">✓</text>
-        </view>
-        <view class="theme-option {{themeSetting === 'dark' ? 'active' : ''}}" bindtap="onSwitchTheme" data-theme="dark">
-          <image class="theme-option-img" src="/images/theme-moon.png" mode="aspectFit"></image>
-          <text class="theme-option-text">深色模式</text>
-          <text class="theme-option-check" wx:if="{{themeSetting === 'dark'}}">✓</text>
-        </view>
-        <view class="theme-option {{themeSetting === 'light' ? 'active' : ''}}" bindtap="onSwitchTheme" data-theme="light">
-          <image class="theme-option-img" src="/images/theme-sun.png" mode="aspectFit"></image>
-          <text class="theme-option-text">浅色模式</text>
-          <text class="theme-option-check" wx:if="{{themeSetting === 'light'}}">✓</text>
-        </view>
-      </view>
-    </view>
+<van-action-sheet
+  show="{{showThemeSetting}}"
+  title="主题设置"
+  bind:close="onClosePopup"
+  close-on-click-overlay
+>
+  <view class="sheet-content">
+    <van-cell title="跟随系统" bindtap="onSwitchTheme" data-theme="system">
+      <van-icon wx:if="{{themeSetting === 'system'}}" name="success" color="var(--color-primary)" slot="right-icon" />
+    </van-cell>
+    <van-cell title="深色模式" bindtap="onSwitchTheme" data-theme="dark">
+      <van-icon wx:if="{{themeSetting === 'dark'}}" name="success" color="var(--color-primary)" slot="right-icon" />
+    </van-cell>
+    <van-cell title="浅色模式" bindtap="onSwitchTheme" data-theme="light">
+      <van-icon wx:if="{{themeSetting === 'light'}}" name="success" color="var(--color-primary)" slot="right-icon" />
+    </van-cell>
   </view>
-</view>
+</van-action-sheet>
 
 <!-- 数据管理弹窗 -->
-<view class="popup-overlay" wx:if="{{showDataManage}}" bindtap="onPopupOverlayTap" catchtouchmove="preventTouchMove">
-  <view class="popup-panel" catchtap="stopPropagation">
-    <view class="popup-header">
-      <text class="popup-title">数据管理</text>
-      <view class="popup-close" bindtap="onClosePopup">
-        <view class="icon-close"></view>
-      </view>
-    </view>
-    <view class="popup-body">
-      <view class="data-manage-item" bindtap="onViewHistory">
-        <view class="data-manage-left">
-          <view class="data-manage-icon icon-list"></view>
-          <text class="data-manage-text">查看历史记录</text>
-        </view>
-        <text class="menu-arrow">›</text>
-      </view>
-      <view class="data-manage-item data-manage-danger" bindtap="onClearAllData">
-        <view class="data-manage-left">
-          <view class="data-manage-icon icon-trash"></view>
-          <text class="data-manage-text">清空所有数据</text>
-        </view>
-        <text class="menu-arrow">›</text>
-      </view>
-    </view>
+<van-action-sheet
+  show="{{showDataManage}}"
+  title="数据管理"
+  bind:close="onClosePopup"
+  close-on-click-overlay
+>
+  <view class="sheet-content">
+    <van-cell title="查看历史记录" is-link bindtap="onViewHistory" />
+    <van-cell title="清空所有数据" title-style="color: var(--color-error);" is-link bindtap="onClearAllData" />
   </view>
-</view>
+</van-action-sheet>
 
 <!-- 关于弹窗 -->
-<view class="popup-overlay" wx:if="{{showAbout}}" bindtap="onPopupOverlayTap" catchtouchmove="preventTouchMove">
-  <view class="popup-panel" catchtap="stopPropagation">
-    <view class="popup-header">
-      <text class="popup-title">关于我们</text>
-      <view class="popup-close" bindtap="onClosePopup">
-        <view class="icon-close"></view>
-      </view>
+<van-dialog
+  theme="{{currentTheme === 'light' ? 'light' : 'default'}}"
+  show="{{showAbout}}"
+  title="关于我们"
+  use-slot
+  bind:close="onClosePopup"
+  confirm-button-text="知道了"
+>
+  <scroll-view class="about-body" scroll-y enhanced show-scrollbar="{{false}}">
+    <image class="about-logo-img" src="/images/qingtilogo.png" mode="widthFix" />
+    <text class="about-name mint-text-primary">轻体日记</text>
+    <text class="about-version mint-text-tertiary">v{{version}}</text>
+    <text class="about-desc mint-text-secondary">一款集体重管理、饮食记录与AI健康助手于一体的智能工具，帮助你坚持记录、科学减脂，遇见更好的自己。</text>
+    <view class="about-features">
+      <text class="about-feature mint-text-secondary">体重打卡与趋势追踪</text>
+      <text class="about-feature mint-text-secondary">饮食记录与热量分析</text>
+      <text class="about-feature mint-text-secondary">AI 智能健康问答</text>
+      <text class="about-feature mint-text-secondary">BMI 计算与目标管理</text>
+      <text class="about-feature mint-text-secondary">运动记录与微信步数同步</text>
+      <text class="about-feature mint-text-secondary">深色/浅色主题切换</text>
+      <text class="about-feature mint-text-secondary">云端数据同步</text>
     </view>
-    <scroll-view class="popup-body about-body" scroll-y enhanced show-scrollbar="{{false}}">
-      <image class="about-logo-img" src="/images/qingtilogo.png" mode="widthFix" />
-      <text class="about-name">轻体日记</text>
-      <text class="about-version">v{{version}}</text>
-      <text class="about-desc">一款集体重管理、饮食记录与AI健康助手于一体的智能工具，帮助你坚持记录、科学减脂，遇见更好的自己。</text>
-      <view class="about-features">
-        <text class="about-feature">体重打卡与趋势追踪</text>
-        <text class="about-feature">饮食记录与热量分析</text>
-        <text class="about-feature">AI 智能健康问答与个性化建议</text>
-        <text class="about-feature">BMI 计算与目标管理</text>
-        <text class="about-feature">运动记录与微信步数同步</text>
-        <text class="about-feature">经期记录与周期追踪</text>
-        <text class="about-feature">成就徽章系统</text>
-        <text class="about-feature">周报/月报健康报告生成</text>
-        <text class="about-feature">深色/浅色主题切换</text>
-        <text class="about-feature">云端数据同步与安全存储</text>
-      </view>
-      <view class="about-contact">
-        <text class="about-contact-title">联系我们</text>
-        <view class="about-contact-item">
-          <text class="about-contact-icon">✉️</text>
-          <text class="about-contact-text">song970502@gmail.com</text>
-          <view class="about-copy-btn {{emailCopied ? 'copied' : ''}}" bindtap="onCopyEmail">
-            <view class="about-copy-icon" wx:if="{{!emailCopied}}"></view>
-            <view class="about-copy-check" wx:if="{{emailCopied}}"></view>
-          </view>
-        </view>
-        <button class="about-contact-btn" open-type="contact">联系客服</button>
-      </view>
-    </scroll-view>
-  </view>
-</view>
+    <view class="about-contact">
+      <text class="mint-text-secondary" style="font-size: 26rpx;">song970502@gmail.com</text>
+      <van-button size="small" type="primary" plain bindtap="onCopyEmail" style="margin-top: 16rpx;">复制邮箱</van-button>
+    </view>
+  </scroll-view>
+</van-dialog>
 
 <!-- 帮助弹窗 -->
-<view class="popup-overlay" wx:if="{{showHelp}}" bindtap="onPopupOverlayTap" catchtouchmove="preventTouchMove">
-  <view class="popup-panel" catchtap="stopPropagation">
-    <view class="popup-header">
-      <text class="popup-title">帮助与反馈</text>
-      <view class="popup-close" bindtap="onClosePopup">
-        <view class="icon-close"></view>
-      </view>
+<van-dialog
+  theme="{{currentTheme === 'light' ? 'light' : 'default'}}"
+  show="{{showHelp}}"
+  title="帮助与反馈"
+  use-slot
+  bind:close="onClosePopup"
+  confirm-button-text="知道了"
+>
+  <scroll-view class="help-body" scroll-y>
+    <view class="help-item">
+      <text class="help-q mint-text-primary">如何记录体重？</text>
+      <text class="help-a mint-text-secondary">在「打卡」页面，点击当前体重卡片或底部按钮，输入当日体重即可完成打卡。</text>
     </view>
-    <view class="popup-body help-body">
-      <view class="help-item">
-        <text class="help-q">如何记录体重？</text>
-        <text class="help-a">在「打卡」页面，点击当前体重卡片或底部按钮，输入当日体重即可完成打卡。</text>
-      </view>
-      <view class="help-item">
-        <text class="help-q">如何记录饮食？</text>
-        <text class="help-a">在「饮食」页面，点击「记录饮食」按钮，选择餐次并输入食物名称和热量即可。</text>
-      </view>
-      <view class="help-item">
-        <text class="help-q">如何设置目标体重？</text>
-        <text class="help-a">在「打卡」页面点击目标体重卡片，或在「我的」→「个人信息」中设置。</text>
-      </view>
-      <view class="help-item">
-        <text class="help-q">数据会丢失吗？</text>
-        <text class="help-a">数据保存在云端，即使更换设备也能通过同一微信账号恢复。</text>
-      </view>
-      <view class="help-feedback">
-        <text class="help-feedback-text">如有其他问题，欢迎反馈！</text>
-        <button class="help-feedback-btn" open-type="contact">联系客服</button>
-      </view>
+    <view class="help-item">
+      <text class="help-q mint-text-primary">如何记录饮食？</text>
+      <text class="help-a mint-text-secondary">在「饮食」页面，点击「记录饮食」按钮，选择餐次并输入食物名称和热量即可。</text>
     </view>
-  </view>
-</view>
+    <view class="help-item">
+      <text class="help-q mint-text-primary">如何设置目标体重？</text>
+      <text class="help-a mint-text-secondary">在「打卡」页面点击目标体重卡片，或在「我的」→「个人信息」中设置。</text>
+    </view>
+    <view class="help-item">
+      <text class="help-q mint-text-primary">数据会丢失吗？</text>
+      <text class="help-a mint-text-secondary">数据保存在云端，即使更换设备也能通过同一微信账号恢复。</text>
+    </view>
+  </scroll-view>
+</van-dialog>
 
 <!-- 协议弹窗 -->
-<view class="popup-overlay" wx:if="{{showAgreement}}" bindtap="onPopupOverlayTap" catchtouchmove="preventTouchMove">
-  <view class="popup-panel popup-panel-large" catchtap="stopPropagation">
-    <view class="popup-header">
-      <text class="popup-title">{{agreementTitle}}</text>
-      <view class="popup-close" bindtap="onClosePopup">
-        <view class="icon-close"></view>
-      </view>
-    </view>
-    <view class="popup-body agreement-body">
-      <scroll-view scroll-y class="agreement-scroll">
-        <text class="agreement-text">{{agreementContent}}</text>
-      </scroll-view>
-    </view>
-  </view>
-</view>
+<van-dialog
+  theme="{{currentTheme === 'light' ? 'light' : 'default'}}"
+  show="{{showAgreement}}"
+  title="{{agreementTitle}}"
+  use-slot
+  bind:close="onClosePopup"
+  confirm-button-text="知道了"
+>
+  <scroll-view class="agreement-scroll" scroll-y>
+    <text class="mint-text-secondary" style="font-size: 26rpx; line-height: 1.8;">{{agreementContent}}</text>
+  </scroll-view>
+</van-dialog>
 
 <!-- Toast -->
-<view class="toast {{toastShow ? 'toast-show' : ''}}" wx:if="{{toastMsg}}">
-  <text class="toast-text">{{toastMsg}}</text>
-</view>
+<van-toast id="van-toast" />
 
 </page>

@@ -1,0 +1,118 @@
+@import '../common/index.wxss';
+.van-tag {
+  align-items: center;
+  border-radius: 8rpx !important;
+  color: #fff;
+  display: inline-flex;
+  font-size: var(--tag-font-size, 12px);
+  line-height: var(--tag-line-height, 16px);
+  padding: var(--tag-padding, 0 4px);
+  position: relative;
+  font-weight: 500 !important;
+}
+
+.van-tag--default {
+  background-color: var(--bg-card-secondary, #252525);
+  color: var(--text-secondary, #A0A0A0);
+}
+
+.van-tag--default.van-tag--plain {
+  background-color: transparent;
+  color: var(--text-secondary, #A0A0A0);
+}
+
+.van-tag--default.van-tag--plain:before {
+  border-color: var(--border-color, #333333);
+}
+
+.van-tag--danger {
+  background-color: var(--color-error, #EF4444);
+}
+
+.van-tag--danger.van-tag--plain {
+  color: var(--color-error, #EF4444);
+}
+
+.van-tag--primary {
+  background-color: var(--color-primary, #22C55E);
+}
+
+.van-tag--primary.van-tag--plain {
+  color: var(--color-primary, #22C55E);
+}
+
+.van-tag--success {
+  background-color: var(--color-success, #22C55E);
+}
+
+.van-tag--success.van-tag--plain {
+  color: var(--color-success, #22C55E);
+}
+
+.van-tag--warning {
+  background-color: var(--color-warning, #F59E0B);
+}
+
+.van-tag--warning.van-tag--plain {
+  color: var(--color-warning, #F59E0B);
+}
+
+.van-tag--plain {
+  background-color: transparent;
+}
+
+.van-tag--plain:before {
+  border: 1px solid;
+  border-radius: inherit;
+  bottom: 0;
+  content: '';
+  left: 0;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.van-tag--medium {
+  padding: var(--tag-medium-padding, 2px 6px);
+}
+
+.van-tag--large {
+  border-radius: var(--tag-large-border-radius, 4px);
+  font-size: var(--tag-large-font-size, 14px);
+  padding: var(--tag-large-padding, 4px 8px);
+}
+
+.van-tag--mark {
+  border-radius: 0 var(--tag-round-border-radius, 999px) var(--tag-round-border-radius, 999px) 0;
+}
+
+.van-tag--mark:after {
+  content: '';
+  display: block;
+  width: 2px;
+}
+
+.van-tag--round {
+  border-radius: var(--tag-round-border-radius, 999px);
+}
+
+.van-tag__close {
+  margin-left: 2px;
+  min-width: 1em;
+}
+
+/* 浅色主题 */
+page.theme-light .van-tag--default {
+  background-color: var(--bg-card-secondary, #F5F5F5);
+  color: var(--text-secondary, #6B7280);
+}
+
+page.theme-light .van-tag--default.van-tag--plain {
+  background-color: transparent;
+  color: var(--text-secondary, #6B7280);
+}
+
+page.theme-light .van-tag--default.van-tag--plain:before {
+  border-color: var(--border-color, #E5E7EB);
+}

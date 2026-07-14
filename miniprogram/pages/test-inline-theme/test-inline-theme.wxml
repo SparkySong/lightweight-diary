@@ -1,0 +1,52 @@
+<!--pages/test-inline-theme/test-inline-theme.wxml-->
+<page class="{{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}}">
+  <view class="container">
+    <view class="header">
+      <text class="title">内联主题测试</text>
+      <text class="subtitle">当前主题: {{currentTheme}}</text>
+    </view>
+
+    <view class="test-section">
+      <text class="section-title">测试按钮</text>
+      <van-button type="primary" bindtap="showDialog">显示弹框</van-button>
+      <van-button type="default" bindtap="toggleTheme">切换主题</van-button>
+    </view>
+
+    <view class="theme-info">
+      <text class="info-text">页面类名: {{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}}</text>
+      <text class="info-text">弹框主题: {{currentTheme === 'light' ? 'light' : 'default'}}</text>
+    </view>
+
+    <!-- 直接测试CSS变量 -->
+    <view class="css-var-test">
+      <text class="section-title">CSS变量测试</text>
+      <view class="var-box var-bg-card">--bg-card</view>
+      <view class="var-box var-bg-page">--bg-page</view>
+      <view class="var-box var-van-dialog">--van-dialog-background</view>
+    </view>
+  </view>
+
+  <!-- 测试弹框 -->
+  <van-dialog
+    show="{{showDialog}}"
+    title="内联主题测试弹框"
+    show-cancel-button
+    use-slot
+    theme="{{currentTheme === 'light' ? 'light' : 'default'}}"
+    bind:confirm="onConfirm"
+    bind:cancel="onCancel"
+    bind:close="hideDialog"
+  >
+    <view class="dialog-form">
+      <van-field
+        type="text"
+        label="测试输入"
+        placeholder="请输入内容"
+        theme="{{currentTheme === 'light' ? 'light' : 'default'}}"
+      />
+      <view class="test-text">
+        <text class="mint-text-secondary">这是一段测试文字，用于验证主题颜色</text>
+      </view>
+    </view>
+  </van-dialog>
+</page>

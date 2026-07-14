@@ -1,0 +1,189 @@
+/* ============================================================
+   薄荷健康风格设计系统 - Design System
+   ============================================================ */
+
+/* ---------- 基础变量 ---------- */
+page {
+  /* 主色调 - 薄荷绿 (更亮更清新的绿色) */
+  --color-primary: #22C55E;
+  --color-primary-light: #4ADE80;
+  --color-primary-dark: #16A34A;
+  --color-primary-bg: rgba(34, 197, 94, 0.1);
+  
+  /* 语义色 */
+  --color-success: #22C55E;
+  --color-warning: #F59E0B;
+  --color-error: #EF4444;
+  --color-info: #3B82F6;
+  
+  /* 间距系统 - 8rpx基准 */
+  --spacing-xs: 8rpx;
+  --spacing-sm: 16rpx;
+  --spacing-md: 24rpx;
+  --spacing-lg: 32rpx;
+  --spacing-xl: 40rpx;
+  --spacing-2xl: 48rpx;
+  
+  /* 圆角系统 */
+  --radius-sm: 8rpx;
+  --radius-md: 16rpx;
+  --radius-lg: 24rpx;
+  --radius-xl: 32rpx;
+  --radius-full: 999rpx;
+  
+  /* 阴影系统 */
+  --shadow-sm: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4rpx 16rpx rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8rpx 32rpx rgba(0, 0, 0, 0.12);
+  
+  /* 字体系统 */
+  --font-size-xs: 20rpx;
+  --font-size-sm: 24rpx;
+  --font-size-md: 28rpx;
+  --font-size-lg: 32rpx;
+  --font-size-xl: 36rpx;
+  --font-size-2xl: 40rpx;
+  --font-size-3xl: 48rpx;
+  
+  /* 动画 */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.3s ease;
+  --transition-slow: 0.5s ease;
+}
+
+/* ---------- 深色主题（默认） ---------- */
+page {
+  --bg-page: #121212;
+  --bg-card: #1E1E1E;
+  --bg-card-secondary: #252525;
+  --bg-input: #2A2A2A;
+  --bg-hover: #333333;
+  
+  --text-primary: #F5F5F5;
+  --text-secondary: #A0A0A0;
+  --text-tertiary: #6B6B6B;
+  --text-placeholder: #555555;
+  
+  --border-color: #333333;
+  --border-light: #2A2A2A;
+  
+  --divider: #2A2A2A;
+}
+
+/* ---------- 浅色主题 ---------- */
+page.theme-light {
+  --bg-page: #F8FAF9;
+  --bg-card: #FFFFFF;
+  --bg-card-secondary: #F5F5F5;
+  --bg-input: #F0F0F0;
+  --bg-hover: #E8E8E8;
+  
+  --text-primary: #1F2937;
+  --text-secondary: #6B7280;
+  --text-tertiary: #9CA3AF;
+  --text-placeholder: #D1D5DB;
+  
+  --border-color: #E5E7EB;
+  --border-light: #F3F4F6;
+  
+  --divider: #F3F4F6;
+  
+  --shadow-sm: 0 2rpx 8rpx rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4rpx 16rpx rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 8rpx 32rpx rgba(0, 0, 0, 0.15);
+}
+
+/* 浅色主题下的Vant组件变量 - 全局作用域 */
+page.theme-light {
+  --van-dialog-background: #FFFFFF;
+  --van-dialog-text-color: #1F2937;
+  --van-background: #F8FAF9;
+  --van-background-2: #FFFFFF;
+  --van-text-color: #1F2937;
+  --van-text-color-2: #6B7280;
+  --van-text-color-3: #9CA3AF;
+  --van-border-color: #E5E7EB;
+  
+  /* 确保浅色主题下的Vant组件样式正确 */
+  --van-button-primary-background: #22C55E;
+  --van-button-primary-border-color: #22C55E;
+  --van-cell-background: #FFFFFF;
+  --van-field-background: #F0F0F0;
+  --van-field-input-text-color: #1F2937;
+  --van-field-placeholder-color: #D1D5DB;
+}
+
+/* ---------- Vant主题覆盖 ---------- */
+page {
+  --van-primary-color: #22C55E;
+  --van-success-color: #22C55E;
+  --van-warning-color: #F59E0B;
+  --van-danger-color: #EF4444;
+  
+  --van-text-color: var(--text-primary);
+  --van-text-color-2: var(--text-secondary);
+  --van-text-color-3: var(--text-tertiary);
+  
+  --van-background: var(--bg-page);
+  --van-background-2: var(--bg-card);
+  
+  --van-border-color: var(--border-color);
+  --van-active-color: var(--bg-hover);
+  
+  /* 按钮 */
+  --van-button-primary-background: var(--color-primary);
+  --van-button-primary-border-color: var(--color-primary);
+  
+  /* 单元格 */
+  --van-cell-background: var(--bg-card);
+  --van-cell-text-color: var(--text-primary);
+  --van-cell-label-color: var(--text-secondary);
+  --van-cell-border-color: var(--border-light);
+  
+  /* 弹窗 */
+  --van-dialog-background: var(--bg-card);
+  --van-dialog-text-color: var(--text-primary);
+  
+  /* Toast */
+  --van-toast-background: rgba(0, 0, 0, 0.85);
+  --van-toast-text-color: #FFFFFF;
+  
+  /* 输入框 */
+  --van-field-input-text-color: var(--text-primary);
+  --van-field-placeholder-color: var(--text-placeholder);
+  --van-field-background: var(--bg-input);
+}
+
+/* ---------- 通用工具类 ---------- */
+
+/* 卡片 */
+.mint-card {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.mint-card-secondary {
+  background: var(--bg-card-secondary);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+}
+
+/* 文字 */
+.mint-text-primary { color: var(--text-primary); }
+.mint-text-secondary { color: var(--text-secondary); }
+.mint-text-tertiary { color: var(--text-tertiary); }
+.mint-text-accent { color: var(--color-primary); }
+
+/* 间距 */
+.mint-mb-xs { margin-bottom: var(--spacing-xs); }
+.mint-mb-sm { margin-bottom: var(--spacing-sm); }
+.mint-mb-md { margin-bottom: var(--spacing-md); }
+.mint-mb-lg { margin-bottom: var(--spacing-lg); }
+.mint-mt-xs { margin-top: var(--spacing-xs); }
+.mint-mt-sm { margin-top: var(--spacing-sm); }
+.mint-mt-md { margin-top: var(--spacing-md); }
+.mint-mt-lg { margin-top: var(--spacing-lg); }
+.mint-px-md { padding-left: var(--spacing-md); padding-right: var(--spacing-md); }
+.mint-py-md { padding-top: var(--spacing-md); padding-bottom: var(--spacing-md); }

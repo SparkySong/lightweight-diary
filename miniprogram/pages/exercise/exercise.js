@@ -1,6 +1,7 @@
 // pages/exercise/exercise.js
 const app = getApp();
 const db = wx.cloud.database();
+const Toast = require('../../vant/toast/toast');
 
 const getInitTheme = () => {
   const themeSetting = wx.getStorageSync('appTheme') || 'system';
@@ -443,8 +444,7 @@ Page({
   },
 
   showToast(msg) {
-    this.setData({ toastMsg: msg, toastShow: true });
-    setTimeout(() => this.setData({ toastShow: false }), 2000);
+    Toast({ message: msg, duration: 2000 });
   },
 
   goBack() {

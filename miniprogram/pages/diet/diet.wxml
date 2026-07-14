@@ -1,5 +1,4 @@
 <!--pages/diet/diet.wxml-->
-<!-- 页面元信息，用于动态设置背景色和下拉刷新样式（必须作为页面第一个节点）-->
 <page-meta
   background-text-style="{{currentTheme === 'light' ? 'dark' : 'light'}}"
   background-color="{{currentTheme === 'light' ? '#F8FAF9' : '#121212'}}"
@@ -10,82 +9,65 @@
 />
 <page class="{{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}} {{hidePage ? 'page-hiding' : ''}}">
 
-<!-- 全屏固定背景遮罩层：覆盖 app.json 默认底色，消除 tab 切换闪烁 -->
 <view class="theme-bg-fixed {{currentTheme === 'light' ? 'theme-light' : ''}}"></view>
-
-<!-- 自定义导航栏区域（完全隐藏原生状态栏，用背景色覆盖） -->
 <view class="custom-nav-area"></view>
 
-<view class="container {{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}}">
+<view class="container">
   <!-- Header -->
   <view class="header">
     <view class="header-title-row">
-      <text class="title">饮食记录</text>
-      <view class="header-actions">
-      </view>
+      <text class="title mint-text-primary">饮食记录</text>
     </view>
-    <text class="subtitle">管住嘴，迈开腿</text>
+    <text class="subtitle mint-text-secondary">管住嘴，迈开腿</text>
   </view>
 
   <!-- 热量分析入口卡片 -->
-  <view class="calorie-analysis-card" bindtap="goToCalorieAnalysis">
-    <view class="analysis-icon">
-      <view class="icon-chart-bar"></view>
+  <view class="mint-card entry-card" bindtap="goToCalorieAnalysis">
+    <van-icon name="bar-chart-o" color="var(--color-primary)" size="48rpx" />
+    <view class="entry-content">
+      <text class="entry-title mint-text-primary">热量分析</text>
+      <text class="entry-desc mint-text-tertiary">查看每日热量摄入与达标情况</text>
     </view>
-    <view class="analysis-content">
-      <text class="analysis-title">热量分析</text>
-      <text class="analysis-desc">查看每日热量摄入与达标情况</text>
-    </view>
-    <view class="analysis-arrow">›</view>
+    <van-icon name="arrow" color="var(--text-tertiary)" size="20" />
   </view>
 
   <!-- 健康问答入口卡片 -->
-  <view class="ai-chat-entry-card" bindtap="goToAiChat">
-    <view class="ai-entry-icon">
-      <view class="ai-entry-icon-line">
-        <view class="ai-entry-circle"></view>
-        <view class="ai-entry-l1"></view>
-        <view class="ai-entry-l2"></view>
-        <view class="ai-entry-d"></view>
-      </view>
+  <view class="mint-card entry-card mint-mt-md" bindtap="goToAiChat">
+    <van-icon name="chat-o" color="var(--color-primary)" size="48rpx" />
+    <view class="entry-content">
+      <text class="entry-title mint-text-primary">健康问答</text>
+      <text class="entry-desc mint-text-tertiary">分析饮食，给出营养建议</text>
     </view>
-    <view class="ai-entry-content">
-      <text class="ai-entry-title">健康问答</text>
-      <text class="ai-entry-desc">分析饮食，给出营养建议</text>
-    </view>
-    <view class="analysis-arrow">›</view>
+    <van-icon name="arrow" color="var(--text-tertiary)" size="20" />
   </view>
 
-  <!-- Add Button / Panel -->
+  <!-- Add Button -->
   <view class="add-section" wx:if="{{!showAddPanel}}">
-    <button class="btn-add" bindtap="toggleAddPanel">
-      <view class="btn-icon icon-plus"></view>
-      <text>记录饮食</text>
-    </button>
+    <van-button type="primary" block round icon="plus" bindtap="toggleAddPanel">记录饮食</van-button>
   </view>
 
   <!-- Add/Edit Panel -->
-  <view class="card add-panel" wx:if="{{showAddPanel}}">
+  <view class="mint-card add-panel" wx:if="{{showAddPanel}}">
     <view class="panel-header">
-      <view class="panel-title-wrap">
-        <view class="title-icon {{isEditing ? 'icon-edit' : 'icon-document'}}"></view>
-        <text class="card-title">{{isEditing ? '编辑饮食' : '添加饮食记录'}}</text>
-      </view>
-      <view class="close-btn" bindtap="{{isEditing ? 'cancelEdit' : 'toggleAddPanel'}}">
-        <view class="icon-close"></view>
-      </view>
+      <text class="panel-title mint-text-primary">{{isEditing ? '编辑饮食' : '添加饮食记录'}}</text>
+      <van-icon name="cross" color="var(--text-tertiary)" size="40rpx" bindtap="{{isEditing ? 'cancelEdit' : 'toggleAddPanel'}}" />
     </view>
 
     <!-- Date -->
     <picker mode="date" value="{{inputDate}}" bindchange="onDateChange">
-      <view class="date-picker">{{inputDate || '选择日期'}}</view>
+      <van-cell title="日期" value="{{inputDate || '选择日期'}}" is-link />
     </picker>
 
     <!-- Meal Type -->
     <view class="meal-types">
-      <view class="meal-type {{item.selected ? 'selected' : ''}}" wx:for="{{mealTypes}}" wx:key="key" data-key="{{item.key}}" bindtap="selectMealType">
-        <text>{{item.label}}</text>
-      </view>
+      <van-tag
+        wx:for="{{mealTypes}}"
+        wx:key="key"
+        size="large"
+        type="{{item.selected ? 'primary' : 'default'}}"
+        data-key="{{item.key}}"
+        bindtap="selectMealType"
+      >{{item.label}}</van-tag>
     </view>
 
     <!-- Food Items -->
@@ -93,64 +75,68 @@
       <block wx:for="{{foods}}" wx:key="index" wx:for-index="foodIdx">
         <view class="food-item-row">
           <view class="food-item">
-            <input class="food-name" placeholder="食物名称" value="{{item.name}}" data-idx="{{foodIdx}}" bindinput="onFoodNameInput" bindfocus="onFoodNameInput" />
-            <input class="food-cal" type="digit" placeholder="卡路里" value="{{item.calories}}" data-idx="{{foodIdx}}" bindinput="onFoodCalInput" />
-            <text class="cal-unit">kcal</text>
-            <view class="remove-food" data-idx="{{foodIdx}}" bindtap="removeFoodItem">−</view>
+            <van-field
+              placeholder="食物名称"
+              value="{{item.name}}"
+              data-idx="{{foodIdx}}"
+              bind:input="onFoodNameInput"
+              bind:focus="onFoodNameInput"
+              custom-style="flex: 2;"
+            />
+            <van-field
+              type="digit"
+              placeholder="卡路里"
+              value="{{item.calories}}"
+              data-idx="{{foodIdx}}"
+              bind:input="onFoodCalInput"
+              custom-style="flex: 1;"
+            />
+            <text class="cal-unit mint-text-tertiary">kcal</text>
+            <van-icon name="minus" color="var(--color-error)" size="40rpx" data-idx="{{foodIdx}}" bindtap="removeFoodItem" />
           </view>
-          <!-- 食物搜索建议 - 单独显示，不影响布局 -->
+          <!-- 食物搜索建议 -->
           <view class="food-search-panel" wx:if="{{showSearchPanel && searchActiveIndex === foodIdx && searchResults.length > 0}}">
-            <view class="search-hint">
-              <view class="hint-icon icon-hand"></view>
-              选择以下食物自动填充卡路里：
-            </view>
+            <view class="search-hint mint-text-secondary">选择以下食物自动填充：</view>
             <view class="search-results">
               <view class="search-item" wx:for="{{searchResults}}" wx:key="name" wx:for-item="result" data-item="{{result}}" data-idx="{{foodIdx}}" catchtap="selectFood">
-                <text class="search-item-name">{{result.name}}</text>
-                <text class="search-item-cal">{{result.calories}} kcal</text>
+                <text class="search-item-name mint-text-primary">{{result.name}}</text>
+                <text class="search-item-cal mint-text-accent">{{result.calories}} kcal</text>
               </view>
             </view>
           </view>
         </view>
       </block>
-      <view class="add-food-btn" bindtap="addFoodItem">+ 添加更多食物</view>
+      <view class="add-food-btn mint-text-accent" bindtap="addFoodItem">+ 添加更多食物</view>
     </view>
-    
+
     <!-- 总热量预览 -->
-    <view class="cal-preview" wx:if="{{showAddPanel}}">
-      <text class="cal-preview-label">本餐预计热量：</text>
-      <text class="cal-preview-value">{{totalCalPreview}} kcal</text>
+    <view class="cal-preview mint-card-secondary" wx:if="{{showAddPanel}}">
+      <text class="mint-text-secondary">本餐预计热量：</text>
+      <text class="mint-text-accent" style="font-weight: 600;">{{totalCalPreview}} kcal</text>
     </view>
 
     <!-- Quick Add -->
     <view class="quick-add">
-      <text class="quick-label">快捷添加：</text>
+      <text class="quick-label mint-text-secondary">快捷添加：</text>
       <view class="quick-items">
-        <view class="quick-item" data-item="{{ {name:'米饭一碗', calories:'230'} }}" bindtap="quickAdd">🍚 米饭</view>
-        <view class="quick-item" data-item="{{ {name:'鸡胸肉100g', calories:'133'} }}" bindtap="quickAdd">🍗 鸡胸肉</view>
-        <view class="quick-item" data-item="{{ {name:'苹果一个', calories:'95'} }}" bindtap="quickAdd">🍎 苹果</view>
-        <view class="quick-item" data-item="{{ {name:'牛奶一杯', calories:'150'} }}" bindtap="quickAdd">🥛 牛奶</view>
-        <view class="quick-item" data-item="{{ {name:'水煮蛋一个', calories:'78'} }}" bindtap="quickAdd">🥚 鸡蛋</view>
-        <view class="quick-item" data-item="{{ {name:'全麦面包一片', calories:'70'} }}" bindtap="quickAdd">🍞 面包</view>
-        <view class="quick-item" data-item="{{ {name:'沙拉一份', calories:'120'} }}" bindtap="quickAdd">🥗 沙拉</view>
-        <view class="quick-item" data-item="{{ {name:'香蕉一根', calories:'105'} }}" bindtap="quickAdd">🍌 香蕉</view>
+        <van-tag wx:for="{{quickItems}}" wx:key="name" data-item="{{item}}" bindtap="quickAdd" size="large" plain type="primary">
+          {{item.icon}} {{item.name}}
+        </van-tag>
       </view>
     </view>
 
-    <button class="btn-submit" bindtap="onSubmit">
-      <text>保存记录</text>
-    </button>
+    <van-button type="primary" block round bindtap="onSubmit" style="margin-top: 24rpx;">保存记录</van-button>
   </view>
 
   <!-- Records by Day -->
   <view wx:if="{{days.length === 0 && !showAddPanel}}" class="empty-state">
-    <view class="empty-icon icon-bowl"></view>
-    <text class="empty-text">还没有饮食记录</text>
-    <text class="empty-hint">点击上方按钮开始记录</text>
+    <van-empty description="还没有饮食记录" image="search">
+      <van-button round type="primary" size="small" bindtap="toggleAddPanel">开始记录</van-button>
+    </van-empty>
   </view>
 
-  <!-- 记录列表滚动容器 -->
-  <scroll-view 
+  <!-- 记录列表 -->
+  <scroll-view
     class="records-scroll"
     scroll-y
     enhanced
@@ -160,45 +146,38 @@
     wx:if="{{days.length > 0}}">
     <view class="day-group" wx:for="{{days}}" wx:key="date" wx:for-item="day">
       <view class="day-header">
-        <text class="day-date">{{day.date}}</text>
-        <text class="day-total">{{day.totalCal}} kcal</text>
+        <text class="day-date mint-text-primary">{{day.date}}</text>
+        <text class="day-total mint-text-accent">{{day.totalCal}} kcal</text>
       </view>
 
-      <view class="card meal-card" wx:for="{{day.records}}" wx:key="_id" wx:for-item="meal" data-meal="{{meal}}" bindtap="onEditDiet">
+      <view class="mint-card meal-card" wx:for="{{day.records}}" wx:key="_id" wx:for-item="meal" data-meal="{{meal}}" bindtap="onEditDiet">
         <view class="meal-header">
-          <text class="meal-type-label">{{meal.mealLabel}}</text>
+          <van-tag type="primary" size="medium">{{meal.mealLabel}}</van-tag>
           <view class="meal-actions">
-            <text class="meal-cal">{{meal.totalCal}} kcal</text>
-            <view class="edit-icon" catchtap="onEditDiet" data-meal="{{meal}}">
-              <view class="icon-edit-small"></view>
-            </view>
-            <view class="delete-btn" data-id="{{meal._id}}" catchtap="onDeleteDiet">
-              <view class="icon-delete"></view>
-            </view>
+            <text class="meal-cal mint-text-accent">{{meal.totalCal}} kcal</text>
+            <van-icon name="edit" color="var(--text-tertiary)" size="36rpx" catchtap="onEditDiet" data-meal="{{meal}}" />
+            <van-icon name="delete" color="var(--color-error)" size="36rpx" data-id="{{meal._id}}" catchtap="onDeleteDiet" />
           </view>
         </view>
         <view class="food-tags">
-          <view class="food-tag" wx:for="{{meal.foods}}" wx:key="name" wx:index="idx2" wx:for-item="food" wx:for-index2="fi">
-            <text>{{food.name}}</text>
-            <text class="food-tag-cal" wx:if="{{food.calories}}">{{food.calories}}cal</text>
-          </view>
+          <van-tag wx:for="{{meal.foods}}" wx:key="name" wx:for-item="food" size="medium" plain>
+            {{food.name}} {{food.calories}}cal
+          </van-tag>
         </view>
       </view>
     </view>
 
-    <!-- 加载更多提示 -->
     <view class="load-more" wx:if="{{hasMore || isLoadingMore}}">
-      <view class="loading-spinner" wx:if="{{isLoadingMore}}"></view>
-      <text class="load-more-text" wx:if="{{isLoadingMore}}">加载中...</text>
-      <text class="load-more-text" wx:elif="{{!hasMore}}">— 已加载全部 —</text>
+      <van-loading wx:if="{{isLoadingMore}}" size="24" />
+      <text class="load-more-text mint-text-tertiary" wx:if="{{isLoadingMore}}">加载中...</text>
+      <text class="load-more-text mint-text-tertiary" wx:elif="{{!hasMore}}">— 已加载全部 —</text>
     </view>
   </scroll-view>
 
   <view class="footer">
-    <text>饮食控制是减肥成功的关键</text>
+    <text class="mint-text-tertiary">饮食控制是减肥成功的关键</text>
   </view>
 </view>
 
-<!-- Toast -->
-<view class="toast {{toastShow ? 'show' : ''}}">{{toastMsg}}</view>
+<van-toast id="van-toast" />
 </page>

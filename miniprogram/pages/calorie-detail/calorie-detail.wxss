@@ -16,7 +16,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #5FA895;
+  color: #22C55E;
 }
 
 .icon-bowl {
@@ -119,7 +119,7 @@
   left: 0;
   right: 0;
   height: 4rpx;
-  background: linear-gradient(90deg, #5FA895, #7BB5AD);
+  background: linear-gradient(90deg, #22C55E, #7BB5AD);
 }
 
 .overview-card.danger::before {
@@ -135,7 +135,7 @@
 }
 
 .overview-card.success::before {
-  background: linear-gradient(90deg, #5FA895, #4A9B8A);
+  background: linear-gradient(90deg, #22C55E, #22C55E);
 }
 
 .overview-header {
@@ -174,7 +174,7 @@
   height: 180rpx;
   border-radius: 50%;
   background: linear-gradient(135deg, rgba(95, 168, 149, 0.15), rgba(95, 168, 149, 0.05));
-  border: 3rpx solid #5FA895;
+  border: 3rpx solid #22C55E;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -199,7 +199,7 @@
 
 .cal-circle.success {
   background: linear-gradient(135deg, rgba(95, 168, 149, 0.15), rgba(95, 168, 149, 0.05));
-  border-color: #5FA895;
+  border-color: #22C55E;
 }
 
 .cal-current {
@@ -240,7 +240,7 @@
 
 .stat-value.danger { color: #C98B8B; }
 .stat-value.warning { color: #D4A574; }
-.stat-value.success { color: #5FA895; }
+.stat-value.success { color: #22C55E; }
 .stat-value.low { color: #8B9EAF; }
 
 .status-badge {
@@ -275,7 +275,7 @@
   width: 20rpx;
   height: 20rpx;
   border-radius: 50%;
-  background: #5FA895;
+  background: #22C55E;
 }
 
 .status-icon.danger {
@@ -291,19 +291,19 @@
 }
 
 .status-icon.success {
-  background: #5FA895;
+  background: #22C55E;
 }
 
 .status-text {
   font-size: 26rpx;
   font-weight: 600;
-  color: #5FA895;
+  color: #22C55E;
 }
 
 .status-text.danger { color: #C98B8B; }
 .status-text.warning { color: #D4A574; }
 .status-text.low { color: #8B9EAF; }
-.status-text.success { color: #5FA895; }
+.status-text.success { color: #22C55E; }
 
 /* ========== 图表卡片 ========== */
 .chart-card {
@@ -460,7 +460,7 @@
 }
 
 .hint-dot.normal {
-  background: #5FA895;
+  background: #22C55E;
 }
 
 .hint-dot.danger {
@@ -649,7 +649,7 @@
 
 .advice-num {
   font-size: 24rpx;
-  color: #5FA895;
+  color: #22C55E;
   font-weight: 600;
   flex-shrink: 0;
 }
@@ -672,7 +672,7 @@
 .alt-title {
   font-size: 24rpx;
   font-weight: 600;
-  color: #5FA895;
+  color: #22C55E;
   display: block;
   margin-bottom: 12rpx;
 }
@@ -700,7 +700,7 @@
 .encourage-text {
   font-size: 26rpx;
   font-weight: 600;
-  color: #5FA895;
+  color: #22C55E;
 }
 
 /* ========== 目标设置卡片 ========== */
@@ -757,7 +757,7 @@
 
 .btn-save-target {
   padding: 14rpx 24rpx;
-  background: linear-gradient(135deg, #5FA895, #4A9B8A);
+  background: linear-gradient(135deg, #22C55E, #22C55E);
   border: none;
   border-radius: 12rpx;
   font-size: 24rpx;
@@ -776,13 +776,13 @@
 .target-current {
   flex: 1;
   font-size: 26rpx;
-  color: #5FA895;
+  color: #22C55E;
   font-weight: 600;
 }
 
 .edit-target-btn {
   font-size: 24rpx;
-  color: #5FA895;
+  color: #22C55E;
   padding: 8rpx 16rpx;
   background: rgba(95, 168, 149, 0.12);
   border-radius: 8rpx;
@@ -815,7 +815,7 @@
 .tips-label {
   display: inline-block;
   font-size: 18rpx;
-  color: #5FA895;
+  color: #22C55E;
   background: rgba(95, 168, 149, 0.12);
   padding: 2rpx 10rpx;
   border-radius: 6rpx;
@@ -862,7 +862,7 @@
 /* ========== 查看食谱按钮 ========== */
 .btn-recipe {
   width: 100%;
-  background: linear-gradient(135deg, #5FA895, #4A9B8A);
+  background: linear-gradient(135deg, #22C55E, #22C55E);
   border: none;
   border-radius: 50rpx;
   color: white;
@@ -931,8 +931,8 @@
   left: 50%;
   transform: translate(-50%, -50%) scale(0.8);
   background: var(--card-bg, #1E1E1E);
-  border: 1rpx solid #5FA895;
-  color: #5FA895;
+  border: 1rpx solid #22C55E;
+  color: #22C55E;
   padding: 24rpx 48rpx;
   border-radius: 16rpx;
   font-size: 28rpx;
@@ -972,7 +972,7 @@
 
 .theme-light .cal-circle {
   background: linear-gradient(135deg, rgba(74, 155, 138, 0.1), rgba(74, 155, 138, 0.03));
-  border-color: #4A9B8A;
+  border-color: #22C55E;
 }
 
 .theme-light .cal-circle.danger {
@@ -992,7 +992,7 @@
 
 .theme-light .cal-circle.success {
   background: linear-gradient(135deg, rgba(74, 155, 138, 0.1), rgba(74, 155, 138, 0.03));
-  border-color: #4A9B8A;
+  border-color: #22C55E;
 }
 
 .theme-light .status-badge {
@@ -1012,19 +1012,19 @@
 }
 
 .theme-light .status-icon {
-  background: #4A9B8A;
+  background: #22C55E;
 }
 
 .theme-light .status-icon.danger { background: #B87B7B; }
 .theme-light .status-icon.warning { background: #C49A6C; }
 .theme-light .status-icon.low { background: #7A8E9F; }
-.theme-light .status-icon.success { background: #4A9B8A; }
+.theme-light .status-icon.success { background: #22C55E; }
 
-.theme-light .status-text { color: #4A9B8A; }
+.theme-light .status-text { color: #22C55E; }
 .theme-light .status-text.danger { color: #B87B7B; }
 .theme-light .status-text.warning { color: #C49A6C; }
 .theme-light .status-text.low { color: #7A8E9F; }
-.theme-light .status-text.success { color: #4A9B8A; }
+.theme-light .status-text.success { color: #22C55E; }
 
 .theme-light .stat-value.danger,
 .theme-light .summary-value.danger,
@@ -1049,37 +1049,37 @@
 }
 
 .theme-light .btn-save-target {
-  background: linear-gradient(135deg, #4A9B8A, #3D8B7A);
+  background: linear-gradient(135deg, #22C55E, #3D8B7A);
 }
 
 .theme-light .target-current {
-  color: #4A9B8A;
+  color: #22C55E;
 }
 
 .theme-light .edit-target-btn {
-  color: #4A9B8A;
+  color: #22C55E;
   background: rgba(74, 155, 138, 0.1);
 }
 
 .theme-light .tips-label {
-  color: #4A9B8A;
+  color: #22C55E;
   background: rgba(74, 155, 138, 0.1);
 }
 
 .theme-light .toast {
   background: #FFFFFF;
-  border-color: #4A9B8A;
-  color: #4A9B8A;
+  border-color: #22C55E;
+  color: #22C55E;
   box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.1);
 }
 
 .theme-light .encourage-text,
 .theme-light .advice-num {
-  color: #4A9B8A;
+  color: #22C55E;
 }
 
 .theme-light .hint-dot.normal {
-  background: #4A9B8A;
+  background: #22C55E;
 }
 
 .theme-light .hint-dot.danger {
@@ -1087,7 +1087,7 @@
 }
 
 .theme-light .title-icon {
-  color: #4A9B8A;
+  color: #22C55E;
 }
 
 .theme-light .icon-warning {
@@ -1095,6 +1095,6 @@
 }
 
 .theme-light .btn-recipe {
-  background: linear-gradient(135deg, #4A9B8A, #3D8B7A);
+  background: linear-gradient(135deg, #22C55E, #3D8B7A);
   box-shadow: 0 4rpx 16rpx rgba(74, 155, 138, 0.2);
 }

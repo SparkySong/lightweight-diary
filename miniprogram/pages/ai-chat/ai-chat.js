@@ -1,3 +1,4 @@
+const Toast = require("../../vant/toast/toast");
 // pages/ai-chat/ai-chat.js —— 混合模式：数据问题用模板，开放问题用 AI + 流式输出
 const app = getApp();
 

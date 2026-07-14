@@ -1,0 +1,183 @@
+@import '../common/index.wxss';
+.van-cell {
+  background-color: var(--bg-card, #1E1E1E) !important;
+  color: var(--text-primary, #F5F5F5) !important;
+  font-size: var(--cell-font-size, 14px);
+  line-height: var(--cell-line-height, 24px);
+  min-height: var(--cell-line-height, 24px);
+  padding: var(--cell-vertical-padding, 10px) var(--cell-horizontal-padding, 16px);
+  position: relative;
+  display: flex;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.van-cell--borderless::after {
+  display: none;
+}
+
+.van-cell::after {
+  border-bottom: 1rpx solid var(--divider, #2A2A2A);
+  bottom: 0;
+  content: '';
+  left: 16px;
+  position: absolute;
+  right: 0;
+  transform: scaleY(0.5);
+}
+
+.van-cell__label {
+  color: var(--text-secondary, #A0A0A0) !important;
+  font-size: var(--cell-label-font-size, 12px);
+  line-height: var(--cell-label-line-height, 18px);
+  margin-top: var(--cell-label-margin-top, 3px);
+}
+
+.van-cell__title,
+.van-cell__value {
+  flex: 1;
+}
+
+.van-cell__title {
+  color: var(--text-primary, #F5F5F5) !important;
+}
+
+.van-cell__title--required::before {
+  color: var(--cell-required-color, #ee0a24);
+  content: '*';
+  font-size: var(--cell-font-size, 14px);
+  margin-right: 2px;
+}
+
+.van-cell__value {
+  color: var(--text-tertiary, #6B6B6B) !important;
+  overflow: hidden;
+  text-align: right;
+  vertical-align: middle;
+}
+
+.van-cell__left-icon-wrap,
+.van-cell__right-icon-wrap {
+  display: flex;
+  align-items: center;
+  height: var(--cell-line-height, 24px);
+  font-size: var(--cell-icon-size, 16px);
+}
+
+.van-cell__left-icon-wrap {
+  margin-right: var(--padding-base, 4px);
+}
+
+.van-cell__right-icon-wrap {
+  margin-left: var(--padding-base, 4px);
+  color: var(--text-tertiary, #6B6B6B) !important;
+}
+
+.van-cell__left-icon {
+  vertical-align: middle;
+}
+
+.van-cell__left-icon .van-icon,
+.van-cell__right-icon .van-icon {
+  display: block;
+}
+
+.van-cell__right-icon {
+  color: var(--text-tertiary, #6B6B6B) !important;
+  line-height: inherit;
+}
+
+.van-cell__left-icon {
+  color: var(--cell-left-icon-color, inherit);
+}
+
+.van-cell--clickable {
+  cursor: pointer;
+}
+
+.van-cell--clickable:active {
+  background-color: var(--bg-hover, #333333);
+}
+
+.van-cell--large {
+  padding-top: var(--cell-large-vertical-padding, 12px);
+  padding-bottom: var(--cell-large-vertical-padding, 12px);
+}
+
+.van-cell--large .van-cell__title {
+  font-size: var(--cell-large-title-font-size, 16px);
+}
+
+.van-cell--large .van-cell__label {
+  font-size: var(--cell-large-label-font-size, 14px);
+}
+
+.van-cell-group {
+  background-color: var(--bg-card, #1E1E1E) !important;
+}
+
+.van-cell-group--inset {
+  margin: var(--cell-group-inset-padding, 12px) var(--cell-group-inset-padding-right, 12px);
+  border-radius: var(--cell-group-inset-radius, 8px);
+  overflow: hidden;
+}
+
+.van-cell-group--inset .van-cell:first-child::before {
+  border-radius: var(--cell-group-inset-radius, 8px) var(--cell-group-inset-radius, 8px) 0 0;
+}
+
+.van-cell-group--inset::after {
+  border-radius: var(--cell-group-inset-radius, 8px);
+}
+
+.van-cell-group .van-cell:first-child::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  background-color: transparent;
+  content: '';
+}
+
+.van-cell-group::after {
+  content: '';
+  display: block;
+  height: 0;
+  overflow: hidden;
+}
+
+/* 浅色主题 */
+page.theme-light .van-cell {
+  background-color: var(--bg-card, #FFFFFF) !important;
+  color: var(--text-primary, #1F2937) !important;
+}
+
+page.theme-light .van-cell__title {
+  color: var(--text-primary, #1F2937) !important;
+}
+
+page.theme-light .van-cell__value {
+  color: var(--text-tertiary, #9CA3AF) !important;
+}
+
+page.theme-light .van-cell__label {
+  color: var(--text-secondary, #6B7280) !important;
+}
+
+page.theme-light .van-cell__right-icon-wrap,
+page.theme-light .van-cell__right-icon {
+  color: var(--text-tertiary, #9CA3AF) !important;
+}
+
+page.theme-light .van-cell::after {
+  border-bottom-color: var(--divider, #F3F4F6);
+}
+
+page.theme-light .van-cell-group {
+  background-color: var(--bg-card, #FFFFFF) !important;
+}
+
+page.theme-light .van-cell--clickable:active {
+  background-color: var(--bg-hover, #E8E8E8);
+}
