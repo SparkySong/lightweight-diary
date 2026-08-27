@@ -7,9 +7,8 @@
   root-background-color="{{currentTheme === 'light' ? '#F8FAF9' : '#121212'}}"
   navigation-bar-style="{{currentTheme === 'light' ? 'dark' : 'light'}}"
 />
-<page class="{{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}}">
+<view class="theme-root {{currentTheme === 'light' ? 'theme-light' : ''}}">
 
-<view class="theme-bg-fixed {{currentTheme === 'light' ? 'theme-light' : ''}}"></view>
 <view class="custom-nav-area"></view>
 
 <view class="container">
@@ -120,7 +119,6 @@
   title="添加运动"
   show-cancel-button
   use-slot
-  theme="{{currentTheme === 'light' ? 'light' : 'default'}}"
   bind:confirm="onSaveExercise"
   bind:cancel="onClosePopup"
   bind:close="onClosePopup"
@@ -141,7 +139,7 @@
       </view>
     </view>
     <!-- 运动时长 -->
-    <van-field
+    <van-field extra-event-params
       type="digit"
       label="时长(分钟)"
       value="{{inputDuration}}"
@@ -149,7 +147,7 @@
       placeholder="如 30"
     />
     <!-- 消耗卡路里 -->
-    <van-field
+    <van-field extra-event-params
       type="digit"
       label="卡路里(kcal)"
       value="{{inputCalories}}"
@@ -160,4 +158,4 @@
 </van-dialog>
 
 <van-toast id="van-toast" />
-</page>
+</view>

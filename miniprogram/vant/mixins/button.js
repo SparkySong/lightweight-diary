@@ -1,5 +1,5 @@
-const { canIUseGetUserProfile } = require('../common/version');
-const button = Behavior({
+import { canIUseGetUserProfile } from '../common/version';
+export const button = Behavior({
     externalClasses: ['hover-class'],
     properties: {
         id: String,
@@ -49,5 +49,3 @@ const button = Behavior({
         },
     },
 });
-
-module.exports = { button };

@@ -1,7 +1,7 @@
-const { VantComponent } = require('../common/component');
-const { button } = require('../mixins/button');
-const { GRAY, RED } = require('../common/color');
-const { toPromise } = require('../common/utils');
+import { VantComponent } from '../common/component';
+import { button } from '../mixins/button';
+import { GRAY, RED } from '../common/color';
+import { toPromise } from '../common/utils';
 VantComponent({
     mixins: [button],
     classes: ['cancle-button-class', 'confirm-button-class'],

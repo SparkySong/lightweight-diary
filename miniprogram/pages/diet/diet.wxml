@@ -7,9 +7,8 @@
   root-background-color="{{currentTheme === 'light' ? '#F8FAF9' : '#121212'}}"
   navigation-bar-style="{{currentTheme === 'light' ? 'dark' : 'light'}}"
 />
-<page class="{{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}} {{hidePage ? 'page-hiding' : ''}}">
+<view class="theme-root {{currentTheme === 'light' ? 'theme-light' : ''}}">
 
-<view class="theme-bg-fixed {{currentTheme === 'light' ? 'theme-light' : ''}}"></view>
 <view class="custom-nav-area"></view>
 
 <view class="container">
@@ -75,7 +74,7 @@
       <block wx:for="{{foods}}" wx:key="index" wx:for-index="foodIdx">
         <view class="food-item-row">
           <view class="food-item">
-            <van-field
+            <van-field extra-event-params
               placeholder="食物名称"
               value="{{item.name}}"
               data-idx="{{foodIdx}}"
@@ -83,7 +82,7 @@
               bind:focus="onFoodNameInput"
               custom-style="flex: 2;"
             />
-            <van-field
+            <van-field extra-event-params
               type="digit"
               placeholder="卡路里"
               value="{{item.calories}}"
@@ -152,7 +151,7 @@
 
       <view class="mint-card meal-card" wx:for="{{day.records}}" wx:key="_id" wx:for-item="meal" data-meal="{{meal}}" bindtap="onEditDiet">
         <view class="meal-header">
-          <van-tag type="primary" size="medium">{{meal.mealLabel}}</van-tag>
+          <view class="meal-label"><view class="meal-dot"></view><text>{{meal.mealLabel}}</text></view>
           <view class="meal-actions">
             <text class="meal-cal mint-text-accent">{{meal.totalCal}} kcal</text>
             <van-icon name="edit" color="var(--text-tertiary)" size="36rpx" catchtap="onEditDiet" data-meal="{{meal}}" />
@@ -160,9 +159,9 @@
           </view>
         </view>
         <view class="food-tags">
-          <van-tag wx:for="{{meal.foods}}" wx:key="name" wx:for-item="food" size="medium" plain>
+          <view wx:for="{{meal.foods}}" wx:key="name" wx:for-item="food" class="food-chip">
             {{food.name}} {{food.calories}}cal
-          </van-tag>
+          </view>
         </view>
       </view>
     </view>
@@ -180,4 +179,4 @@
 </view>
 
 <van-toast id="van-toast" />
-</page>
+</view>

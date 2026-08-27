@@ -1,7 +1,7 @@
 // pages/exercise/exercise.js
 const app = getApp();
 const db = wx.cloud.database();
-const Toast = require('../../vant/toast/toast');
+const Toast = require('../../vant/toast/toast').default;
 
 const getInitTheme = () => {
   const themeSetting = wx.getStorageSync('appTheme') || 'system';

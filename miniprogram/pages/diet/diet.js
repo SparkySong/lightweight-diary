@@ -1,6 +1,6 @@
 // pages/diet/diet.js
 const app = getApp();
-const Toast = require('../../vant/toast/toast');
+const Toast = require('../../vant/toast/toast').default;
 
 // 分页配置
 const PAGE_SIZE = 10;
@@ -358,8 +358,6 @@ Page({
     pageSize: PAGE_SIZE,   // 每页加载数量
     // 云端自定义食物库
     customFoods: [],       // 存储云端自定义食物
-    // 防闪炃：主题切换后第一次切 tab 时短暂隐藏页面
-    hidePage: false
   },
 
   onLoad() {
@@ -380,10 +378,6 @@ Page({
     this.initTheme();
     this.showPendingThemeToast(); // 显示 reLaunch 后的主题切换提示
     
-    // 🔑 修复：恢复页面可见性（主题变化期间 hidePage 可能被设为 true 导致白屏）
-    if (this.data.hidePage) {
-      this.setData({ hidePage: false });
-    }
     
     this.loadRecords();
     // 加载云端自定义食物

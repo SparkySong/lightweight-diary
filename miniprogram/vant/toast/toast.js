@@ -1,4 +1,4 @@
-const { isObj } = require('../common/validator');
+import { isObj } from '../common/validator';
 const defaultOptions = {
     type: 'text',
     mask: false,
@@ -65,4 +65,4 @@ Toast.setDefaultOptions = (options) => {
 Toast.resetDefaultOptions = () => {
     currentOptions = Object.assign({}, defaultOptions);
 };
-module.exports = Toast;
+export default Toast;

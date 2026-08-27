@@ -1,4 +1,4 @@
-const { basic } = require('../mixins/basic');
+import { basic } from '../mixins/basic';
 function mapKeys(source, target, map) {
     Object.keys(map).forEach((key) => {
         if (source[key]) {
@@ -43,5 +43,4 @@ function VantComponent(vantOptions) {
     };
     Component(options);
 }
-
-module.exports = { VantComponent };
+export { VantComponent };

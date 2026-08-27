@@ -1,4 +1,4 @@
-function useParent(name, onEffect) {
+export function useParent(name, onEffect) {
     const path = `../${name}/index`;
     return {
         relations: {
@@ -28,7 +28,7 @@ function useParent(name, onEffect) {
         }),
     };
 }
-function useChildren(name, onEffect) {
+export function useChildren(name, onEffect) {
     const path = `../${name}/index`;
     return {
         relations: {
@@ -54,5 +54,3 @@ function useChildren(name, onEffect) {
         }),
     };
 }
-
-module.exports = { useParent, useChildren };

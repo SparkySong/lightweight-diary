@@ -1,4 +1,4 @@
-const { VantComponent } = require('../common/component');
+import { VantComponent } from '../common/component';
 VantComponent({
     props: {
         color: String,

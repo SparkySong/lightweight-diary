@@ -1,5 +1,5 @@
-const { VantComponent } = require('../common/component');
-const { transition } = require('../mixins/transition');
+import { VantComponent } from '../common/component';
+import { transition } from '../mixins/transition';
 VantComponent({
     classes: [
         'enter-class',

@@ -1,4 +1,4 @@
-const basic = Behavior({
+export const basic = Behavior({
     methods: {
         $emit(name, detail, options) {
             this.triggerEvent(name, detail, options);
@@ -24,5 +24,3 @@ const basic = Behavior({
         },
     },
 });
-
-module.exports = { basic };

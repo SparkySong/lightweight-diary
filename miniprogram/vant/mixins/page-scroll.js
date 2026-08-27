@@ -1,5 +1,5 @@
-const { isFunction } = require('../common/validator');
-const { getCurrentPage, isDef } = require('../common/utils');
+import { isFunction } from '../common/validator';
+import { getCurrentPage, isDef } from '../common/utils';
 function onPageScroll(event) {
     const { vanPageScroller = [] } = getCurrentPage();
     vanPageScroller.forEach((scroller) => {
@@ -9,7 +9,7 @@ function onPageScroll(event) {
         }
     });
 }
-function pageScrollMixin(scroller) {
+export function pageScrollMixin(scroller) {
     return Behavior({
         attached() {
             const page = getCurrentPage();
@@ -40,5 +40,3 @@ function pageScrollMixin(scroller) {
         },
     });
 }
-
-module.exports = { pageScrollMixin };

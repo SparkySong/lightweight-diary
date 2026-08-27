@@ -1,5 +1,5 @@
-const { link } = require('../mixins/link');
-const { VantComponent } = require('../common/component');
+import { link } from '../mixins/link';
+import { VantComponent } from '../common/component';
 VantComponent({
     classes: [
         'title-class',

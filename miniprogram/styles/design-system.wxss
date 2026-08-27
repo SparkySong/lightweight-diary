@@ -1,21 +1,30 @@
 /* ============================================================
    薄荷健康风格设计系统 - Design System
+   主题机制说明：
+   - 变量定义在 page（兼容旧页面的假 <page> 包裹）与 .theme-root（新包裹）上；
+   - 变量值为 var() 间接引用，浅色主题只需切换 token，无需重复映射；
+   - Vant 组件通过官方 CSS 变量名（--button-*、--popup-* 等）消费 token，
+     自定义属性可穿透组件边界继承，无需修改 vant 源码。
    ============================================================ */
 
-/* ---------- 基础变量 ---------- */
-page {
+/* ---------- 基础变量 + 深色 token（默认） ---------- */
+page,
+.theme-root {
   /* 主色调 - 薄荷绿 (更亮更清新的绿色) */
   --color-primary: #22C55E;
   --color-primary-light: #4ADE80;
   --color-primary-dark: #16A34A;
   --color-primary-bg: rgba(34, 197, 94, 0.1);
-  
+
   /* 语义色 */
   --color-success: #22C55E;
   --color-warning: #F59E0B;
   --color-error: #EF4444;
   --color-info: #3B82F6;
-  
+
+  /* 文字强调色：深色主题用亮薄荷绿保证暗底对比，填充色仍用 --color-primary */
+  --accent-text: #4ADE80;
+
   /* 间距系统 - 8rpx基准 */
   --spacing-xs: 8rpx;
   --spacing-sm: 16rpx;
@@ -23,19 +32,19 @@ page {
   --spacing-lg: 32rpx;
   --spacing-xl: 40rpx;
   --spacing-2xl: 48rpx;
-  
+
   /* 圆角系统 */
   --radius-sm: 8rpx;
   --radius-md: 16rpx;
   --radius-lg: 24rpx;
   --radius-xl: 32rpx;
   --radius-full: 999rpx;
-  
+
   /* 阴影系统 */
   --shadow-sm: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
   --shadow-md: 0 4rpx 16rpx rgba(0, 0, 0, 0.08);
   --shadow-lg: 0 8rpx 32rpx rgba(0, 0, 0, 0.12);
-  
+
   /* 字体系统 */
   --font-size-xs: 20rpx;
   --font-size-sm: 24rpx;
@@ -44,114 +53,158 @@ page {
   --font-size-xl: 36rpx;
   --font-size-2xl: 40rpx;
   --font-size-3xl: 48rpx;
-  
+
   /* 动画 */
   --transition-fast: 0.15s ease;
   --transition-normal: 0.3s ease;
   --transition-slow: 0.5s ease;
-}
 
-/* ---------- 深色主题（默认） ---------- */
-page {
+  /* 深色主题（默认） */
   --bg-page: #121212;
   --bg-card: #1E1E1E;
   --bg-card-secondary: #252525;
   --bg-input: #2A2A2A;
   --bg-hover: #333333;
-  
+
   --text-primary: #F5F5F5;
   --text-secondary: #A0A0A0;
   --text-tertiary: #6B6B6B;
   --text-placeholder: #555555;
-  
+
   --border-color: #333333;
   --border-light: #2A2A2A;
-  
+
   --divider: #2A2A2A;
 }
 
-/* ---------- 浅色主题 ---------- */
-page.theme-light {
+/* ---------- 浅色主题 token ---------- */
+page.theme-light,
+.theme-root.theme-light {
   --bg-page: #F8FAF9;
   --bg-card: #FFFFFF;
   --bg-card-secondary: #F5F5F5;
   --bg-input: #F0F0F0;
   --bg-hover: #E8E8E8;
-  
+
   --text-primary: #1F2937;
   --text-secondary: #6B7280;
   --text-tertiary: #9CA3AF;
   --text-placeholder: #D1D5DB;
-  
+
   --border-color: #E5E7EB;
   --border-light: #F3F4F6;
-  
+
   --divider: #F3F4F6;
-  
+
+  --accent-text: #16A34A;
+
   --shadow-sm: 0 2rpx 8rpx rgba(0, 0, 0, 0.06);
   --shadow-md: 0 4rpx 16rpx rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 8rpx 32rpx rgba(0, 0, 0, 0.15);
 }
 
-/* 浅色主题下的Vant组件变量 - 全局作用域 */
-page.theme-light {
-  --van-dialog-background: #FFFFFF;
-  --van-dialog-text-color: #1F2937;
-  --van-background: #F8FAF9;
-  --van-background-2: #FFFFFF;
-  --van-text-color: #1F2937;
-  --van-text-color-2: #6B7280;
-  --van-text-color-3: #9CA3AF;
-  --van-border-color: #E5E7EB;
-  
-  /* 确保浅色主题下的Vant组件样式正确 */
-  --van-button-primary-background: #22C55E;
-  --van-button-primary-border-color: #22C55E;
-  --van-cell-background: #FFFFFF;
-  --van-field-background: #F0F0F0;
-  --van-field-input-text-color: #1F2937;
-  --van-field-placeholder-color: #D1D5DB;
+/* ---------- 新主题包裹层 ---------- */
+.theme-root {
+  min-height: 100vh;
+  background-color: var(--bg-page);
+  color: var(--text-primary);
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
-/* ---------- Vant主题覆盖 ---------- */
-page {
-  --van-primary-color: #22C55E;
-  --van-success-color: #22C55E;
-  --van-warning-color: #F59E0B;
-  --van-danger-color: #EF4444;
-  
-  --van-text-color: var(--text-primary);
-  --van-text-color-2: var(--text-secondary);
-  --van-text-color-3: var(--text-tertiary);
-  
-  --van-background: var(--bg-page);
-  --van-background-2: var(--bg-card);
-  
-  --van-border-color: var(--border-color);
-  --van-active-color: var(--bg-hover);
-  
-  /* 按钮 */
-  --van-button-primary-background: var(--color-primary);
-  --van-button-primary-border-color: var(--color-primary);
-  
-  /* 单元格 */
-  --van-cell-background: var(--bg-card);
-  --van-cell-text-color: var(--text-primary);
-  --van-cell-label-color: var(--text-secondary);
-  --van-cell-border-color: var(--border-light);
-  
-  /* 弹窗 */
-  --van-dialog-background: var(--bg-card);
-  --van-dialog-text-color: var(--text-primary);
-  
-  /* Toast */
-  --van-toast-background: rgba(0, 0, 0, 0.85);
-  --van-toast-text-color: #FFFFFF;
-  
-  /* 输入框 */
-  --van-field-input-text-color: var(--text-primary);
-  --van-field-placeholder-color: var(--text-placeholder);
-  --van-field-background: var(--bg-input);
+/* ---------- Vant 官方变量映射 ----------
+   值为 var() 间接引用，深浅色随 token 自动切换 */
+page,
+.theme-root {
+  /* Button */
+  --button-border-radius: var(--radius-md);
+  --button-primary-background-color: var(--color-primary);
+  --button-primary-border-color: var(--color-primary);
+  --button-danger-background-color: var(--color-error);
+  --button-danger-border-color: var(--color-error);
+  --button-warning-background-color: var(--color-warning);
+  --button-warning-border-color: var(--color-warning);
+  --button-info-background-color: var(--color-info);
+  --button-info-border-color: var(--color-info);
+  --button-default-background-color: var(--bg-card);
+  --button-default-border-color: var(--border-color);
+  --button-default-color: var(--text-primary);
+  --button-plain-background-color: var(--bg-card);
+
+  /* Cell */
+  --cell-background-color: var(--bg-card);
+  --cell-text-color: var(--text-primary);
+  --cell-label-color: var(--text-tertiary);
+  --cell-value-color: var(--text-tertiary);
+  --cell-active-color: var(--bg-hover);
+  --cell-required-color: var(--color-error);
+  --cell-right-icon-color: var(--text-tertiary);
+  --cell-group-title-color: var(--text-tertiary);
+
+  /* Field */
+  --field-input-text-color: var(--text-primary);
+  --field-label-color: var(--text-secondary);
+  --field-placeholder-text-color: var(--text-placeholder);
+  --field-clear-icon-color: var(--text-placeholder);
+  --field-icon-container-color: var(--text-tertiary);
+  --field-disabled-text-color: var(--text-placeholder);
+  --field-input-disabled-text-color: var(--text-placeholder);
+  --field-error-message-color: var(--color-error);
+  --field-input-error-text-color: var(--color-error);
+  --field-word-num-full-color: var(--color-error);
+  --field-word-limit-color: var(--text-secondary);
+
+  /* Popup / Dialog */
+  --popup-background-color: var(--bg-card);
+  --popup-round-border-radius: var(--radius-lg);
+  --popup-close-icon-color: var(--text-tertiary);
+  --dialog-background-color: var(--bg-card);
+  --dialog-border-radius: var(--radius-lg);
+  --dialog-has-title-message-text-color: var(--text-secondary);
+
+  /* ActionSheet */
+  --action-sheet-item-background: var(--bg-card);
+  --action-sheet-item-text-color: var(--text-primary);
+  --action-sheet-item-disabled-text-color: var(--text-placeholder);
+  --action-sheet-cancel-text-color: var(--text-secondary);
+  --action-sheet-cancel-padding-color: var(--bg-page);
+  --action-sheet-description-color: var(--text-tertiary);
+  --action-sheet-subname-color: var(--text-tertiary);
+  --action-sheet-close-icon-color: var(--text-placeholder);
+
+  /* Picker */
+  --picker-background-color: var(--bg-card);
+  --picker-cancel-action-color: var(--text-tertiary);
+  --picker-confirm-action-color: var(--color-primary);
+
+  /* Tag */
+  --tag-primary-color: var(--color-primary);
+  --tag-success-color: var(--color-success);
+  --tag-danger-color: var(--color-error);
+  --tag-warning-color: var(--color-warning);
+  --tag-default-color: var(--text-tertiary);
+  --tag-plain-background-color: var(--bg-card);
+
+  /* Progress / Slider / Switch / Stepper */
+  --progress-background-color: var(--border-color);
+  --progress-color: var(--color-primary);
+  --progress-pivot-background-color: var(--color-primary);
+  --slider-active-background-color: var(--color-primary);
+  --slider-inactive-background-color: var(--border-color);
+  --slider-button-background-color: var(--bg-card);
+  --switch-on-background-color: var(--color-primary);
+  --switch-background-color: var(--bg-input);
+  --stepper-background-color: var(--bg-hover);
+  --stepper-active-color: var(--bg-hover);
+  --stepper-button-icon-color: var(--text-primary);
+  --stepper-button-disabled-color: var(--bg-card-secondary);
+  --stepper-button-disabled-icon-color: var(--text-placeholder);
+  --stepper-input-disabled-background-color: var(--bg-card-secondary);
+  --stepper-input-disabled-text-color: var(--text-placeholder);
+  --stepper-input-text-color: var(--text-primary);
+
+  /* Loading */
+  --loading-spinner-color: var(--text-placeholder);
+  --loading-text-color: var(--text-tertiary);
 }
 
 /* ---------- 通用工具类 ---------- */

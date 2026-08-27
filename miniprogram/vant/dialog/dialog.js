@@ -74,4 +74,4 @@ Dialog.resetDefaultOptions = () => {
     Dialog.currentOptions = currentOptions;
 };
 Dialog.resetDefaultOptions();
-module.exports = Dialog;
+export default Dialog;

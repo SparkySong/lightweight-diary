@@ -8,15 +8,12 @@
   root-background-color="{{currentTheme === 'light' ? '#F8FAF9' : '#121212'}}"
   navigation-bar-style="{{currentTheme === 'light' ? 'dark' : 'light'}}"
 />
-<page class="{{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}} {{hidePage ? 'page-hiding' : ''}}" bindtap="onPageTap" catchtap="onCancelGoalInput">
-
-<!-- 全屏固定背景遮罩层：覆盖 app.json 默认底色，消除 tab 切换闪烁 -->
-<view class="theme-bg-fixed {{currentTheme === 'light' ? 'theme-light' : ''}}"></view>
+<view class="theme-root {{currentTheme === 'light' ? 'theme-light' : ''}}" bindtap="onPageTap" catchtap="onCancelGoalInput">
 
 <!-- 自定义导航栏区域 -->
 <view class="custom-nav-area"></view>
 
-<view class="container {{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}}">
+<view class="container">
   <!-- Header -->
   <view class="header">
     <view class="header-title-row">
@@ -116,7 +113,7 @@
         <text class="mint-text-accent" bindtap="onEditHeight">修改</text>
       </view>
       <view wx:else class="height-input-wrap" catchtap="stopPropagation">
-        <van-field type="digit" placeholder="身高 (cm)" value="{{inputHeight}}" bind:input="onHeightInput" use-button-slot>
+        <van-field extra-event-params type="digit" placeholder="身高 (cm)" value="{{inputHeight}}" bind:input="onHeightInput" use-button-slot>
           <van-button slot="button" size="small" type="primary" bindtap="onSetHeight">保存</van-button>
         </van-field>
       </view>
@@ -351,18 +348,17 @@
   title="修改体重"
   show-cancel-button
   use-slot
-  theme="{{currentTheme === 'light' ? 'light' : 'default'}}"
+  confirm-button-color="{{currentTheme === 'light' ? '#16A34A' : '#22C55E'}}"
   bind:confirm="onSaveEdit"
   bind:cancel="closeEditPanel"
   bind:close="closeEditPanel"
 >
   <view class="dialog-form">
-    <van-field
+    <van-field extra-event-params
       type="digit"
       placeholder="体重 ({{weightUnitLabel}})"
       value="{{editWeight}}"
       bind:input="onEditWeightInput"
-      theme="{{currentTheme === 'light' ? 'light' : 'default'}}"
     />
     <text class="mint-text-tertiary" style="font-size: 24rpx; padding: 0 32rpx;">{{editDate}}</text>
   </view>
@@ -370,7 +366,6 @@
 
 <!-- Toast -->
 <van-toast id="van-toast" />
-</page>
 
 <!-- 体重编辑弹框 - Vant Dialog -->
 <van-dialog
@@ -378,19 +373,18 @@
   title="{{weightPopupType === 'current' ? (currentWeight !== '--' ? '编辑当前体重' : '记录当前体重') : (goalWeight ? '编辑目标体重' : '设置目标体重')}}"
   show-cancel-button
   use-slot
-  theme="{{currentTheme === 'light' ? 'light' : 'default'}}"
+  confirm-button-color="{{currentTheme === 'light' ? '#16A34A' : '#22C55E'}}"
   bind:confirm="saveWeightPopup"
   bind:cancel="closeWeightPopup"
   bind:close="closeWeightPopup"
 >
   <view class="dialog-form">
-    <van-field
+    <van-field extra-event-params
       type="digit"
       label="{{weightPopupType === 'current' ? '当前体重' : '目标体重'}}"
       placeholder="请输入体重"
       value="{{weightInputValue}}"
       bind:input="onWeightPopupInput"
-      theme="{{currentTheme === 'light' ? 'light' : 'default'}}"
     >
       <text slot="button" class="mint-text-tertiary">{{weightUnitLabel}}</text>
     </van-field>
@@ -399,3 +393,4 @@
     </view>
   </view>
 </van-dialog>
+</view>

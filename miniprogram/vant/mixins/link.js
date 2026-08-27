@@ -1,4 +1,4 @@
-const link = Behavior({
+export const link = Behavior({
     properties: {
         url: String,
         linkType: {
@@ -21,5 +21,3 @@ const link = Behavior({
         },
     },
 });
-
-module.exports = { link };

@@ -1,4 +1,4 @@
-const Toast = require("../../vant/toast/toast");
+const Toast = require("../../vant/toast/toast").default;
 // pages/ai-chat/ai-chat.js —— 混合模式：数据问题用模板，开放问题用 AI + 流式输出
 const app = getApp();
 
@@ -20,7 +20,6 @@ Page({
     userAvatar: DEFAULT_AVATAR,
     copiedIndex: -1,
     currentTheme: app.getEffectiveTheme(),
-    hidePage: false,
     quickQuestions: [
       '分析我的整体情况',
       '我的 BMI正常吗',

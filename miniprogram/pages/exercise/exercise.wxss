@@ -20,12 +20,12 @@
 }
 
 .theme-light .custom-nav-area,
-page.theme-light {
+.theme-root.theme-light {
   --nav-bg: #F8FAF9;
 }
 
 .theme-dark .custom-nav-area,
-page.theme-dark {
+.theme-root {
   --nav-bg: #121212;
 }
 
@@ -67,7 +67,7 @@ page.theme-dark {
 }
 
 .balance-value.intake {
-  color: var(--color-primary);
+  color: var(--accent-text);
 }
 
 .balance-value.burn {

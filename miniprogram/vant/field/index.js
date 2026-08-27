@@ -1,6 +1,6 @@
-const { nextTick } = require('../common/utils');
-const { VantComponent } = require('../common/component');
-const { commonProps, inputProps, textareaProps } = require('./props');
+import { nextTick } from '../common/utils';
+import { VantComponent } from '../common/component';
+import { commonProps, inputProps, textareaProps } from './props';
 VantComponent({
     field: true,
     classes: ['input-class', 'right-icon-class', 'label-class'],

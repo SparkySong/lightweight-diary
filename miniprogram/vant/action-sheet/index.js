@@ -1,5 +1,5 @@
-const { VantComponent } = require('../common/component');
-const { button } = require('../mixins/button');
+import { VantComponent } from '../common/component';
+import { button } from '../mixins/button';
 VantComponent({
     classes: ['list-class'],
     mixins: [button],

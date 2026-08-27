@@ -1,4 +1,4 @@
-const Toast = require("../../vant/toast/toast");
+const Toast = require("../../vant/toast/toast").default;
 // pages/report/report.js
 const app = getApp();
 

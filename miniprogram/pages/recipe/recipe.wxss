@@ -40,7 +40,7 @@
   width: 76rpx;
   height: 76rpx;
   border-radius: 50%;
-  background: linear-gradient(135deg, rgba(95, 168, 149, 0.18), rgba(95, 168, 149, 0.06));
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.18), rgba(34, 197, 94, 0.06));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -48,7 +48,7 @@
 }
 
 .intro-icon {
-  color: #22C55E;
+  color: var(--accent-text);
   width: 36rpx;
   height: 36rpx;
   display: flex;
@@ -116,7 +116,7 @@
 }
 
 .category-card-breakfast::before {
-  background: linear-gradient(90deg, #D4A574, #E0C098);
+  background: linear-gradient(90deg, #FBBF24, #E0C098);
 }
 
 .category-card-lunch::before {
@@ -124,11 +124,11 @@
 }
 
 .category-card-dinner::before {
-  background: linear-gradient(90deg, #8B9EAF, #A3B4C2);
+  background: linear-gradient(90deg, #60A5FA, #A3B4C2);
 }
 
 .category-card-snack::before {
-  background: linear-gradient(90deg, #C98B8B, #D9A5A5);
+  background: linear-gradient(90deg, #F87171, #D9A5A5);
 }
 
 /* ========== 分类头部 ========== */
@@ -184,7 +184,7 @@
 .daily-count-badge {
   font-size: 20rpx;
   color: var(--accent-green, #22C55E);
-  background: rgba(95, 168, 149, 0.1);
+  background: rgba(34, 197, 94, 0.1);
   padding: 3rpx 12rpx;
   border-radius: 8rpx;
   font-weight: 600;
@@ -238,7 +238,7 @@
 }
 
 .category-divider-breakfast { background: rgba(212, 165, 116, 0.15); }
-.category-divider-lunch { background: rgba(95, 168, 149, 0.15); }
+.category-divider-lunch { background: rgba(34, 197, 94, 0.15); }
 .category-divider-dinner { background: rgba(139, 158, 175, 0.15); }
 .category-divider-snack { background: rgba(201, 139, 139, 0.15); }
 
@@ -288,17 +288,17 @@
 }
 
 .tag-protein {
-  color: #22C55E;
-  background: rgba(95, 168, 149, 0.1);
+  color: var(--accent-text);
+  background: rgba(34, 197, 94, 0.1);
 }
 
 .tag-lowfat {
-  color: #8B9EAF;
+  color: #60A5FA;
   background: rgba(139, 158, 175, 0.1);
 }
 
 .tag-lowgi {
-  color: #D4A574;
+  color: #FBBF24;
   background: rgba(212, 165, 116, 0.1);
 }
 
@@ -313,12 +313,12 @@
 }
 
 .tag-lowcal {
-  color: #C98B8B;
+  color: #F87171;
   background: rgba(201, 139, 139, 0.12);
 }
 
 .tag-lowcal {
-  color: #C98B8B;
+  color: #F87171;
   background: rgba(201, 139, 139, 0.1);
 }
 
@@ -330,25 +330,25 @@
   flex-shrink: 0;
   padding: 8rpx 16rpx;
   border-radius: 12rpx;
-  background: rgba(95, 168, 149, 0.1);
+  background: rgba(34, 197, 94, 0.1);
 }
 
 .cal-wrap-breakfast { background: rgba(212, 165, 116, 0.1); }
-.cal-wrap-lunch { background: rgba(95, 168, 149, 0.1); }
+.cal-wrap-lunch { background: rgba(34, 197, 94, 0.1); }
 .cal-wrap-dinner { background: rgba(139, 158, 175, 0.1); }
 .cal-wrap-snack { background: rgba(201, 139, 139, 0.1); }
 
 .recipe-cal-num {
   font-size: 28rpx;
   font-weight: 700;
-  color: #22C55E;
+  color: var(--accent-text);
   line-height: 1;
 }
 
-.cal-wrap-breakfast .recipe-cal-num { color: #D4A574; }
-.cal-wrap-lunch .recipe-cal-num { color: #22C55E; }
-.cal-wrap-dinner .recipe-cal-num { color: #8B9EAF; }
-.cal-wrap-snack .recipe-cal-num { color: #C98B8B; }
+.cal-wrap-breakfast .recipe-cal-num { color: #FBBF24; }
+.cal-wrap-lunch .recipe-cal-num { color: var(--accent-text); }
+.cal-wrap-dinner .recipe-cal-num { color: #60A5FA; }
+.cal-wrap-snack .recipe-cal-num { color: #F87171; }
 
 .recipe-cal-unit {
   font-size: 18rpx;
@@ -372,7 +372,7 @@
   align-items: center;
   justify-content: center;
   gap: 12rpx;
-  box-shadow: 0 6rpx 24rpx rgba(95, 168, 149, 0.3);
+  box-shadow: 0 6rpx 24rpx rgba(34, 197, 94, 0.3);
   transition: all 0.25s ease;
   position: relative;
   overflow: hidden;
@@ -453,7 +453,7 @@
   left: 0;
   right: 0;
   height: 4rpx;
-  background: linear-gradient(90deg, #22C55E, #D4A574, #8B9EAF, #C98B8B);
+  background: linear-gradient(90deg, #22C55E, #FBBF24, #60A5FA, #F87171);
 }
 
 /* 方案头部 */
@@ -484,7 +484,7 @@
 .plan-date-label {
   font-size: 20rpx;
   color: var(--text-secondary, #6B7280);
-  background: rgba(95, 168, 149, 0.1);
+  background: rgba(34, 197, 94, 0.1);
   padding: 3rpx 12rpx;
   border-radius: 8rpx;
   font-weight: 500;
@@ -534,7 +534,7 @@
   gap: 10rpx;
   padding: 16rpx 28rpx;
   margin: 0 28rpx;
-  background: rgba(95, 168, 149, 0.08);
+  background: rgba(34, 197, 94, 0.08);
   border-radius: 12rpx;
   flex-wrap: wrap;
 }
@@ -548,7 +548,7 @@
 .plan-total-num {
   font-size: 36rpx;
   font-weight: 800;
-  color: #22C55E;
+  color: var(--accent-text);
   line-height: 1;
 }
 
@@ -567,12 +567,12 @@
 }
 
 .hint-good {
-  color: #22C55E;
-  background: rgba(95, 168, 149, 0.12);
+  color: var(--accent-text);
+  background: rgba(34, 197, 94, 0.12);
 }
 
 .hint-normal {
-  color: #D4A574;
+  color: #FBBF24;
   background: rgba(212, 165, 116, 0.12);
 }
 
@@ -594,10 +594,10 @@
   transition: all 0.25s ease;
 }
 
-.meal-item-breakfast { border-left-color: #D4A574; }
+.meal-item-breakfast { border-left-color: #FBBF24; }
 .meal-item-lunch { border-left-color: #22C55E; }
-.meal-item-dinner { border-left-color: #8B9EAF; }
-.meal-item-snack { border-left-color: #C98B8B; }
+.meal-item-dinner { border-left-color: #60A5FA; }
+.meal-item-snack { border-left-color: #F87171; }
 
 .plan-meal-left {
   flex: 1;
@@ -665,21 +665,21 @@
 }
 
 .cal-dot-breakfast { background: rgba(212, 165, 116, 0.12); }
-.cal-dot-lunch { background: rgba(95, 168, 149, 0.12); }
+.cal-dot-lunch { background: rgba(34, 197, 94, 0.12); }
 .cal-dot-dinner { background: rgba(139, 158, 175, 0.12); }
 .cal-dot-snack { background: rgba(201, 139, 139, 0.12); }
 
 .plan-cal-num {
   font-size: 26rpx;
   font-weight: 700;
-  color: #22C55E;
+  color: var(--accent-text);
   line-height: 1;
 }
 
-.cal-dot-breakfast .plan-cal-num { color: #D4A574; }
-.cal-dot-lunch .plan-cal-num { color: #22C55E; }
-.cal-dot-dinner .plan-cal-num { color: #8B9EAF; }
-.cal-dot-snack .plan-cal-num { color: #C98B8B; }
+.cal-dot-breakfast .plan-cal-num { color: #FBBF24; }
+.cal-dot-lunch .plan-cal-num { color: var(--accent-text); }
+.cal-dot-dinner .plan-cal-num { color: #60A5FA; }
+.cal-dot-snack .plan-cal-num { color: #F87171; }
 
 .plan-cal-unit {
   font-size: 17rpx;
@@ -694,20 +694,20 @@
   gap: 6rpx;
   padding: 8rpx 16rpx;
   border-radius: 20rpx;
-  background: rgba(95, 168, 149, 0.08);
+  background: rgba(34, 197, 94, 0.08);
   flex-shrink: 0;
   transition: all 0.2s ease;
 }
 
 .plan-reshuffle-btn:active {
-  background: rgba(95, 168, 149, 0.18);
+  background: rgba(34, 197, 94, 0.18);
   transform: scale(0.94);
 }
 
 .reshuffle-text {
   font-size: 20rpx;
   font-weight: 600;
-  color: #22C55E;
+  color: var(--accent-text);
 }
 
 .reshuffle-icon {
@@ -799,7 +799,7 @@
   transform: translate(-50%, -50%) scale(0.8);
   background: var(--card-bg, #1E1E1E);
   border: 1rpx solid #22C55E;
-  color: #22C55E;
+  color: var(--accent-text);
   padding: 24rpx 48rpx;
   border-radius: 16rpx;
   font-size: 28rpx;
@@ -842,11 +842,11 @@
 }
 
 .theme-light .intro-icon {
-  color: #22C55E;
+  color: var(--accent-text);
 }
 
 .theme-light .icon-leaf {
-  color: #22C55E;
+  color: var(--accent-text);
 }
 
 .theme-light .intro-card::before {
@@ -868,7 +868,7 @@
 
 .theme-light .daily-count-badge {
   background: rgba(74, 155, 138, 0.08);
-  color: #22C55E;
+  color: var(--accent-text);
 }
 
 .theme-light .category-toggle {
@@ -892,17 +892,17 @@
 
 /* 标签浅色 */
 .theme-light .tag-protein {
-  color: #22C55E;
+  color: var(--accent-text);
   background: rgba(74, 155, 138, 0.08);
 }
 
 .theme-light .tag-lowfat {
-  color: #7A8E9F;
+  color: #3B82F6;
   background: rgba(122, 142, 159, 0.08);
 }
 
 .theme-light .tag-lowgi {
-  color: #C49A6C;
+  color: #D97706;
   background: rgba(196, 154, 108, 0.08);
 }
 
@@ -912,7 +912,7 @@
 }
 
 .theme-light .tag-lowcal {
-  color: #B87B7B;
+  color: #DC2626;
   background: rgba(184, 123, 123, 0.08);
 }
 
@@ -922,14 +922,14 @@
 .theme-light .cal-wrap-dinner { background: rgba(122, 142, 159, 0.08); }
 .theme-light .cal-wrap-snack { background: rgba(184, 123, 123, 0.08); }
 
-.theme-light .cal-wrap-breakfast .recipe-cal-num { color: #C49A6C; }
-.theme-light .cal-wrap-lunch .recipe-cal-num { color: #22C55E; }
-.theme-light .cal-wrap-dinner .recipe-cal-num { color: #7A8E9F; }
-.theme-light .cal-wrap-snack .recipe-cal-num { color: #B87B7B; }
+.theme-light .cal-wrap-breakfast .recipe-cal-num { color: #D97706; }
+.theme-light .cal-wrap-lunch .recipe-cal-num { color: var(--accent-text); }
+.theme-light .cal-wrap-dinner .recipe-cal-num { color: #3B82F6; }
+.theme-light .cal-wrap-snack .recipe-cal-num { color: #DC2626; }
 
 /* 分类顶部线浅色 */
 .theme-light .category-card-breakfast::before {
-  background: linear-gradient(90deg, #C49A6C, #D4B48C);
+  background: linear-gradient(90deg, #D97706, #D4B48C);
 }
 
 .theme-light .category-card-lunch::before {
@@ -937,11 +937,11 @@
 }
 
 .theme-light .category-card-dinner::before {
-  background: linear-gradient(90deg, #7A8E9F, #97AAB8);
+  background: linear-gradient(90deg, #3B82F6, #97AAB8);
 }
 
 .theme-light .category-card-snack::before {
-  background: linear-gradient(90deg, #B87B7B, #CE9E9E);
+  background: linear-gradient(90deg, #DC2626, #CE9E9E);
 }
 
 /* 随机推荐按钮浅色 */
@@ -961,7 +961,7 @@
 
 .theme-light .plan-date-label {
   background: rgba(74, 155, 138, 0.08);
-  color: #7A8E9F;
+  color: #3B82F6;
 }
 
 .theme-light .close-x::before,
@@ -974,16 +974,16 @@
 }
 
 .theme-light .plan-total-num {
-  color: #22C55E;
+  color: var(--accent-text);
 }
 
 .theme-light .hint-good {
-  color: #22C55E;
+  color: var(--accent-text);
   background: rgba(74, 155, 138, 0.1);
 }
 
 .theme-light .hint-normal {
-  color: #C49A6C;
+  color: #D97706;
   background: rgba(196, 154, 108, 0.1);
 }
 
@@ -1006,7 +1006,7 @@
 }
 
 .theme-light .reshuffle-text {
-  color: #22C55E;
+  color: var(--accent-text);
 }
 
 .theme-light .icon-refresh-sm {
@@ -1018,16 +1018,16 @@
 .theme-light .cal-dot-dinner { background: rgba(122, 142, 159, 0.07); }
 .theme-light .cal-dot-snack { background: rgba(184, 123, 123, 0.07); }
 
-.theme-light .cal-dot-breakfast .plan-cal-num { color: #C49A6C; }
-.theme-light .cal-dot-lunch .plan-cal-num { color: #22C55E; }
-.theme-light .cal-dot-dinner .plan-cal-num { color: #7A8E9F; }
-.theme-light .cal-dot-snack .plan-cal-num { color: #B87B7B; }
+.theme-light .cal-dot-breakfast .plan-cal-num { color: #D97706; }
+.theme-light .cal-dot-lunch .plan-cal-num { color: var(--accent-text); }
+.theme-light .cal-dot-dinner .plan-cal-num { color: #3B82F6; }
+.theme-light .cal-dot-snack .plan-cal-num { color: #DC2626; }
 
 /* Toast 浅色 */
 .theme-light .toast {
   background: #FFFFFF;
   border-color: #22C55E;
-  color: #22C55E;
+  color: var(--accent-text);
   box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.1);
 }
 

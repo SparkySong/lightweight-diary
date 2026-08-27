@@ -1,6 +1,6 @@
-const { VantComponent } = require('../common/component');
-const { button } = require('../mixins/button');
-const { canIUseFormFieldButton } = require('../common/version');
+import { VantComponent } from '../common/component';
+import { button } from '../mixins/button';
+import { canIUseFormFieldButton } from '../common/version';
 const mixins = [button];
 if (canIUseFormFieldButton()) {
     mixins.push('wx://form-field-button');

@@ -9,10 +9,7 @@
     "pages/exercise/exercise",
     "pages/achievements/achievements",
     "pages/report/report",
-    "pages/period/period",
-    "pages/test-theme/test-theme",
-    "pages/test-dialog-theme/test-dialog-theme",
-    "pages/test-inline-theme/test-inline-theme"
+    "pages/period/period"
   ],
   "window": {
     "navigationBarBackgroundColor": "#121212",

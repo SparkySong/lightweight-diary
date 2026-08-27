@@ -1,7 +1,7 @@
-const { VantComponent } = require('../common/component');
-const { touch } = require('../mixins/touch');
-const { canIUseModel } = require('../common/version');
-const { getRect, addUnit, nextTick, addNumber, clamp } = require('../common/utils');
+import { VantComponent } from '../common/component';
+import { touch } from '../mixins/touch';
+import { canIUseModel } from '../common/version';
+import { getRect, addUnit, nextTick, addNumber, clamp } from '../common/utils';
 const DRAG_STATUS = {
     START: 'start',
     MOVING: 'moving',

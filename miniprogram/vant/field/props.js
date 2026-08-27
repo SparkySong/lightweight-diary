@@ -1,4 +1,4 @@
-const commonProps = {
+export const commonProps = {
     value: String,
     placeholder: String,
     placeholderStyle: String,
@@ -32,7 +32,7 @@ const commonProps = {
     },
     holdKeyboard: Boolean,
 };
-const inputProps = {
+export const inputProps = {
     type: {
         type: String,
         value: 'text',
@@ -42,7 +42,7 @@ const inputProps = {
     confirmHold: Boolean,
     alwaysEmbed: Boolean,
 };
-const textareaProps = {
+export const textareaProps = {
     autoHeight: Boolean,
     fixed: Boolean,
     showConfirmBar: {
@@ -54,5 +54,3 @@ const textareaProps = {
         value: true,
     },
 };
-
-module.exports = { commonProps, inputProps, textareaProps };

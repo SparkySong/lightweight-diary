@@ -9,7 +9,7 @@ function getDirection(x, y) {
     }
     return '';
 }
-const touch = Behavior({
+export const touch = Behavior({
     methods: {
         resetTouchStatus() {
             this.direction = '';
@@ -35,5 +35,3 @@ const touch = Behavior({
         },
     },
 });
-
-module.exports = { touch };

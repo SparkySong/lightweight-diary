@@ -1,5 +1,5 @@
 let systemInfo;
-function getSystemInfoSync() {
+export function getSystemInfoSync() {
     if (systemInfo == null) {
         systemInfo = wx.getSystemInfoSync();
     }
@@ -31,19 +31,19 @@ function gte(version) {
     const system = getSystemInfoSync();
     return compareVersion(system.SDKVersion, version) >= 0;
 }
-function canIUseModel() {
+export function canIUseModel() {
     return gte('2.9.3');
 }
-function canIUseFormFieldButton() {
+export function canIUseFormFieldButton() {
     return gte('2.10.3');
 }
-function canIUseAnimate() {
+export function canIUseAnimate() {
     return gte('2.9.0');
 }
-function canIUseGroupSetData() {
+export function canIUseGroupSetData() {
     return gte('2.4.0');
 }
-function canIUseNextTick() {
+export function canIUseNextTick() {
     try {
         return wx.canIUse('nextTick');
     }
@@ -51,20 +51,9 @@ function canIUseNextTick() {
         return gte('2.7.1');
     }
 }
-function canIUseCanvas2d() {
+export function canIUseCanvas2d() {
     return gte('2.9.0');
 }
-function canIUseGetUserProfile() {
+export function canIUseGetUserProfile() {
     return !!wx.getUserProfile;
 }
-
-module.exports = {
-    getSystemInfoSync,
-    canIUseModel,
-    canIUseFormFieldButton,
-    canIUseAnimate,
-    canIUseGroupSetData,
-    canIUseNextTick,
-    canIUseCanvas2d,
-    canIUseGetUserProfile
-};

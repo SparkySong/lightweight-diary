@@ -1,5 +1,5 @@
-const { VantComponent } = require('../common/component');
-const { pickerProps } = require('./shared');
+import { VantComponent } from '../common/component';
+import { pickerProps } from './shared';
 VantComponent({
     classes: ['active-class', 'toolbar-class', 'column-class'],
     props: Object.assign(Object.assign({}, pickerProps), { valueKey: {

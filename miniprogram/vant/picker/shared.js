@@ -1,4 +1,4 @@
-const pickerProps = {
+export const pickerProps = {
     title: String,
     loading: Boolean,
     showToolbar: Boolean,
@@ -19,5 +19,3 @@ const pickerProps = {
         value: 44,
     },
 };
-
-module.exports = { pickerProps };
