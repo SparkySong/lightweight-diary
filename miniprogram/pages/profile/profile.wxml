@@ -59,7 +59,7 @@
       <!-- 个人信息设置 -->
       <view class="menu-item" bindtap="onMenuItemTap" data-action="profile">
         <view class="menu-item-left">
-          <view class="menu-icon menu-icon-profile"></view>
+          <van-icon class="menu-icon" name="contact" color="var(--accent-text)" size="36rpx" />
           <text class="menu-text">个人信息</text>
         </view>
         <view class="menu-item-right">
@@ -73,7 +73,7 @@
       <!-- 每日热量目标 -->
       <view class="menu-item" bindtap="onMenuItemTap" data-action="calorieGoal">
         <view class="menu-item-left">
-          <view class="menu-icon menu-icon-calorie"></view>
+          <van-icon class="menu-icon" name="fire-o" color="var(--accent-text)" size="36rpx" />
           <text class="menu-text">热量目标</text>
         </view>
         <view class="menu-item-right">
@@ -85,7 +85,7 @@
       <!-- 单位与偏好设置 -->
       <view class="menu-item" bindtap="onMenuItemTap" data-action="preferences">
         <view class="menu-item-left">
-          <view class="menu-icon menu-icon-settings"></view>
+          <van-icon class="menu-icon" name="setting-o" color="var(--accent-text)" size="36rpx" />
           <text class="menu-text">偏好设置</text>
         </view>
         <view class="menu-item-right">
@@ -97,7 +97,7 @@
       <!-- 深色模式设置 -->
       <view class="menu-item" bindtap="onMenuItemTap" data-action="theme">
         <view class="menu-item-left">
-          <view class="menu-icon menu-icon-theme"></view>
+          <van-icon class="menu-icon" name="bulb-o" color="var(--accent-text)" size="36rpx" />
           <text class="menu-text">主题设置</text>
         </view>
         <view class="menu-item-right">
@@ -109,7 +109,7 @@
       <!-- 健康问答 -->
       <view class="menu-item" bindtap="onMenuItemTap" data-action="aiChat">
         <view class="menu-item-left">
-          <view class="menu-icon menu-icon-ai"></view>
+          <van-icon class="menu-icon" name="chat-o" color="var(--accent-text)" size="36rpx" />
           <text class="menu-text">健康问答</text>
         </view>
         <view class="menu-item-right">
@@ -121,7 +121,7 @@
       <!-- 我的成就 -->
       <view class="menu-item" bindtap="onMenuItemTap" data-action="achievements">
         <view class="menu-item-left">
-          <view class="menu-icon menu-icon-achievement">🏆</view>
+          <van-icon class="menu-icon" name="award-o" color="var(--accent-text)" size="36rpx" />
           <text class="menu-text">我的成就</text>
         </view>
         <view class="menu-item-right">
@@ -133,7 +133,7 @@
       <!-- 健康报告 -->
       <view class="menu-item" bindtap="onMenuItemTap" data-action="report">
         <view class="menu-item-left">
-          <view class="menu-icon menu-icon-report">📊</view>
+          <van-icon class="menu-icon" name="chart-trending-o" color="var(--accent-text)" size="36rpx" />
           <text class="menu-text">健康报告</text>
         </view>
         <view class="menu-item-right">
@@ -145,7 +145,7 @@
       <!-- 经期记录 -->
       <view class="menu-item" bindtap="onMenuItemTap" data-action="period">
         <view class="menu-item-left">
-          <view class="menu-icon menu-icon-period">🌙</view>
+          <van-icon class="menu-icon" name="calendar-o" color="var(--accent-text)" size="36rpx" />
           <text class="menu-text">经期记录</text>
         </view>
         <view class="menu-item-right">
@@ -159,7 +159,7 @@
       <!-- 数据管理 -->
       <view class="menu-item" bindtap="onMenuItemTap" data-action="dataManage">
         <view class="menu-item-left">
-          <view class="menu-icon menu-icon-data"></view>
+          <van-icon class="menu-icon" name="records" color="var(--accent-text)" size="36rpx" />
           <text class="menu-text">数据管理</text>
         </view>
         <view class="menu-item-right">
@@ -170,7 +170,7 @@
       <!-- 帮助与反馈 -->
       <view class="menu-item" bindtap="onMenuItemTap" data-action="help">
         <view class="menu-item-left">
-          <view class="menu-icon menu-icon-help"></view>
+          <van-icon class="menu-icon" name="question-o" color="var(--accent-text)" size="36rpx" />
           <text class="menu-text">帮助与反馈</text>
         </view>
         <view class="menu-item-right">
@@ -181,7 +181,7 @@
       <!-- 关于 -->
       <view class="menu-item" bindtap="onMenuItemTap" data-action="about">
         <view class="menu-item-left">
-          <view class="menu-icon menu-icon-about"></view>
+          <van-icon class="menu-icon" name="info-o" color="var(--accent-text)" size="36rpx" />
           <text class="menu-text">关于我们</text>
         </view>
         <view class="menu-item-right">
@@ -244,10 +244,10 @@
         <text class="form-label">性别</text>
         <view class="gender-options">
           <view class="gender-option {{editGender === 'male' ? 'gender-active' : ''}}" bindtap="onGenderSelect" data-gender="male">
-            <text>👨 男</text>
+            <text>男</text>
           </view>
           <view class="gender-option {{editGender === 'female' ? 'gender-active' : ''}}" bindtap="onGenderSelect" data-gender="female">
-            <text>👩 女</text>
+            <text>女</text>
           </view>
         </view>
       </view>
@@ -336,17 +336,17 @@
     <view class="popup-body">
       <view class="theme-options">
         <view class="theme-option {{themeSetting === 'system' ? 'active' : ''}}" bindtap="onSwitchTheme" data-theme="system">
-          <image class="theme-option-img" src="/images/theme-system.png" mode="aspectFit"></image>
+          <view class="theme-option-icon"><text class="theme-option-glyph">◐</text></view>
           <text class="theme-option-text">跟随系统</text>
           <text class="theme-option-check" wx:if="{{themeSetting === 'system'}}">✓</text>
         </view>
         <view class="theme-option {{themeSetting === 'dark' ? 'active' : ''}}" bindtap="onSwitchTheme" data-theme="dark">
-          <image class="theme-option-img" src="/images/theme-moon.png" mode="aspectFit"></image>
+          <view class="theme-option-icon"><text class="theme-option-glyph">☾</text></view>
           <text class="theme-option-text">深色模式</text>
           <text class="theme-option-check" wx:if="{{themeSetting === 'dark'}}">✓</text>
         </view>
         <view class="theme-option {{themeSetting === 'light' ? 'active' : ''}}" bindtap="onSwitchTheme" data-theme="light">
-          <image class="theme-option-img" src="/images/theme-sun.png" mode="aspectFit"></image>
+          <view class="theme-option-icon"><text class="theme-option-glyph">☀</text></view>
           <text class="theme-option-text">浅色模式</text>
           <text class="theme-option-check" wx:if="{{themeSetting === 'light'}}">✓</text>
         </view>

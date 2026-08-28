@@ -240,3 +240,28 @@ page,
 .mint-mt-lg { margin-top: var(--spacing-lg); }
 .mint-px-md { padding-left: var(--spacing-md); padding-right: var(--spacing-md); }
 .mint-py-md { padding-top: var(--spacing-md); padding-bottom: var(--spacing-md); }
+
+/* 记录操作按钮（编辑/删除） */
+.record-actions {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.action-btn {
+  font-size: 22rpx;
+  line-height: 1;
+  padding: 8rpx 20rpx;
+  border-radius: var(--radius-full);
+  font-weight: 500;
+}
+
+.action-edit {
+  color: var(--accent-text, #22C55E);
+  background: var(--color-primary-bg, rgba(34, 197, 94, 0.1));
+}
+
+.action-delete {
+  color: var(--color-error, #EF4444);
+  background: rgba(239, 68, 68, 0.1);
+}

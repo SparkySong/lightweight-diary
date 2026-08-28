@@ -649,7 +649,7 @@
 
 .advice-num {
   font-size: 24rpx;
-  color: var(--accent-text);
+  color: var(--text-secondary);
   font-weight: 600;
   flex-shrink: 0;
 }
@@ -815,7 +815,7 @@
 .tips-label {
   display: inline-block;
   font-size: 18rpx;
-  color: var(--accent-text);
+  color: var(--text-secondary);
   background: rgba(34, 197, 94, 0.12);
   padding: 2rpx 10rpx;
   border-radius: 6rpx;
@@ -1062,7 +1062,7 @@
 }
 
 .theme-light .tips-label {
-  color: var(--accent-text);
+  color: var(--text-secondary);
   background: rgba(74, 155, 138, 0.1);
 }
 
@@ -1075,7 +1075,7 @@
 
 .theme-light .encourage-text,
 .theme-light .advice-num {
-  color: var(--accent-text);
+  color: var(--text-secondary);
 }
 
 .theme-light .hint-dot.normal {

@@ -263,13 +263,6 @@
   color: var(--text-primary);
 }
 
-.meal-dot {
-  width: 14rpx;
-  height: 14rpx;
-  border-radius: 50%;
-  background: var(--accent-text, #22C55E);
-}
-
 .meal-actions {
   display: flex;
   align-items: center;
@@ -292,8 +285,8 @@
   align-items: center;
   padding: 6rpx 20rpx;
   border-radius: var(--radius-full);
-  background: var(--color-primary-bg, rgba(34, 197, 94, 0.1));
-  color: var(--accent-text, #22C55E);
+  background: var(--bg-card-secondary);
+  color: var(--text-secondary);
   font-size: 24rpx;
   line-height: 1.6;
 }

@@ -321,11 +321,9 @@
 /* Card 基础样式 - 毛玻璃效果 */
 
 /* ===== 今日能量概览卡片 ===== */
-.energy-overview-card {}
-
 .energy-hint {
   font-size: 22rpx;
-  color: var(--accent-text, #22C55E);
+  color: var(--text-secondary);
   font-weight: 500;
 }
 
@@ -423,7 +421,7 @@
 }
 
 .bar-val.intake { color: var(--color-warning, #FBBF24); }
-.bar-val.burn { color: var(--accent-text, #22C55E); }
+.bar-val.burn { color: var(--text-primary); }
 
 /* 进度条 */
 .energy-progress-bar {
@@ -456,7 +454,7 @@
 
 /* 浅色主题 - 今日能量概览 */
 .theme-light .energy-hint {
-  color: var(--accent-text);
+  color: var(--text-secondary);
 }
 
 .theme-light .energy-label { color: #9CA3AF; }
@@ -471,7 +469,7 @@
 
 .theme-light .bar-label { color: #9CA3AF; }
 .theme-light .bar-val.intake { color: #D97706; }
-.theme-light .bar-val.burn { color: var(--accent-text); }
+.theme-light .bar-val.burn { color: var(--text-primary); }
 
 .theme-light .energy-progress-bar {
   background: rgba(0, 0, 0, 0.06);
@@ -710,7 +708,7 @@
   transform: translate(-50%, -50%);
   width: 20rpx;
   height: 20rpx;
-  background: var(--text-primary, #F5F5F5);
+  background: var(--accent-text, #22C55E);
   border-radius: 50%;
   border: 4rpx solid var(--bg-page, #121212);
   box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.35);
@@ -748,7 +746,7 @@
 
 .height-edit {
   font-size: 24rpx;
-  color: var(--accent-text);
+  color: var(--text-primary);
   font-weight: 500;
 }
 
@@ -1006,7 +1004,7 @@
 }
 .goal-edit-hint {
   font-size: 22rpx;
-  color: var(--accent-text, #22C55E);
+  color: var(--text-secondary);
   opacity: 0.8;
   display: flex;
   align-items: center;
@@ -2111,7 +2109,7 @@
 }
 
 .theme-light .height-edit {
-  color: var(--accent-text);
+  color: var(--text-primary);
 }
 
 .theme-light .height-input {
@@ -2147,7 +2145,7 @@
 
 /* 目标卡片 */
 .theme-light .goal-edit-hint {
-  color: var(--accent-text);
+  color: var(--text-secondary);
 }
 
 .theme-light .goal-empty {

@@ -31,12 +31,12 @@
 .stats-number {
   font-size: 80rpx;
   font-weight: 700;
-  color: var(--accent-text);
+  color: var(--text-primary);
   letter-spacing: -0.03em;
 }
 
 .theme-light .stats-number {
-  color: var(--accent-text);
+  color: var(--text-primary);
 }
 
 .stats-total {

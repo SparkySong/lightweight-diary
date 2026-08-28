@@ -5,6 +5,32 @@ const Toast = require('../../vant/toast/toast').default;
 // 分页配置
 const PAGE_SIZE = 10;
 
+// 餐次展示元数据：统一图标与纯文字标签（云端旧数据含 emoji 或中文 mealType，客户端归一化）
+const MEAL_META = {
+  breakfast: { label: '早餐', icon: 'star-o' },
+  lunch: { label: '午餐', icon: 'clock-o' },
+  dinner: { label: '晚餐', icon: 'bulb-o' },
+  snack: { label: '加餐', icon: 'birthday-cake-o' }
+};
+const MEAL_KEY_BY_TEXT = { '早餐': 'breakfast', '午餐': 'lunch', '晚餐': 'dinner', '加餐': 'snack' };
+
+function mealKeyOf(r) {
+  const t = String(r.mealType || '');
+  if (MEAL_META[t]) return t;
+  return MEAL_KEY_BY_TEXT[t.replace(/[^\u4e00-\u9fa5]/g, '')];
+}
+
+function normalizeMealDays(days) {
+  return (days || []).map(d => ({
+    ...d,
+    records: (d.records || []).map(r => {
+      const key = mealKeyOf(r);
+      const meta = key && MEAL_META[key];
+      return meta ? { ...r, mealType: key, mealLabel: meta.label, mealIcon: meta.icon } : r;
+    })
+  }));
+}
+
 // 🔑 关键修复：从存储获取当前生效的主题（用于 data 初始值，避免闪烁）
 const getInitTheme = () => {
   const themeSetting = wx.getStorageSync('appTheme') || 'system';
@@ -329,10 +355,10 @@ Page({
     inputDate: '',
     mealType: 'breakfast',
     mealTypes: [
-      { key: 'breakfast', label: '🌅 早餐', selected: true },
-      { key: 'lunch', label: '☀️ 午餐', selected: false },
-      { key: 'dinner', label: '🌙 晚餐', selected: false },
-      { key: 'snack', label: '🍪 加餐', selected: false }
+      { key: 'breakfast', label: '早餐', selected: true },
+      { key: 'lunch', label: '午餐', selected: false },
+      { key: 'dinner', label: '晚餐', selected: false },
+      { key: 'snack', label: '加餐', selected: false }
     ],
     foods: [{ name: '', calories: '' }],
     days: [],
@@ -382,6 +408,12 @@ Page({
     this.loadRecords();
     // 加载云端自定义食物
     this.loadCustomFoods();
+  },
+
+  onHide() {
+    if (this.data.isEditing || this.data.showAddPanel) {
+      this.cancelEdit();
+    }
   },
 
   // 读取 reLaunch 前存入的主题切换提示并显示一次
@@ -499,7 +531,7 @@ Page({
   async loadRecords() {
     try {
       const res = await wx.cloud.callFunction({ name: 'getDietRecords', data: {} });
-      const allDays = res.result.days || [];
+      const allDays = normalizeMealDays(res.result.days);
       
       // 初始化分页数据
       const displayedDays = allDays.slice(0, PAGE_SIZE);
@@ -581,10 +613,10 @@ Page({
         editRecordId: newEditRecordId,
         mealType: 'breakfast',
         mealTypes: [
-          { key: 'breakfast', label: '🌅 早餐', selected: true },
-          { key: 'lunch', label: '☀️ 午餐', selected: false },
-          { key: 'dinner', label: '🌙 晚餐', selected: false },
-          { key: 'snack', label: '🍪 加餐', selected: false }
+          { key: 'breakfast', label: '早餐', selected: true },
+          { key: 'lunch', label: '午餐', selected: false },
+          { key: 'dinner', label: '晚餐', selected: false },
+          { key: 'snack', label: '加餐', selected: false }
         ],
         foods: newFoods,
         totalCalPreview: 0
@@ -850,10 +882,10 @@ Page({
       inputDate: '',
       mealType: 'breakfast',
       mealTypes: [
-        { key: 'breakfast', label: '🌅 早餐', selected: true },
-        { key: 'lunch', label: '☀️ 午餐', selected: false },
-        { key: 'dinner', label: '🌙 晚餐', selected: false },
-        { key: 'snack', label: '🍪 加餐', selected: false }
+        { key: 'breakfast', label: '早餐', selected: true },
+        { key: 'lunch', label: '午餐', selected: false },
+        { key: 'dinner', label: '晚餐', selected: false },
+        { key: 'snack', label: '加餐', selected: false }
       ],
       foods: [{ name: '', calories: '' }],
       showAddPanel: false

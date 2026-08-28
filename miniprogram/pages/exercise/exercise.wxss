@@ -67,7 +67,7 @@
 }
 
 .balance-value.intake {
-  color: var(--accent-text);
+  color: var(--text-primary);
 }
 
 .balance-value.burn {

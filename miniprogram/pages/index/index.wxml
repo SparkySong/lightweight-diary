@@ -290,11 +290,9 @@
                 <view class="trend-icon trend-flat"></view>
               </block>
             </view>
-            <view class="edit-icon" catchtap="onEditRecord" data-record="{{record}}">
-              <view class="icon-edit-small"></view>
-            </view>
-            <view class="delete-btn" data-id="{{record._id}}" data-date="{{record.date}}" catchtap="onDelete">
-              <view class="icon-delete"></view>
+            <view class="record-actions">
+              <text class="action-btn action-edit" catchtap="onEditRecord" data-record="{{record}}">编辑</text>
+              <text class="action-btn action-delete" data-id="{{record._id}}" data-date="{{record.date}}" catchtap="onDelete">删除</text>
             </view>
           </view>
         </view>

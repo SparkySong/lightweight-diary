@@ -172,7 +172,7 @@
 .profile-stat-value {
   font-size: 32rpx;
   font-weight: 700;
-  color: var(--accent-text);
+  color: var(--text-primary);
   letter-spacing: -0.02em;
   line-height: 1.2;
 }
@@ -244,146 +244,6 @@
   align-items: center;
   justify-content: center;
   color: var(--accent-text, #22C55E);
-}
-
-/* 菜单图标 */
-.menu-icon-profile::before {
-  content: '';
-  width: 20rpx;
-  height: 20rpx;
-  border: 2rpx solid currentColor;
-  border-radius: 50%;
-  position: relative;
-}
-
-.menu-icon-profile::after {
-  content: '';
-  position: absolute;
-  width: 28rpx;
-  height: 12rpx;
-  border: 2rpx solid currentColor;
-  border-radius: 10rpx 10rpx 0 0;
-  border-bottom: none;
-  margin-top: 16rpx;
-}
-
-.menu-icon-calorie::before {
-  content: '';
-  width: 20rpx;
-  height: 24rpx;
-  border: 2rpx solid currentColor;
-  border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
-}
-
-.menu-icon-settings::before {
-  content: '';
-  width: 22rpx;
-  height: 22rpx;
-  border: 2rpx solid currentColor;
-  border-radius: 50%;
-  position: relative;
-}
-
-.menu-icon-settings::after {
-  content: '';
-  position: absolute;
-  width: 32rpx;
-  height: 32rpx;
-  border: 2rpx dashed currentColor;
-  border-radius: 50%;
-}
-
-.menu-icon-theme::before {
-  content: '';
-  width: 22rpx;
-  height: 22rpx;
-  border-radius: 50%;
-  box-shadow: inset -6rpx -2rpx 0 0 currentColor;
-}
-
-.menu-icon-ai {
-  width: 36rpx;
-  height: 36rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.menu-icon-ai::before {
-  content: '';
-  width: 22rpx;
-  height: 22rpx;
-  border: 2rpx solid currentColor;
-  border-radius: 50%;
-}
-
-.menu-icon-ai::after {
-  content: '';
-  position: absolute;
-  width: 8rpx;
-  height: 8rpx;
-  background: currentColor;
-  border-radius: 50%;
-  margin-top: -2rpx;
-}
-
-.menu-icon-data::before {
-  content: '';
-  width: 20rpx;
-  height: 20rpx;
-  border: 2rpx solid currentColor;
-  border-radius: 2rpx;
-  position: relative;
-}
-
-.menu-icon-data::after {
-  content: '';
-  position: absolute;
-  width: 8rpx;
-  height: 8rpx;
-  background: currentColor;
-  margin-left: 12rpx;
-  margin-top: -12rpx;
-}
-
-.menu-icon-help::before {
-  content: '?';
-  width: 22rpx;
-  height: 22rpx;
-  border: 2rpx solid currentColor;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14rpx;
-  font-weight: 600;
-}
-
-.menu-icon-about::before {
-  content: 'i';
-  width: 22rpx;
-  height: 22rpx;
-  border: 2rpx solid currentColor;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14rpx;
-  font-weight: 600;
-  font-style: italic;
-}
-
-/* Emoji 图标菜单项 */
-.menu-icon-achievement,
-.menu-icon-report,
-.menu-icon-period {
-  font-size: 32rpx;
-  line-height: 1;
-  width: 36rpx;
-  height: 36rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .menu-text {
@@ -587,6 +447,7 @@
   display: flex;
   gap: 16rpx;
 }
+
 .gender-option {
   flex: 1;
   height: 72rpx;
@@ -1069,7 +930,7 @@
 }
 
 .container.theme-light .profile-stat-value {
-  color: var(--accent-text);
+  color: var(--text-primary);
 }
 
 .container.theme-light .profile-stat-label {
@@ -1334,3 +1195,26 @@
   box-shadow: 0 8rpx 24rpx rgba(74, 155, 138, 0.18);
 }
 
+
+
+/* 性别符号与主题选项图标 */
+
+
+.theme-option-icon {
+  width: 48rpx;
+  height: 40rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.theme-option-glyph {
+  font-size: 30rpx;
+  line-height: 1;
+  color: var(--text-tertiary);
+}
+
+.theme-option.active .theme-option-glyph {
+  color: #22C55E;
+}

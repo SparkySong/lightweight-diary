@@ -236,7 +236,7 @@
 }
 
 .stat-value.stat-green {
-  color: var(--accent-text);
+  color: var(--text-primary);
 }
 
 .stat-value.stat-red {
@@ -248,7 +248,7 @@
 }
 
 .theme-light .stat-value.stat-green {
-  color: var(--accent-text);
+  color: var(--text-primary);
 }
 
 .theme-light .stat-value.stat-red {

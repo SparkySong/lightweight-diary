@@ -151,11 +151,13 @@
 
       <view class="mint-card meal-card" wx:for="{{day.records}}" wx:key="_id" wx:for-item="meal" data-meal="{{meal}}" bindtap="onEditDiet">
         <view class="meal-header">
-          <view class="meal-label"><view class="meal-dot"></view><text>{{meal.mealLabel}}</text></view>
+          <view class="meal-label"><van-icon wx:if="{{meal.mealIcon}}" name="{{meal.mealIcon}}" color="var(--accent-text)" size="32rpx" /><text>{{meal.mealLabel}}</text></view>
           <view class="meal-actions">
-            <text class="meal-cal mint-text-accent">{{meal.totalCal}} kcal</text>
-            <van-icon name="edit" color="var(--text-tertiary)" size="36rpx" catchtap="onEditDiet" data-meal="{{meal}}" />
-            <van-icon name="delete" color="var(--color-error)" size="36rpx" data-id="{{meal._id}}" catchtap="onDeleteDiet" />
+            <text class="meal-cal mint-text-primary">{{meal.totalCal}} kcal</text>
+            <view class="record-actions">
+              <text class="action-btn action-edit" catchtap="onEditDiet" data-meal="{{meal}}">编辑</text>
+              <text class="action-btn action-delete" data-id="{{meal._id}}" catchtap="onDeleteDiet">删除</text>
+            </view>
           </view>
         </view>
         <view class="food-tags">
