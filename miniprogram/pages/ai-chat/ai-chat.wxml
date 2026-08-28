@@ -30,14 +30,9 @@
         wx:key="index"
         id="msg-{{index}}"
       >
-        <!-- AI 头像 — 简约线条 -->
+        <!-- AI 头像 -->
         <view class="avatar avatar-ai" wx:if="{{item.role === 'assistant'}}">
-          <view class="ai-icon">
-            <view class="ai-icon-circle"></view>
-            <view class="ai-icon-line ai-icon-line-1"></view>
-            <view class="ai-icon-line ai-icon-line-2"></view>
-            <view class="ai-icon-dot"></view>
-          </view>
+          <van-icon name="chat-o" size="48rpx" color="#22C55E" />
         </view>
 
         <!-- 消息气泡 -->

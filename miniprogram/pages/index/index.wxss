@@ -2449,3 +2449,52 @@
 .theme-light .icon-device {
   color: #6B7280;
 }
+
+/* BMI 轨道分段按真实区间比例（显示域 14-32） */
+.bmi-segment.underweight { flex: 4.5; }
+.bmi-segment.normal { flex: 5.5; }
+.bmi-segment.overweight { flex: 4; }
+.bmi-segment.obese { flex: 4; }
+
+.bmi-label:nth-child(1) { flex: 4.5; }
+.bmi-label:nth-child(2) { flex: 5.5; }
+.bmi-label:nth-child(3) { flex: 4; }
+.bmi-label:nth-child(4) { flex: 4; }
+
+/* 体重编辑弹窗 - 纵向居中布局 */
+.weight-edit-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24rpx 0 16rpx;
+}
+
+.weight-edit-label {
+  font-size: 24rpx;
+  color: var(--text-tertiary);
+  margin-bottom: 16rpx;
+  letter-spacing: 1rpx;
+}
+
+.weight-edit-input {
+  width: 100%;
+  text-align: center;
+  font-size: 48rpx;
+  font-weight: 700;
+  color: var(--text-primary);
+  padding: 20rpx 0;
+  line-height: 1.3;
+  border: none;
+  background: transparent;
+}
+
+.weight-edit-date {
+  font-size: 24rpx;
+  margin-top: 12rpx;
+}
+
+.field-error {
+  color: var(--color-error);
+  font-size: 24rpx;
+  margin-top: 8rpx;
+}

@@ -535,7 +535,7 @@ Page({
     const h = height / 100;
     const bmi = (w / (h * h)).toFixed(1);
     // 计算 BMI 指示器位置 (0-40 范围)
-    const bmiIndicatorLeft = Math.min(Math.max((bmi / 40) * 100, 0), 100);
+    const bmiIndicatorLeft = Math.min(Math.max(((bmi - 14) / 18) * 100, 0), 100);
 
     const isDark = this.data.currentTheme === 'dark';
     let category, color, bgColor;

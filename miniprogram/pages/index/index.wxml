@@ -85,7 +85,7 @@
   <view class="mint-card bmi-card">
     <view class="card-header">
       <text class="card-title mint-text-primary">BMI 指数</text>
-      <van-tag type="{{bmiCategory === '正常' ? 'success' : 'warning'}}" size="medium">{{bmiCategory}}</van-tag>
+      <van-tag round type="{{bmiCategory === '正常' ? 'success' : 'warning'}}" size="medium">{{bmiCategory}}</van-tag>
     </view>
     <view class="bmi-content">
       <view class="bmi-value-wrap">
@@ -352,17 +352,10 @@
   bind:cancel="closeEditPanel"
   bind:close="closeEditPanel"
 >
-  <view class="dialog-form">
-    <van-field extra-event-params
-      type="digit"
-      label="体重"
-      placeholder="请输入体重"
-      value="{{editWeight}}"
-      bind:input="onEditWeightInput"
-    >
-      <text slot="button" class="mint-text-tertiary">{{weightUnitLabel}}</text>
-    </van-field>
-    <text class="mint-text-tertiary" style="font-size: 24rpx; padding: 0 32rpx;">{{editDate}}</text>
+  <view class="dialog-form weight-edit-form">
+    <text class="weight-edit-label">当前体重 ({{weightUnitLabel}})</text>
+    <input class="weight-edit-input" type="digit" placeholder="0.0" value="{{editWeight}}" bindinput="onEditWeightInput" cursor-spacing="150" />
+    <text class="mint-text-tertiary weight-edit-date">{{editDate}}</text>
   </view>
 </van-dialog>
 
@@ -381,19 +374,10 @@
   bind:cancel="closeWeightPopup"
   bind:close="closeWeightPopup"
 >
-  <view class="dialog-form">
-    <van-field extra-event-params
-      type="digit"
-      label="{{weightPopupType === 'current' ? '当前体重' : '目标体重'}}"
-      placeholder="请输入体重"
-      value="{{weightInputValue}}"
-      bind:input="onWeightPopupInput"
-    >
-      <text slot="button" class="mint-text-tertiary">{{weightUnitLabel}}</text>
-    </van-field>
-    <view wx:if="{{weightPopupError}}" style="padding: 16rpx 32rpx;">
-      <text style="color: var(--color-error); font-size: 24rpx;">{{weightPopupError}}</text>
-    </view>
+  <view class="dialog-form weight-edit-form">
+    <text class="weight-edit-label">{{weightPopupType === 'current' ? '当前体重' : '目标体重'}} ({{weightUnitLabel}})</text>
+    <input class="weight-edit-input" type="digit" placeholder="0.0" value="{{weightInputValue}}" bindinput="onWeightPopupInput" cursor-spacing="150" />
+    <text class="field-error" wx:if="{{weightPopupError}}">{{weightPopupError}}</text>
   </view>
 </van-dialog>
 </view>

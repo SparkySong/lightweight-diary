@@ -1,0 +1,5 @@
+fix(index): 修复 BMI 指示器位置计算公式
+
+style(index): 重构体重编辑弹窗布局并调整 BMI 轨道比例
+
+refactor(ai-chat): 使用 van-icon 替换 AI 头像线条图标

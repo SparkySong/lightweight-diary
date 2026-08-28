@@ -70,70 +70,7 @@
 }
 
 /* ====== AI 简约线条图标（核心）====== */
-.ai-icon {
-  position: relative;
-  width: 68rpx;
-  height: 68rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
 
-.ai-icon-circle {
-  position: absolute;
-  width: 60rpx;
-  height: 60rpx;
-  border-radius: 50%;
-  border: 3rpx solid #22C55E;
-  box-sizing: border-box;
-}
-
-.theme-light .ai-icon-circle {
-  border-color: #22C55E;
-}
-
-/* 内部线条：模拟"大脑/对话"的简约线条 */
-.ai-icon-line-1,
-.ai-icon-line-2 {
-  position: absolute;
-  width: 22rpx;
-  height: 2rpx;
-  background: #22C55E;
-  border-radius: 1rpx;
-}
-
-.theme-light .ai-icon-line-1,
-.theme-light .ai-icon-line-2 {
-  background: #22C55E;
-}
-
-.ai-icon-line-1 {
-  top: 26rpx;
-  left: 16rpx;
-  transform: rotate(-20deg);
-}
-
-.ai-icon-line-2 {
-  bottom: 24rpx;
-  right: 18rpx;
-  transform: rotate(-15deg);
-  width: 18rpx;
-}
-
-/* 底部小圆点 */
-.ai-icon-dot {
-  position: absolute;
-  width: 6rpx;
-  height: 6rpx;
-  border-radius: 50%;
-  background: #22C55E;
-  bottom: 19rpx;
-  left: 27rpx;
-}
-
-.theme-light .ai-icon-dot {
-  background: #22C55E;
-}
 
 .user-avatar-img {
   width: 72rpx;
