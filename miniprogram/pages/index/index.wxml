@@ -340,12 +340,13 @@
 
 <!-- 身高编辑已改为内联模式，不再需要全屏遮罩层 -->
 
-<!-- 编辑体重弹窗 - Vant Dialog -->
+<!-- 修改体重弹窗 - 居中对话框（fade 动画，无缩放跳动） -->
 <van-dialog
   show="{{showEditPanel}}"
   title="修改体重"
   show-cancel-button
   use-slot
+  transition="fade"
   confirm-button-color="{{currentTheme === 'light' ? '#16A34A' : '#22C55E'}}"
   bind:confirm="onSaveEdit"
   bind:cancel="closeEditPanel"
@@ -354,10 +355,13 @@
   <view class="dialog-form">
     <van-field extra-event-params
       type="digit"
-      placeholder="体重 ({{weightUnitLabel}})"
+      label="体重"
+      placeholder="请输入体重"
       value="{{editWeight}}"
       bind:input="onEditWeightInput"
-    />
+    >
+      <text slot="button" class="mint-text-tertiary">{{weightUnitLabel}}</text>
+    </van-field>
     <text class="mint-text-tertiary" style="font-size: 24rpx; padding: 0 32rpx;">{{editDate}}</text>
   </view>
 </van-dialog>
@@ -365,12 +369,13 @@
 <!-- Toast -->
 <van-toast id="van-toast" />
 
-<!-- 体重编辑弹框 - Vant Dialog -->
+<!-- 体重编辑弹框 - 居中对话框（fade 动画） -->
 <van-dialog
   show="{{weightPopupShow}}"
   title="{{weightPopupType === 'current' ? (currentWeight !== '--' ? '编辑当前体重' : '记录当前体重') : (goalWeight ? '编辑目标体重' : '设置目标体重')}}"
   show-cancel-button
   use-slot
+  transition="fade"
   confirm-button-color="{{currentTheme === 'light' ? '#16A34A' : '#22C55E'}}"
   bind:confirm="saveWeightPopup"
   bind:cancel="closeWeightPopup"

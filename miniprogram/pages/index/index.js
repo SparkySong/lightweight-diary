@@ -1172,7 +1172,8 @@ Page({
     }
   },
 
-  // 阻止事件冒泡
+  preventTouchMove() {},
+
   stopPropagation(e) {
     e && e.stopPropagation && e.stopPropagation();
   },

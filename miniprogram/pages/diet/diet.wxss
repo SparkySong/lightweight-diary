@@ -80,7 +80,9 @@
 
 /* 添加面板 */
 .add-panel {
-  margin: 20rpx 0;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding-bottom: calc(env(safe-area-inset-bottom) + 24rpx);
 }
 
 .panel-header {
@@ -314,4 +316,99 @@
   text-align: center;
   padding: 40rpx 0;
   font-size: 24rpx;
+}
+
+/* ===== 编辑/添加面板（项目表单语言） ===== */
+.date-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 88rpx;
+  padding: 0 24rpx;
+  background: var(--bg-input);
+  border: 1rpx solid var(--border-color);
+  border-radius: 16rpx;
+  margin-bottom: 24rpx;
+  box-sizing: border-box;
+}
+
+.date-label {
+  font-size: 26rpx;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.date-row-right {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.date-value {
+  font-size: 28rpx;
+  color: var(--text-primary);
+}
+
+.meal-pill {
+  padding: 14rpx 30rpx;
+  border-radius: 999rpx;
+  background: var(--bg-card-secondary);
+  color: var(--text-secondary);
+  font-size: 26rpx;
+  border: 2rpx solid transparent;
+  transition: all 0.2s ease;
+}
+
+.meal-pill-active {
+  background: var(--color-primary-bg);
+  color: var(--accent-text);
+  border-color: var(--color-primary);
+  font-weight: 500;
+}
+
+.food-item {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.food-name-input { flex: 2; }
+.food-cal-input { flex: 1.2; }
+
+.food-remove {
+  width: 56rpx;
+  height: 56rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(239, 68, 68, 0.1);
+  flex-shrink: 0;
+}
+
+.cal-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  font-size: 26rpx;
+}
+
+.quick-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+
+.quick-chip {
+  padding: 12rpx 24rpx;
+  border-radius: 999rpx;
+  background: var(--bg-card-secondary);
+  color: var(--text-secondary);
+  font-size: 26rpx;
+}
+
+.quick-chip:active {
+  background: var(--color-primary-bg);
+  color: var(--accent-text);
 }

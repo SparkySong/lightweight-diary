@@ -45,8 +45,9 @@
     <van-button type="primary" block round icon="plus" bindtap="toggleAddPanel">记录饮食</van-button>
   </view>
 
-  <!-- Add/Edit Panel -->
-  <view class="mint-card add-panel" wx:if="{{showAddPanel}}">
+  <!-- Add/Edit Panel - 底部弹层 -->
+  <view class="popup-overlay" wx:if="{{showAddPanel}}" bindtap="{{isEditing ? 'cancelEdit' : 'toggleAddPanel'}}" catchtouchmove="preventTouchMove">
+    <view class="popup-panel add-panel" catchtap="stopPropagation">
     <view class="panel-header">
       <text class="panel-title mint-text-primary">{{isEditing ? '编辑饮食' : '添加饮食记录'}}</text>
       <van-icon name="cross" color="var(--text-tertiary)" size="40rpx" bindtap="{{isEditing ? 'cancelEdit' : 'toggleAddPanel'}}" />
@@ -54,19 +55,24 @@
 
     <!-- Date -->
     <picker mode="date" value="{{inputDate}}" bindchange="onDateChange">
-      <van-cell title="日期" value="{{inputDate || '选择日期'}}" is-link />
+      <view class="date-row">
+        <text class="date-label">日期</text>
+        <view class="date-row-right">
+          <text class="date-value">{{inputDate || '选择日期'}}</text>
+          <van-icon name="arrow" size="26rpx" color="var(--text-tertiary)" />
+        </view>
+      </view>
     </picker>
 
     <!-- Meal Type -->
     <view class="meal-types">
-      <van-tag
+      <view
         wx:for="{{mealTypes}}"
         wx:key="key"
-        size="large"
-        type="{{item.selected ? 'primary' : 'default'}}"
+        class="meal-pill {{item.selected ? 'meal-pill-active' : ''}}"
         data-key="{{item.key}}"
         bindtap="selectMealType"
-      >{{item.label}}</van-tag>
+      >{{item.label}}</view>
     </view>
 
     <!-- Food Items -->
@@ -74,24 +80,12 @@
       <block wx:for="{{foods}}" wx:key="index" wx:for-index="foodIdx">
         <view class="food-item-row">
           <view class="food-item">
-            <van-field extra-event-params
-              placeholder="食物名称"
-              value="{{item.name}}"
-              data-idx="{{foodIdx}}"
-              bind:input="onFoodNameInput"
-              bind:focus="onFoodNameInput"
-              custom-style="flex: 2;"
-            />
-            <van-field extra-event-params
-              type="digit"
-              placeholder="卡路里"
-              value="{{item.calories}}"
-              data-idx="{{foodIdx}}"
-              bind:input="onFoodCalInput"
-              custom-style="flex: 1;"
-            />
+            <input class="form-input food-name-input" placeholder="食物名称" value="{{item.name}}" data-idx="{{foodIdx}}" bindinput="onFoodNameInput" bindfocus="onFoodNameInput" cursor-spacing="150" />
+            <input class="form-input food-cal-input" type="digit" placeholder="热量" value="{{item.calories}}" data-idx="{{foodIdx}}" bindinput="onFoodCalInput" cursor-spacing="150" />
             <text class="cal-unit mint-text-tertiary">kcal</text>
-            <van-icon name="minus" color="var(--color-error)" size="40rpx" data-idx="{{foodIdx}}" bindtap="removeFoodItem" />
+            <view class="food-remove" data-idx="{{foodIdx}}" bindtap="removeFoodItem">
+              <van-icon name="minus" size="30rpx" color="var(--color-error)" />
+            </view>
           </view>
           <!-- 食物搜索建议 -->
           <view class="food-search-panel" wx:if="{{showSearchPanel && searchActiveIndex === foodIdx && searchResults.length > 0}}">
@@ -118,13 +112,12 @@
     <view class="quick-add">
       <text class="quick-label mint-text-secondary">快捷添加：</text>
       <view class="quick-items">
-        <van-tag wx:for="{{quickItems}}" wx:key="name" data-item="{{item}}" bindtap="quickAdd" size="large" plain type="primary">
-          {{item.icon}} {{item.name}}
-        </van-tag>
+        <view class="quick-chip" wx:for="{{quickItems}}" wx:key="name" data-item="{{item}}" bindtap="quickAdd">{{item.icon}} {{item.name}}</view>
       </view>
     </view>
 
     <van-button type="primary" block round bindtap="onSubmit" style="margin-top: 24rpx;">保存记录</van-button>
+    </view>
   </view>
 
   <!-- Records by Day -->
@@ -151,7 +144,7 @@
 
       <view class="mint-card meal-card" wx:for="{{day.records}}" wx:key="_id" wx:for-item="meal" data-meal="{{meal}}" bindtap="onEditDiet">
         <view class="meal-header">
-          <view class="meal-label"><van-icon wx:if="{{meal.mealIcon}}" name="{{meal.mealIcon}}" color="var(--accent-text)" size="32rpx" /><text>{{meal.mealLabel}}</text></view>
+          <view class="meal-label"><text>{{meal.mealLabel}}</text></view>
           <view class="meal-actions">
             <text class="meal-cal mint-text-primary">{{meal.totalCal}} kcal</text>
             <view class="record-actions">

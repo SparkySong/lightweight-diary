@@ -265,3 +265,114 @@ page,
   color: var(--color-error, #EF4444);
   background: rgba(239, 68, 68, 0.1);
 }
+
+/* ---------- 共享底部弹层（全项目统一 sheet） ---------- */
+.popup-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 10000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.popup-panel {
+  width: 100%;
+  background: var(--bg-card);
+  border-radius: 32rpx 32rpx 0 0;
+  padding: 40rpx 30rpx;
+  padding-bottom: calc(env(safe-area-inset-bottom) + 40rpx);
+  animation: sheetSlideUp 0.28s ease;
+  box-sizing: border-box;
+}
+
+@keyframes sheetSlideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.popup-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 30rpx;
+}
+
+.popup-title {
+  font-size: 34rpx;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.popup-close {
+  width: 48rpx;
+  height: 48rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 32rpx;
+  color: var(--text-tertiary);
+}
+
+.popup-body { margin-bottom: 30rpx; }
+
+.popup-footer {
+  display: flex;
+  gap: 20rpx;
+}
+
+.popup-btn {
+  flex: 1;
+  height: 88rpx;
+  line-height: 88rpx;
+  text-align: center;
+  border-radius: 16rpx;
+  font-size: 30rpx;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font-weight: 500;
+}
+
+.popup-btn::after { border: none; }
+
+.popup-btn-cancel {
+  background: var(--bg-hover);
+  color: var(--text-secondary);
+}
+
+.popup-btn-confirm {
+  background: var(--color-primary);
+  color: #FFFFFF;
+}
+
+.form-group { margin-bottom: 24rpx; }
+
+.form-label {
+  font-size: 26rpx;
+  color: var(--text-secondary);
+  margin-bottom: 12rpx;
+  display: block;
+  font-weight: 500;
+}
+
+.form-input {
+  width: 100%;
+  height: 88rpx;
+  background: var(--bg-input);
+  border: 1rpx solid var(--border-color);
+  border-radius: 16rpx;
+  padding: 0 24rpx;
+  font-size: 30rpx;
+  color: var(--text-primary);
+  box-sizing: border-box;
+}
+
+.field-error {
+  display: block;
+  color: var(--color-error);
+  font-size: 24rpx;
+  margin-top: 8rpx;
+}

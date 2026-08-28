@@ -7,10 +7,10 @@ const PAGE_SIZE = 10;
 
 // 餐次展示元数据：统一图标与纯文字标签（云端旧数据含 emoji 或中文 mealType，客户端归一化）
 const MEAL_META = {
-  breakfast: { label: '早餐', icon: 'star-o' },
-  lunch: { label: '午餐', icon: 'clock-o' },
-  dinner: { label: '晚餐', icon: 'bulb-o' },
-  snack: { label: '加餐', icon: 'birthday-cake-o' }
+  breakfast: { label: '🌅 早餐', icon: 'star-o' },
+  lunch: { label: '☀️ 午餐', icon: 'clock-o' },
+  dinner: { label: '🌙 晚餐', icon: 'bulb-o' },
+  snack: { label: '🍪 加餐', icon: 'birthday-cake-o' }
 };
 const MEAL_KEY_BY_TEXT = { '早餐': 'breakfast', '午餐': 'lunch', '晚餐': 'dinner', '加餐': 'snack' };
 
@@ -355,12 +355,22 @@ Page({
     inputDate: '',
     mealType: 'breakfast',
     mealTypes: [
-      { key: 'breakfast', label: '早餐', selected: true },
-      { key: 'lunch', label: '午餐', selected: false },
-      { key: 'dinner', label: '晚餐', selected: false },
-      { key: 'snack', label: '加餐', selected: false }
+      { key: 'breakfast', label: '🌅 早餐', selected: true },
+      { key: 'lunch', label: '☀️ 午餐', selected: false },
+      { key: 'dinner', label: '🌙 晚餐', selected: false },
+      { key: 'snack', label: '🍪 加餐', selected: false }
     ],
     foods: [{ name: '', calories: '' }],
+    quickItems: [
+      { icon: '🍚', name: '米饭', calories: 116 },
+      { icon: '🥚', name: '鸡蛋', calories: 72 },
+      { icon: '🥛', name: '牛奶', calories: 107 },
+      { icon: '🍎', name: '苹果', calories: 95 },
+      { icon: '🥗', name: '沙拉', calories: 80 },
+      { icon: '🍞', name: '面包', calories: 167 },
+      { icon: '🍗', name: '鸡胸肉', calories: 133 },
+      { icon: '🍌', name: '香蕉', calories: 93 }
+    ],
     days: [],
     showAddPanel: false,
     toastMsg: '',
@@ -613,10 +623,10 @@ Page({
         editRecordId: newEditRecordId,
         mealType: 'breakfast',
         mealTypes: [
-          { key: 'breakfast', label: '早餐', selected: true },
-          { key: 'lunch', label: '午餐', selected: false },
-          { key: 'dinner', label: '晚餐', selected: false },
-          { key: 'snack', label: '加餐', selected: false }
+          { key: 'breakfast', label: '🌅 早餐', selected: true },
+          { key: 'lunch', label: '☀️ 午餐', selected: false },
+          { key: 'dinner', label: '🌙 晚餐', selected: false },
+          { key: 'snack', label: '🍪 加餐', selected: false }
         ],
         foods: newFoods,
         totalCalPreview: 0
@@ -882,10 +892,10 @@ Page({
       inputDate: '',
       mealType: 'breakfast',
       mealTypes: [
-        { key: 'breakfast', label: '早餐', selected: true },
-        { key: 'lunch', label: '午餐', selected: false },
-        { key: 'dinner', label: '晚餐', selected: false },
-        { key: 'snack', label: '加餐', selected: false }
+        { key: 'breakfast', label: '🌅 早餐', selected: true },
+        { key: 'lunch', label: '☀️ 午餐', selected: false },
+        { key: 'dinner', label: '🌙 晚餐', selected: false },
+        { key: 'snack', label: '🍪 加餐', selected: false }
       ],
       foods: [{ name: '', calories: '' }],
       showAddPanel: false
@@ -905,6 +915,12 @@ Page({
     this.setData({ foods });
     // 更新总热量预览
     this.calcTotalCal();
+  },
+
+  preventTouchMove() {},
+
+  stopPropagation(e) {
+    e && e.stopPropagation && e.stopPropagation();
   },
 
   showToast(msg) {
