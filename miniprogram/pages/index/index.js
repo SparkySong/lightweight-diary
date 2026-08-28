@@ -1,6 +1,7 @@
 // pages/index/index.js
 const db = wx.cloud.database();
 const _ = db.command;
+const Toast = require('../../vant/toast/toast').default;
 
 const app = getApp();
 
@@ -114,8 +115,6 @@ Page({
     // 导航栏胶囊按钮适配
     navBarRightPadding: 0,    // 胶囊按钮右侧安全距离
     statusBarHeight: 0,       // 状态栏高度
-    // 防闪炃：主题切换后第一次切 tab 时短暂隐藏页面
-    hidePage: false,
     // AI 浮窗拖动
     fabLeft: 0,
     fabTop: 0,
@@ -151,11 +150,6 @@ Page({
     this.initWeightUnit();
     this.initTheme(); // 在数据加载前立即同步主题
     this.showPendingThemeToast(); // 显示 reLaunch 后的主题切换提示
-
-    // 🔑 修复：恢复页面可见性（主题变化期间 hidePage 可能被设为 true 导致白屏）
-    if (this.data.hidePage) {
-      this.setData({ hidePage: false });
-    }
 
     // 防抖：避免频繁切换tab时重复加载（1秒内不重复加载）
     const now = Date.now();
@@ -552,17 +546,17 @@ Page({
     }
     else if (bmi < 24) { 
       category = '正常'; 
-      color = isDark ? '#5FA895' : '#4A9B8A'; 
-      bgColor = isDark ? 'rgba(95, 168, 149, 0.2)' : 'rgba(74, 155, 138, 0.15)';
+      color = isDark ? '#4ADE80' : '#16A34A'; 
+      bgColor = isDark ? 'rgba(34, 197, 94, 0.2)' : 'rgba(74, 155, 138, 0.15)';
     }
     else if (bmi < 28) { 
       category = '偏胖'; 
-      color = isDark ? '#D4A574' : '#C49A6C'; 
+      color = isDark ? '#FBBF24' : '#D97706'; 
       bgColor = isDark ? 'rgba(212, 165, 116, 0.2)' : 'rgba(196, 154, 108, 0.15)';
     }
     else { 
       category = '肥胖'; 
-      color = isDark ? '#C98B8B' : '#B87B7B'; 
+      color = isDark ? '#F87171' : '#DC2626'; 
       bgColor = isDark ? 'rgba(201, 139, 139, 0.2)' : 'rgba(184, 123, 123, 0.15)';
     }
 
@@ -831,8 +825,8 @@ Page({
     const totalDiff = latest.weight - first.weight;
     const isDark = this.data.currentTheme === 'dark';
     let totalLost = '0.0', totalLostColor = isDark ? '#9CA3AF' : '#6B7280';
-    if (totalDiff < 0) { totalLost = Math.abs(totalDiff).toFixed(1); totalLostColor = isDark ? '#5FA895' : '#4A9B8A'; }
-    else if (totalDiff > 0) { totalLost = `+${totalDiff.toFixed(1)}`; totalLostColor = isDark ? '#C98B8B' : '#B87B7B'; }
+    if (totalDiff < 0) { totalLost = Math.abs(totalDiff).toFixed(1); totalLostColor = isDark ? '#4ADE80' : '#16A34A'; }
+    else if (totalDiff > 0) { totalLost = `+${totalDiff.toFixed(1)}`; totalLostColor = isDark ? '#F87171' : '#DC2626'; }
 
     // latest.weight 已经是正确的显示值（已经过 formatRecordsForDisplay 转换）
     const displayWeight = latest.weight.toFixed(1);
@@ -951,7 +945,7 @@ Page({
         ctx.setLineDash([6, 4], 0);
         ctx.beginPath(); ctx.moveTo(pad.l, gy); ctx.lineTo(W - pad.r, gy); ctx.stroke();
         ctx.setLineDash([], 0);
-        ctx.setFillStyle('#D4A574');
+        ctx.setFillStyle('#FBBF24');
         ctx.setFontSize(10);
         ctx.setTextAlign('right');
         ctx.fillText(`目标 ${displayGoal.toFixed(1)}`, W - pad.r, gy - 4);
@@ -1011,14 +1005,14 @@ Page({
     
     // 渐变填充
     if (isDark) {
-      ctx.setFillStyle(ctx.createLinearGradient(0, pad.t, 0, pad.t + cH, [[0, 'rgba(95, 168, 149, 0.15)'], [1, 'rgba(95, 168, 149, 0.02)']])); 
+      ctx.setFillStyle(ctx.createLinearGradient(0, pad.t, 0, pad.t + cH, [[0, 'rgba(34, 197, 94, 0.15)'], [1, 'rgba(34, 197, 94, 0.02)']])); 
     } else {
       ctx.setFillStyle(ctx.createLinearGradient(0, pad.t, 0, pad.t + cH, [[0, 'rgba(74, 155, 138, 0.12)'], [1, 'rgba(74, 155, 138, 0.01)']])); 
     }
     ctx.fill();
 
     // Line - 使用 Catmull-Rom 样条曲线，确保经过每个数据点
-    ctx.setStrokeStyle(isDark ? '#5FA895' : '#4A9B8A'); 
+    ctx.setStrokeStyle(isDark ? '#4ADE80' : '#16A34A'); 
     ctx.setLineWidth(2.5); 
     ctx.setLineJoin('round');
     ctx.setLineCap('round');
@@ -1060,7 +1054,7 @@ Page({
       // 内圈
       ctx.beginPath(); 
       ctx.arc(p.x, p.y, 3.5, 0, Math.PI * 2);
-      ctx.setFillStyle(isDark ? '#5FA895' : '#4A9B8A'); 
+      ctx.setFillStyle(isDark ? '#4ADE80' : '#16A34A'); 
       ctx.fill();
     });
 
@@ -1253,8 +1247,7 @@ Page({
   },
 
   showToast(msg) {
-    this.setData({ toastMsg: msg, toastShow: true });
-    setTimeout(() => this.setData({ toastShow: false }), 2000);
+    Toast({ message: msg, duration: 2000 });
   },
   
   // 主题相关方法

@@ -1,5 +1,6 @@
 // pages/profile/profile.js
 const app = getApp();
+const Toast = require('../../vant/toast/toast').default;
 
 // 🔥 导入版本配置（统一管理）
 const { VERSION: CONFIG_VERSION } = require('../../config/version');
@@ -107,8 +108,6 @@ Page({
     // 昵称编辑
     showNicknameEdit: false,
     editNickname: '',
-    // 防闪炃：主题切换后第一次切 tab 时短暂隐藏页面
-    hidePage: false
   },
 
   onLoad() {
@@ -159,10 +158,6 @@ Page({
     this.initTheme();
     this.showPendingThemeToast(); // 显示 reLaunch 后的主题切换提示
     
-    // 🔑 修复：恢复页面可见性（主题变化期间 hidePage 可能被设为 true 导致白屏）
-    if (this.data.hidePage) {
-      this.setData({ hidePage: false });
-    }
     
     // 每次显示都同步刷新本地数据（确保其他页面修改后数据最新）
     this.initBasicData();
@@ -963,7 +958,6 @@ loadStats(goalWeight) {
 
   // ========== Toast ==========
   showToast(msg) {
-    this.setData({ toastMsg: msg, toastShow: true });
-    setTimeout(() => this.setData({ toastShow: false }), 2000);
+    Toast({ message: msg, duration: 2000 });
   }
 });

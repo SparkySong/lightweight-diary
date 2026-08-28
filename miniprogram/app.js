@@ -241,132 +241,17 @@ App({
   
   // 应用主题到tabBar
   applyThemeToTabBar() {
+    // 原生 tabBar：只按主题切换样式，选中图标由 selectedIconPath 自动处理
     const theme = this.getTheme();
-    const tabBarConfig = {
-      color: theme === 'dark' ? '#8888a0' : '#868e96',
-      selectedColor: theme === 'dark' ? '#5FA895' : '#4A9B8A',
-      backgroundColor: theme === 'dark' ? '#0f0f13' : '#ffffff',
-      borderStyle: theme === 'dark' ? 'black' : 'white'
-    };
-    
-    // 存储当前tabBar配置供页面使用
-    this.globalData.tabBarConfig = tabBarConfig;
     this.globalData.theme = theme;
-    
-    // 动态更新原生 tabBar 样式
     try {
       wx.setTabBarStyle({
-        color: tabBarConfig.color,
-        selectedColor: tabBarConfig.selectedColor,
-        backgroundColor: tabBarConfig.backgroundColor,
-        borderStyle: tabBarConfig.borderStyle,
-        fail: (err) => {
-          console.error('设置tabBar样式失败:', err);
-        }
+        color: theme === 'dark' ? '#8888a0' : '#868e96',
+        selectedColor: '#22C55E',
+        backgroundColor: theme === 'dark' ? '#0f0f13' : '#ffffff',
+        borderStyle: theme === 'dark' ? 'black' : 'white'
       });
-      
-      // 更新 tabBar 图标（浅色主题：激活用普通图标，未激活用高亮图标）
-      const pages = getCurrentPages();
-      if (pages.length > 0) {
-        const currentPage = pages[pages.length - 1];
-        const route = currentPage.route;
-        
-        // 根据主题决定图标路径
-        // 统一逻辑：普通状态用灰色图标，选中状态用绿色高亮图标
-        const indexIconPath = 'images/tab-weight.png';
-        const indexSelectedIconPath = 'images/tab-weight-active.png';
-        const dietIconPath = 'images/tab-diet.png';
-        const dietSelectedIconPath = 'images/tab-diet-active.png';
-        const profileIconPath = 'images/profile.png';
-        const profileSelectedIconPath = 'images/profile-active.png';
-        
-        // 根据当前页面更新图标选中状态
-        if (route === 'pages/index/index') {
-          wx.setTabBarItem({
-            index: 0,
-            iconPath: indexIconPath,
-            selectedIconPath: indexSelectedIconPath,
-            text: '打卡'
-          });
-          wx.setTabBarItem({
-            index: 1,
-            iconPath: dietIconPath,
-            selectedIconPath: dietIconPath,
-            text: '饮食'
-          });
-          wx.setTabBarItem({
-            index: 2,
-            iconPath: profileIconPath,
-            selectedIconPath: profileIconPath,
-            text: '我的'
-          });
-        } else if (route === 'pages/diet/diet') {
-          wx.setTabBarItem({
-            index: 0,
-            iconPath: indexIconPath,
-            selectedIconPath: indexIconPath,
-            text: '打卡'
-          });
-          wx.setTabBarItem({
-            index: 1,
-            iconPath: dietIconPath,
-            selectedIconPath: dietSelectedIconPath,
-            text: '饮食'
-          });
-          wx.setTabBarItem({
-            index: 2,
-            iconPath: profileIconPath,
-            selectedIconPath: profileIconPath,
-            text: '我的'
-          });
-        } else if (route === 'pages/profile/profile') {
-          wx.setTabBarItem({
-            index: 0,
-            iconPath: indexIconPath,
-            selectedIconPath: indexIconPath,
-            text: '打卡'
-          });
-          wx.setTabBarItem({
-            index: 1,
-            iconPath: dietIconPath,
-            selectedIconPath: dietIconPath,
-            text: '饮食'
-          });
-          wx.setTabBarItem({
-            index: 2,
-            iconPath: profileIconPath,
-            selectedIconPath: profileSelectedIconPath,
-            text: '我的'
-          });
-        }
-      }
-    } catch (err) {
-      console.error('更新tabBar失败:', err);
-    }
-    
-    // 更新自定义tabBar主题（如果有的话）
-    this.updateCustomTabBarTheme(theme);
-  },
-  
-  // 更新自定义tabBar组件的主题
-  updateCustomTabBarTheme(theme) {
-    try {
-      // 获取当前页面栈
-      const pages = getCurrentPages();
-      if (pages.length > 0) {
-        const currentPage = pages[pages.length - 1];
-        
-        // 如果有自定义tabBar组件，则更新其主题
-        if (currentPage.selectComponent) {
-          const customTabBar = currentPage.selectComponent('.custom-tab-bar');
-          if (customTabBar && customTabBar.updateTheme) {
-            customTabBar.updateTheme(theme);
-          }
-        }
-      }
-    } catch (error) {
-      // console.log('更新自定义tabBar主题失败:', error);
-    }
+    } catch (e) {}
   },
   
   // 获取tabBar配置（供页面使用）

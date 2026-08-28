@@ -16,7 +16,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #5FA895;
+  color: var(--accent-text);
 }
 
 .icon-bowl {
@@ -119,23 +119,23 @@
   left: 0;
   right: 0;
   height: 4rpx;
-  background: linear-gradient(90deg, #5FA895, #7BB5AD);
+  background: linear-gradient(90deg, #22C55E, #7BB5AD);
 }
 
 .overview-card.danger::before {
-  background: linear-gradient(90deg, #C98B8B, #B87B7B);
+  background: linear-gradient(90deg, #F87171, #DC2626);
 }
 
 .overview-card.warning::before {
-  background: linear-gradient(90deg, #D4A574, #C49A6C);
+  background: linear-gradient(90deg, #FBBF24, #D97706);
 }
 
 .overview-card.low::before {
-  background: linear-gradient(90deg, #8B9EAF, #7A8E9F);
+  background: linear-gradient(90deg, #60A5FA, #3B82F6);
 }
 
 .overview-card.success::before {
-  background: linear-gradient(90deg, #5FA895, #4A9B8A);
+  background: linear-gradient(90deg, #22C55E, #22C55E);
 }
 
 .overview-header {
@@ -173,8 +173,8 @@
   width: 180rpx;
   height: 180rpx;
   border-radius: 50%;
-  background: linear-gradient(135deg, rgba(95, 168, 149, 0.15), rgba(95, 168, 149, 0.05));
-  border: 3rpx solid #5FA895;
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.15), rgba(34, 197, 94, 0.05));
+  border: 3rpx solid #22C55E;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -184,22 +184,22 @@
 
 .cal-circle.danger {
   background: linear-gradient(135deg, rgba(201, 139, 139, 0.15), rgba(201, 139, 139, 0.05));
-  border-color: #C98B8B;
+  border-color: #F87171;
 }
 
 .cal-circle.warning {
   background: linear-gradient(135deg, rgba(212, 165, 116, 0.15), rgba(212, 165, 116, 0.05));
-  border-color: #D4A574;
+  border-color: #FBBF24;
 }
 
 .cal-circle.low {
   background: linear-gradient(135deg, rgba(139, 158, 175, 0.15), rgba(139, 158, 175, 0.05));
-  border-color: #8B9EAF;
+  border-color: #60A5FA;
 }
 
 .cal-circle.success {
-  background: linear-gradient(135deg, rgba(95, 168, 149, 0.15), rgba(95, 168, 149, 0.05));
-  border-color: #5FA895;
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.15), rgba(34, 197, 94, 0.05));
+  border-color: #22C55E;
 }
 
 .cal-current {
@@ -238,10 +238,10 @@
   color: var(--text-primary, #F5F5F5);
 }
 
-.stat-value.danger { color: #C98B8B; }
-.stat-value.warning { color: #D4A574; }
-.stat-value.success { color: #5FA895; }
-.stat-value.low { color: #8B9EAF; }
+.stat-value.danger { color: #F87171; }
+.stat-value.warning { color: #FBBF24; }
+.stat-value.success { color: var(--accent-text); }
+.stat-value.low { color: #60A5FA; }
 
 .status-badge {
   display: flex;
@@ -249,7 +249,7 @@
   justify-content: center;
   gap: 8rpx;
   padding: 12rpx 24rpx;
-  background: rgba(95, 168, 149, 0.12);
+  background: rgba(34, 197, 94, 0.12);
   border-radius: 30rpx;
   width: fit-content;
   margin: 0 auto;
@@ -268,42 +268,42 @@
 }
 
 .status-badge.success {
-  background: rgba(95, 168, 149, 0.12);
+  background: rgba(34, 197, 94, 0.12);
 }
 
 .status-icon {
   width: 20rpx;
   height: 20rpx;
   border-radius: 50%;
-  background: #5FA895;
+  background: #22C55E;
 }
 
 .status-icon.danger {
-  background: #C98B8B;
+  background: #F87171;
 }
 
 .status-icon.warning {
-  background: #D4A574;
+  background: #FBBF24;
 }
 
 .status-icon.low {
-  background: #8B9EAF;
+  background: #60A5FA;
 }
 
 .status-icon.success {
-  background: #5FA895;
+  background: #22C55E;
 }
 
 .status-text {
   font-size: 26rpx;
   font-weight: 600;
-  color: #5FA895;
+  color: var(--accent-text);
 }
 
-.status-text.danger { color: #C98B8B; }
-.status-text.warning { color: #D4A574; }
-.status-text.low { color: #8B9EAF; }
-.status-text.success { color: #5FA895; }
+.status-text.danger { color: #F87171; }
+.status-text.warning { color: #FBBF24; }
+.status-text.low { color: #60A5FA; }
+.status-text.success { color: var(--accent-text); }
 
 /* ========== 图表卡片 ========== */
 .chart-card {
@@ -460,11 +460,11 @@
 }
 
 .hint-dot.normal {
-  background: #5FA895;
+  background: #22C55E;
 }
 
 .hint-dot.danger {
-  background: #C98B8B;
+  background: #F87171;
 }
 
 .week-summary {
@@ -493,7 +493,7 @@
 }
 
 .summary-value.danger {
-  color: #C98B8B;
+  color: #F87171;
 }
 
 /* ========== 柱状图 ========== */
@@ -532,7 +532,7 @@
 }
 
 .recommend-range.over {
-  color: #C98B8B;
+  color: #F87171;
 }
 
 /* ========== 智能建议卡片 ========== */
@@ -577,7 +577,7 @@
   border: 2rpx solid currentColor;
   border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
   position: relative;
-  color: #D4A574;
+  color: #FBBF24;
 }
 
 .icon-warning::before {
@@ -649,7 +649,7 @@
 
 .advice-num {
   font-size: 24rpx;
-  color: #5FA895;
+  color: var(--text-secondary);
   font-weight: 600;
   flex-shrink: 0;
 }
@@ -664,15 +664,15 @@
 .alt-card {
   margin-top: 16rpx;
   padding: 16rpx;
-  background: rgba(95, 168, 149, 0.1);
-  border: 1rpx solid rgba(95, 168, 149, 0.2);
+  background: rgba(34, 197, 94, 0.1);
+  border: 1rpx solid rgba(34, 197, 94, 0.2);
   border-radius: 12rpx;
 }
 
 .alt-title {
   font-size: 24rpx;
   font-weight: 600;
-  color: #5FA895;
+  color: var(--accent-text);
   display: block;
   margin-bottom: 12rpx;
 }
@@ -700,7 +700,7 @@
 .encourage-text {
   font-size: 26rpx;
   font-weight: 600;
-  color: #5FA895;
+  color: var(--accent-text);
 }
 
 /* ========== 目标设置卡片 ========== */
@@ -757,7 +757,7 @@
 
 .btn-save-target {
   padding: 14rpx 24rpx;
-  background: linear-gradient(135deg, #5FA895, #4A9B8A);
+  background: linear-gradient(135deg, #22C55E, #22C55E);
   border: none;
   border-radius: 12rpx;
   font-size: 24rpx;
@@ -776,15 +776,15 @@
 .target-current {
   flex: 1;
   font-size: 26rpx;
-  color: #5FA895;
+  color: var(--accent-text);
   font-weight: 600;
 }
 
 .edit-target-btn {
   font-size: 24rpx;
-  color: #5FA895;
+  color: var(--accent-text);
   padding: 8rpx 16rpx;
-  background: rgba(95, 168, 149, 0.12);
+  background: rgba(34, 197, 94, 0.12);
   border-radius: 8rpx;
 }
 
@@ -815,8 +815,8 @@
 .tips-label {
   display: inline-block;
   font-size: 18rpx;
-  color: #5FA895;
-  background: rgba(95, 168, 149, 0.12);
+  color: var(--text-secondary);
+  background: rgba(34, 197, 94, 0.12);
   padding: 2rpx 10rpx;
   border-radius: 6rpx;
   margin-right: 8rpx;
@@ -862,7 +862,7 @@
 /* ========== 查看食谱按钮 ========== */
 .btn-recipe {
   width: 100%;
-  background: linear-gradient(135deg, #5FA895, #4A9B8A);
+  background: linear-gradient(135deg, #22C55E, #22C55E);
   border: none;
   border-radius: 50rpx;
   color: white;
@@ -874,7 +874,7 @@
   align-items: center;
   justify-content: center;
   gap: 12rpx;
-  box-shadow: 0 4rpx 16rpx rgba(95, 168, 149, 0.25);
+  box-shadow: 0 4rpx 16rpx rgba(34, 197, 94, 0.25);
   transition: all 0.2s ease;
 }
 
@@ -931,8 +931,8 @@
   left: 50%;
   transform: translate(-50%, -50%) scale(0.8);
   background: var(--card-bg, #1E1E1E);
-  border: 1rpx solid #5FA895;
-  color: #5FA895;
+  border: 1rpx solid #22C55E;
+  color: var(--accent-text);
   padding: 24rpx 48rpx;
   border-radius: 16rpx;
   font-size: 28rpx;
@@ -972,27 +972,27 @@
 
 .theme-light .cal-circle {
   background: linear-gradient(135deg, rgba(74, 155, 138, 0.1), rgba(74, 155, 138, 0.03));
-  border-color: #4A9B8A;
+  border-color: #22C55E;
 }
 
 .theme-light .cal-circle.danger {
   background: linear-gradient(135deg, rgba(184, 123, 123, 0.1), rgba(184, 123, 123, 0.03));
-  border-color: #B87B7B;
+  border-color: #DC2626;
 }
 
 .theme-light .cal-circle.warning {
   background: linear-gradient(135deg, rgba(196, 154, 108, 0.1), rgba(196, 154, 108, 0.03));
-  border-color: #C49A6C;
+  border-color: #D97706;
 }
 
 .theme-light .cal-circle.low {
   background: linear-gradient(135deg, rgba(122, 142, 159, 0.1), rgba(122, 142, 159, 0.03));
-  border-color: #7A8E9F;
+  border-color: #3B82F6;
 }
 
 .theme-light .cal-circle.success {
   background: linear-gradient(135deg, rgba(74, 155, 138, 0.1), rgba(74, 155, 138, 0.03));
-  border-color: #4A9B8A;
+  border-color: #22C55E;
 }
 
 .theme-light .status-badge {
@@ -1012,24 +1012,24 @@
 }
 
 .theme-light .status-icon {
-  background: #4A9B8A;
+  background: #22C55E;
 }
 
-.theme-light .status-icon.danger { background: #B87B7B; }
-.theme-light .status-icon.warning { background: #C49A6C; }
-.theme-light .status-icon.low { background: #7A8E9F; }
-.theme-light .status-icon.success { background: #4A9B8A; }
+.theme-light .status-icon.danger { background: #DC2626; }
+.theme-light .status-icon.warning { background: #D97706; }
+.theme-light .status-icon.low { background: #3B82F6; }
+.theme-light .status-icon.success { background: #22C55E; }
 
-.theme-light .status-text { color: #4A9B8A; }
-.theme-light .status-text.danger { color: #B87B7B; }
-.theme-light .status-text.warning { color: #C49A6C; }
-.theme-light .status-text.low { color: #7A8E9F; }
-.theme-light .status-text.success { color: #4A9B8A; }
+.theme-light .status-text { color: var(--accent-text); }
+.theme-light .status-text.danger { color: #DC2626; }
+.theme-light .status-text.warning { color: #D97706; }
+.theme-light .status-text.low { color: #3B82F6; }
+.theme-light .status-text.success { color: var(--accent-text); }
 
 .theme-light .stat-value.danger,
 .theme-light .summary-value.danger,
 .theme-light .recommend-range.over {
-  color: #B87B7B;
+  color: #DC2626;
 }
 
 .theme-light .stat-value.success { color: #2B8A5E; }
@@ -1049,52 +1049,52 @@
 }
 
 .theme-light .btn-save-target {
-  background: linear-gradient(135deg, #4A9B8A, #3D8B7A);
+  background: linear-gradient(135deg, #22C55E, #3D8B7A);
 }
 
 .theme-light .target-current {
-  color: #4A9B8A;
+  color: var(--accent-text);
 }
 
 .theme-light .edit-target-btn {
-  color: #4A9B8A;
+  color: var(--accent-text);
   background: rgba(74, 155, 138, 0.1);
 }
 
 .theme-light .tips-label {
-  color: #4A9B8A;
+  color: var(--text-secondary);
   background: rgba(74, 155, 138, 0.1);
 }
 
 .theme-light .toast {
   background: #FFFFFF;
-  border-color: #4A9B8A;
-  color: #4A9B8A;
+  border-color: #22C55E;
+  color: var(--accent-text);
   box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.1);
 }
 
 .theme-light .encourage-text,
 .theme-light .advice-num {
-  color: #4A9B8A;
+  color: var(--text-secondary);
 }
 
 .theme-light .hint-dot.normal {
-  background: #4A9B8A;
+  background: #22C55E;
 }
 
 .theme-light .hint-dot.danger {
-  background: #B87B7B;
+  background: #DC2626;
 }
 
 .theme-light .title-icon {
-  color: #4A9B8A;
+  color: var(--accent-text);
 }
 
 .theme-light .icon-warning {
-  color: #C49A6C;
+  color: #D97706;
 }
 
 .theme-light .btn-recipe {
-  background: linear-gradient(135deg, #4A9B8A, #3D8B7A);
+  background: linear-gradient(135deg, #22C55E, #3D8B7A);
   box-shadow: 0 4rpx 16rpx rgba(74, 155, 138, 0.2);
 }

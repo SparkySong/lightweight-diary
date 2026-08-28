@@ -1,3 +1,4 @@
+const Toast = require("../../vant/toast/toast").default;
 // pages/calorie-detail/calorie-detail.js
 const app = getApp();
 
@@ -281,10 +282,10 @@ Page({
     // 计算图例数据 - 使用低饱和度配色
     const isDark = this.data.currentTheme === 'dark';
     const mealLegend = [
-      { name: '早餐', color: isDark ? '#D4A574' : '#C49A6C', cal: meals.breakfast, percent: totalCal > 0 ? Math.round(meals.breakfast / totalCal * 100) : 0 },
-      { name: '午餐', color: isDark ? '#5FA895' : '#4A9B8A', cal: meals.lunch, percent: totalCal > 0 ? Math.round(meals.lunch / totalCal * 100) : 0 },
-      { name: '晚餐', color: isDark ? '#8B9EAF' : '#7A8E9F', cal: meals.dinner, percent: totalCal > 0 ? Math.round(meals.dinner / totalCal * 100) : 0 },
-      { name: '加餐', color: isDark ? '#C98B8B' : '#B87B7B', cal: meals.snack, percent: totalCal > 0 ? Math.round(meals.snack / totalCal * 100) : 0 }
+      { name: '早餐', color: isDark ? '#FBBF24' : '#D97706', cal: meals.breakfast, percent: totalCal > 0 ? Math.round(meals.breakfast / totalCal * 100) : 0 },
+      { name: '午餐', color: isDark ? '#22C55E' : '#16A34A', cal: meals.lunch, percent: totalCal > 0 ? Math.round(meals.lunch / totalCal * 100) : 0 },
+      { name: '晚餐', color: isDark ? '#60A5FA' : '#3B82F6', cal: meals.dinner, percent: totalCal > 0 ? Math.round(meals.dinner / totalCal * 100) : 0 },
+      { name: '加餐', color: isDark ? '#F87171' : '#DC2626', cal: meals.snack, percent: totalCal > 0 ? Math.round(meals.snack / totalCal * 100) : 0 }
     ];
     
     // 计算三餐推荐对比
@@ -471,10 +472,10 @@ Page({
     const radius = Math.min(width, height) / 2 - 5;
     
     const data = [
-      { value: meals.breakfast, color: currentTheme === 'dark' ? '#D4A574' : '#C49A6C' },
-      { value: meals.lunch, color: currentTheme === 'dark' ? '#5FA895' : '#4A9B8A' },
-      { value: meals.dinner, color: currentTheme === 'dark' ? '#8B9EAF' : '#7A8E9F' },
-      { value: meals.snack, color: currentTheme === 'dark' ? '#C98B8B' : '#B87B7B' }
+      { value: meals.breakfast, color: currentTheme === 'dark' ? '#FBBF24' : '#D97706' },
+      { value: meals.lunch, color: currentTheme === 'dark' ? '#22C55E' : '#16A34A' },
+      { value: meals.dinner, color: currentTheme === 'dark' ? '#60A5FA' : '#3B82F6' },
+      { value: meals.snack, color: currentTheme === 'dark' ? '#F87171' : '#DC2626' }
     ];
     
     const total = data.reduce((sum, item) => sum + item.value, 0);
@@ -552,7 +553,7 @@ Page({
     // 绘制目标线
     const targetY = padding.top + chartHeight - (targetCal / maxCal) * chartHeight;
     ctx.beginPath();
-    ctx.setStrokeStyle(currentTheme === 'light' ? '#D4A574' : '#D4A574');
+    ctx.setStrokeStyle(currentTheme === 'light' ? '#FBBF24' : '#FBBF24');
     ctx.setLineWidth(2);
     ctx.setLineDash([5, 5]);
     ctx.moveTo(padding.left, targetY);
@@ -562,7 +563,7 @@ Page({
     // 绘制折线
     const xStep = chartWidth / 6;
     ctx.beginPath();
-    ctx.setStrokeStyle(currentTheme === 'light' ? '#4A9B8A' : '#5FA895');
+    ctx.setStrokeStyle(currentTheme === 'light' ? '#16A34A' : '#22C55E');
     ctx.setLineWidth(3);
     ctx.setLineCap('round');
     ctx.setLineJoin('round');
@@ -587,7 +588,7 @@ Page({
       // 数据点
       ctx.beginPath();
       ctx.arc(x, y, 6, 0, 2 * Math.PI);
-      ctx.setFillStyle(d.isOver ? (currentTheme === 'light' ? '#B87B7B' : '#C98B8B') : (currentTheme === 'light' ? '#4A9B8A' : '#5FA895'));
+      ctx.setFillStyle(d.isOver ? (currentTheme === 'light' ? '#DC2626' : '#F87171') : (currentTheme === 'light' ? '#16A34A' : '#22C55E'));
       ctx.fill();
       
       // 内部白点
@@ -633,9 +634,9 @@ Page({
     
     const isDark = currentTheme === 'dark';
     const barData = [
-      { name: '早餐', value: meals.breakfast, target: targetCal * 0.3, color: isDark ? '#D4A574' : '#C49A6C' },
-      { name: '午餐', value: meals.lunch, target: targetCal * 0.4, color: isDark ? '#5FA895' : '#4A9B8A' },
-      { name: '晚餐', value: meals.dinner, target: targetCal * 0.3, color: isDark ? '#8B9EAF' : '#7A8E9F' }
+      { name: '早餐', value: meals.breakfast, target: targetCal * 0.3, color: isDark ? '#FBBF24' : '#D97706' },
+      { name: '午餐', value: meals.lunch, target: targetCal * 0.4, color: isDark ? '#22C55E' : '#16A34A' },
+      { name: '晚餐', value: meals.dinner, target: targetCal * 0.3, color: isDark ? '#60A5FA' : '#3B82F6' }
     ];
     
     const maxValue = Math.max(...barData.map(d => Math.max(d.value, d.target)));
@@ -663,7 +664,7 @@ Page({
       
       ctx.beginPath();
       ctx.rect(baseX, actualY, barWidth, actualHeight);
-      ctx.setFillStyle(d.value > d.target * 1.1 ? (isDark ? '#C98B8B' : '#B87B7B') : d.color);
+      ctx.setFillStyle(d.value > d.target * 1.1 ? (isDark ? '#F87171' : '#DC2626') : d.color);
       ctx.fill();
       
       // 标签
@@ -727,8 +728,7 @@ Page({
   },
 
   showToast(msg) {
-    this.setData({ toastMsg: msg, toastShow: true });
-    setTimeout(() => this.setData({ toastShow: false }), 2000);
+    Toast({ message: msg, duration: 2000 });
   },
 
   // 下拉刷新

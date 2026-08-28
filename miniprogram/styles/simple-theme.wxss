@@ -9,9 +9,9 @@
   --content-bg-dark: #121212;
   --content-bg-light: #F8FAF9;
   
-  /* 品牌色 */
-  --brand-primary-dark: #5FA895;
-  --brand-primary-light: #4A9B8A;
+  /* 品牌色 - 薄荷绿 */
+  --brand-primary-dark: #22C55E;
+  --brand-primary-light: #16A34A;
   --brand-secondary-dark: #6B8E9F;
   --brand-secondary-light: #5A7D8C;
 }
@@ -138,11 +138,11 @@ page.theme-light .custom-nav-area {
 
 /* 按钮样式 - 深色主题 */
 .container.theme-dark .btn-primary {
-  background: #5FA895;
+  background: #22C55E;
   color: white;
   border-radius: 50rpx;
   font-weight: 500;
-  box-shadow: 0 4rpx 16rpx rgba(95, 168, 149, 0.25);
+  box-shadow: 0 4rpx 16rpx rgba(34, 197, 94, 0.25);
 }
 
 .container.theme-dark .btn-primary:active {
@@ -158,11 +158,11 @@ page.theme-light .custom-nav-area {
 
 /* 按钮样式 - 浅色主题 */
 .container.theme-light .btn-primary {
-  background: #4A9B8A;
+  background: #22C55E;
   color: white;
   border-radius: 50rpx;
   font-weight: 500;
-  box-shadow: 0 4rpx 16rpx rgba(74, 155, 138, 0.2);
+  box-shadow: 0 4rpx 16rpx rgba(34, 197, 94, 0.2);
 }
 
 .container.theme-light .btn-primary:active {
@@ -265,13 +265,13 @@ page.theme-light .custom-nav-area {
 }
 
 /* 状态颜色 - 深色主题 */
-.container.theme-dark .down { color: #5FA895; }
-.container.theme-dark .up { color: #C98B8B; }
+.container.theme-dark .down { color: #22C55E; }
+.container.theme-dark .up { color: #EF4444; }
 .container.theme-dark .neutral { color: #9CA3AF; }
 
 /* 状态颜色 - 浅色主题 */
-.container.theme-light .down { color: #4A9B8A; }
-.container.theme-light .up { color: #B87B7B; }
+.container.theme-light .down { color: #22C55E; }
+.container.theme-light .up { color: #EF4444; }
 .container.theme-light .neutral { color: #6B7280; }
 
 /* 趋势图网格线 */

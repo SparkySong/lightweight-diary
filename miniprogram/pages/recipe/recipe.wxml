@@ -7,7 +7,7 @@
   root-background-color="{{currentTheme === 'light' ? '#F8FAF9' : '#121212'}}"
   navigation-bar-style="{{currentTheme === 'light' ? 'dark' : 'light'}}"
 />
-<page class="{{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}}">
+<view class="theme-root {{currentTheme === 'light' ? 'theme-light' : ''}}">
 
 <view class="container {{currentTheme === 'light' ? 'theme-light' : 'theme-dark'}}">
 
@@ -126,5 +126,5 @@
 </view>
 
 <!-- Toast -->
-<view class="toast {{toastShow ? 'show' : ''}}">{{toastMsg}}</view>
-</page>
+<van-toast id="van-toast" />
+</view>

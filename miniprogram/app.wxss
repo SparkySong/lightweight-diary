@@ -1,4 +1,5 @@
 /* app.wxss - 全局样式 */
+@import './styles/design-system.wxss';
 page {
   color: #F5F5F5;
   /* 默认深色背景，避免tab切换时第一帧出现白色闪烁 */
