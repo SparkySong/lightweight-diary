@@ -151,6 +151,20 @@ Page({
     this.initTheme(); // 在数据加载前立即同步主题
     this.showPendingThemeToast(); // 显示 reLaunch 后的主题切换提示
 
+    // 首次使用引导：本地无数据时云端探测，老账号清缓存也不打扰
+    const hasExistingData = wx.getStorageSync('userHeight') || wx.getStorageSync('localGoal') || (wx.getStorageSync('localRecords') || []).length > 0;
+    if (!wx.getStorageSync('onboarded') && !hasExistingData) {
+      wx.cloud.callFunction({ name: 'getRecords', data: {} }).then(res => {
+        if (((res.result && res.result.data) || []).length > 0) {
+          wx.setStorageSync('onboarded', 1);
+        } else {
+          wx.navigateTo({ url: '/pages/onboarding/onboarding' });
+        }
+      }).catch(() => {
+        wx.navigateTo({ url: '/pages/onboarding/onboarding' });
+      });
+    }
+
     // 防抖：避免频繁切换tab时重复加载（1秒内不重复加载）
     const now = Date.now();
     if (this._lastLoadTime && (now - this._lastLoadTime < 1000)) return;
@@ -467,7 +481,7 @@ Page({
       
       if (goal) {
         // 确保保留一位小数并同步到本地存储
-        goal = parseFloat(parseFloat(goal).toFixed(1));
+        goal = parseFloat(parseFloat(goal).toFixed(2));
         weightData.targetWeight = goal;
         wx.setStorageSync('weightData', weightData);
         
@@ -1148,7 +1162,7 @@ Page({
       val = val / KG_TO_JIN;
     }
     
-    val = parseFloat(val.toFixed(1));
+    val = parseFloat(val.toFixed(2));
     try {
       await wx.cloud.callFunction({ name: 'setGoal', data: { goal: val } });
       
@@ -1586,7 +1600,7 @@ Page({
       } else {
         // 保存目标体重到本地存储（保留一位小数）
         const weightData = wx.getStorageSync('weightData') || {};
-        weightData.targetWeight = parseFloat(value.toFixed(1));
+        weightData.targetWeight = parseFloat(value.toFixed(2));
         wx.setStorageSync('weightData', weightData);
         
         // 同时同步到云端

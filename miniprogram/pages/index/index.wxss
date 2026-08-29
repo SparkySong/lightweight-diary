@@ -2565,7 +2565,7 @@
 
 .checkin-weight-row {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: center;
   gap: 8rpx;
   padding-bottom: 16rpx;
@@ -2575,11 +2575,12 @@
 
 .checkin-weight-input {
   width: 240rpx;
+  height: 88rpx;
+  line-height: 88rpx;
   text-align: center;
   font-size: 56rpx;
   font-weight: 700;
   color: var(--text-primary);
-  line-height: 1.2;
   background: transparent;
 }
 

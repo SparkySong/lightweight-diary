@@ -1,0 +1,63 @@
+<page-meta
+  background-text-style="{{currentTheme === 'light' ? 'dark' : 'light'}}"
+  background-color="{{currentTheme === 'light' ? '#F8FAF9' : '#121212'}}"
+  root-background-color="{{currentTheme === 'light' ? '#F8FAF9' : '#121212'}}"
+  navigation-bar-style="{{currentTheme === 'light' ? 'dark' : 'light'}}"
+/>
+<view class="theme-root {{currentTheme === 'light' ? 'theme-light' : ''}}">
+  <view class="ob-wrap">
+    <view class="ob-head">
+      <text class="ob-title">轻体日记</text>
+      <text class="ob-sub">三步完成初始化，开始科学减脂</text>
+    </view>
+
+    <view class="ob-dots">
+      <view class="ob-dot {{step >= 1 ? 'ob-dot-active' : ''}}"></view>
+      <view class="ob-dot {{step >= 2 ? 'ob-dot-active' : ''}}"></view>
+      <view class="ob-dot {{step >= 3 ? 'ob-dot-active' : ''}}"></view>
+    </view>
+
+    <!-- 步骤1：性别 + 身高 -->
+    <view class="ob-card mint-card" wx:if="{{step === 1}}">
+      <text class="ob-label">性别</text>
+      <view class="ob-pill-row">
+        <view class="ob-pill {{gender === 'male' ? 'ob-pill-active' : ''}}" bindtap="setGender" data-gender="male">男</view>
+        <view class="ob-pill {{gender === 'female' ? 'ob-pill-active' : ''}}" bindtap="setGender" data-gender="female">女</view>
+      </view>
+      <text class="ob-label">身高 (cm)</text>
+      <input class="form-input" type="digit" placeholder="请输入身高" value="{{height}}" bindinput="onHeight" cursor-spacing="150" />
+    </view>
+
+    <!-- 步骤2：单位 + 当前体重 -->
+    <view class="ob-card mint-card" wx:if="{{step === 2}}">
+      <text class="ob-label">体重单位</text>
+      <view class="ob-pill-row">
+        <view class="ob-pill {{unit === 'kg' ? 'ob-pill-active' : ''}}" bindtap="setUnit" data-unit="kg">千克 kg</view>
+        <view class="ob-pill {{unit === 'jin' ? 'ob-pill-active' : ''}}" bindtap="setUnit" data-unit="jin">斤</view>
+      </view>
+      <text class="ob-label">当前体重 ({{unit === 'jin' ? '斤' : 'kg'}})</text>
+      <view class="ob-big-row">
+        <input class="ob-big-input" type="text" placeholder="0.0" value="{{currentWeight}}" bindinput="onCurrent" cursor-spacing="150" />
+        <text class="ob-unit">{{unit === 'jin' ? '斤' : 'kg'}}</text>
+      </view>
+    </view>
+
+    <!-- 步骤3：目标体重 -->
+    <view class="ob-card mint-card" wx:if="{{step === 3}}">
+      <text class="ob-label">目标体重 ({{unit === 'jin' ? '斤' : 'kg'}}，可跳过)</text>
+      <view class="ob-big-row">
+        <input class="ob-big-input" type="text" placeholder="0.0" value="{{goalWeight}}" bindinput="onGoal" cursor-spacing="150" />
+        <text class="ob-unit">{{unit === 'jin' ? '斤' : 'kg'}}</text>
+      </view>
+      <text class="ob-tip mint-text-tertiary">设置目标后可以追踪进度，之后也能随时修改</text>
+    </view>
+
+    <text class="ob-error" wx:if="{{error}}">{{error}}</text>
+
+    <view class="ob-footer">
+      <view class="ob-btn-back" wx:if="{{step > 1}}" bindtap="back">上一步</view>
+      <view class="ob-btn-next" bindtap="next">{{step === 3 ? '开始使用' : '下一步'}}</view>
+    </view>
+    <view class="ob-skip" bindtap="skipAll">暂时跳过</view>
+  </view>
+</view>

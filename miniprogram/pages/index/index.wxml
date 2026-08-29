@@ -95,7 +95,7 @@
       </view>
     </picker>
     <view class="checkin-weight-row">
-      <input class="checkin-weight-input" type="digit" placeholder="0.0" placeholder-class="checkin-ph" value="{{inputWeight}}" bindinput="onWeightInput" confirm-type="done" bindconfirm="onCheckin" />
+      <input class="checkin-weight-input" type="text" placeholder="0.0" placeholder-class="checkin-ph" value="{{inputWeight}}" bindinput="onWeightInput" confirm-type="done" bindconfirm="onCheckin" />
       <text class="checkin-unit">{{weightUnitLabel}}</text>
     </view>
     <van-button type="primary" round block bindtap="onCheckin">打卡记录</van-button>
@@ -279,7 +279,7 @@
 >
   <view class="dialog-form weight-edit-form">
     <text class="weight-edit-label">当前体重 ({{weightUnitLabel}})</text>
-    <input class="weight-edit-input" type="digit" placeholder="0.0" value="{{editWeight}}" bindinput="onEditWeightInput" cursor-spacing="150" />
+    <input class="weight-edit-input" type="text" placeholder="0.0" value="{{editWeight}}" bindinput="onEditWeightInput" cursor-spacing="150" />
     <text class="mint-text-tertiary weight-edit-date">{{editDate}}</text>
   </view>
 </van-dialog>
@@ -301,7 +301,7 @@
 >
   <view class="dialog-form weight-edit-form">
     <text class="weight-edit-label">{{weightPopupType === 'current' ? '当前体重' : '目标体重'}} ({{weightUnitLabel}})</text>
-    <input class="weight-edit-input" type="digit" placeholder="0.0" value="{{weightInputValue}}" bindinput="onWeightPopupInput" cursor-spacing="150" />
+    <input class="weight-edit-input" type="text" placeholder="0.0" value="{{weightInputValue}}" bindinput="onWeightPopupInput" cursor-spacing="150" />
     <text class="field-error" wx:if="{{weightPopupError}}">{{weightPopupError}}</text>
   </view>
 </van-dialog>

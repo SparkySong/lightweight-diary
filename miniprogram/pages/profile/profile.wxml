@@ -257,11 +257,11 @@
       </view>
       <view class="form-group">
         <text class="form-label">当前体重 ({{weightUnit === 'jin' ? '斤' : 'kg'}})</text>
-        <input class="form-input" type="digit" value="{{editCurrentWeight}}" bindinput="onCurrentWeightInput" placeholder="请输入当前体重" adjust-position="false" cursor-spacing="80" />
+        <input class="form-input" type="text" value="{{editCurrentWeight}}" bindinput="onCurrentWeightInput" placeholder="请输入当前体重" adjust-position="false" cursor-spacing="80" />
       </view>
       <view class="form-group">
         <text class="form-label">目标体重 ({{weightUnit === 'jin' ? '斤' : 'kg'}})</text>
-        <input class="form-input" type="digit" value="{{editGoalWeight}}" bindinput="onGoalWeightInput" placeholder="请输入目标体重" adjust-position="false" cursor-spacing="80" />
+        <input class="form-input" type="text" value="{{editGoalWeight}}" bindinput="onGoalWeightInput" placeholder="请输入目标体重" adjust-position="false" cursor-spacing="80" />
       </view>
     </view>
     <view class="popup-footer">

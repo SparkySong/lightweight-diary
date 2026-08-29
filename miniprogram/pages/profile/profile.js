@@ -667,7 +667,7 @@ loadStats(goalWeight) {
         return;
       }
       if (weightUnit === 'jin') cw = cw / KG_TO_JIN;
-      weightKg = parseFloat(cw.toFixed(1));
+      weightKg = parseFloat(cw.toFixed(2));
     }
     // 验证目标体重
     let goalWeightKg = null;
@@ -680,7 +680,7 @@ loadStats(goalWeight) {
         return;
       }
       if (weightUnit === 'jin') w = w / KG_TO_JIN;
-      goalWeightKg = parseFloat(w.toFixed(1));
+      goalWeightKg = parseFloat(w.toFixed(2));
     }
 
     // 保存到本地

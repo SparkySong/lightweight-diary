@@ -1,6 +1,7 @@
 {
   "pages": [
     "pages/index/index",
+    "pages/onboarding/onboarding",
     "pages/diet/diet",
     "pages/profile/profile",
     "pages/calorie-detail/calorie-detail",
