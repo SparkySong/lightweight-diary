@@ -198,7 +198,6 @@ App({
   notifyThemeChange(effectiveTheme) {
     const themeSetting = this.getThemeSetting();
     // 记录主题切换时间戳，供各 tab 页面 onShow 时判断是否需要防闪炃处理
-    this.globalData.themeChangedAt = Date.now();
     const pages = getCurrentPages();
     // 当前激活页面（栈顶），不需要 hidePage。其他 tab 页面需要预设 hidePage: true
     const activePage = pages[pages.length - 1];
@@ -254,15 +253,6 @@ App({
     } catch (e) {}
   },
   
-  // 获取tabBar配置（供页面使用）
-  getTabBarConfig() {
-    return this.globalData.tabBarConfig || {
-      color: '#8888a0',
-      selectedColor: '#6c5ce7',
-      backgroundColor: '#0f0f13',
-      borderStyle: 'black'
-    };
-  },
   
   globalData: {
     userInfo: null,
@@ -270,6 +260,5 @@ App({
     tabBarConfig: null,
     weightUnit: 'kg', // 体重单位
     subscribeTemplateId: '5X2tUq0NbycqoeFiymKj4FiKaLts5K5ZdSgzqHf4Lt4', // 订阅消息模板ID（统一管理，避免硬编码散落）
-    themeChangedAt: 0 // 主题切换时间戳，用于 tab 切换防闪炃
   }
 });

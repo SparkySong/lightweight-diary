@@ -1,32 +1,10 @@
 /* pages/exercise/exercise.wxss - Vant组件版 */
 @import "/styles/simple-theme.wxss";
-@import "/styles/theme.wxss";
 
 .container {
   padding: 30rpx;
   padding-bottom: 120rpx;
-  padding-top: calc(env(safe-area-inset-top) + 44px);
   min-height: 100vh;
-}
-
-.custom-nav-area {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: calc(env(safe-area-inset-top) + 44px);
-  background-color: var(--nav-bg, #121212);
-  z-index: 9999;
-}
-
-.theme-light .custom-nav-area,
-.theme-root.theme-light {
-  --nav-bg: #F8FAF9;
-}
-
-.theme-dark .custom-nav-area,
-.theme-root {
-  --nav-bg: #121212;
 }
 
 /* 卡片标题 */
@@ -247,7 +225,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 8rpx 24rpx rgba(74, 155, 138, 0.4);
+  box-shadow: 0 8rpx 24rpx rgba(34, 197, 94, 0.4);
   z-index: 100;
 }
 

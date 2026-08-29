@@ -19,34 +19,6 @@ page.theme-light {
   background-color: #F8FAF9;
 }
 
-/* 全屏固定背景遮罩层：覆盖 app.json window.backgroundColor 的默认底色，
-   防止 tab 切换时第一帧出现与当前主题不一致的背景色 */
-.theme-bg-fixed {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: -1;
-  background-color: #121212;
-  transition: background-color 0.25s ease;
-  pointer-events: none;
-}
-.theme-bg-fixed.theme-light {
-  background-color: #F8FAF9;
-}
-
-/* 防闪炃：主题切换后第一次切 tab 时，短暂隐藏页面内容，
-   等 DOM 渲染新主题完成后再显示，避免看到旧主题的残留帧。
-   期间用户看到的是 .theme-bg-fixed 遮罩层的新主题色。 */
-.page-hiding {
-  visibility: hidden;
-}
-/* 需要在 page 隐藏期间仍然显示 theme-bg-fixed 遮罩（新主题底色） */
-.page-hiding .theme-bg-fixed {
-  visibility: visible;
-}
-
 /* 全局字体层级 */
 .text-display {
   font-size: 48rpx;

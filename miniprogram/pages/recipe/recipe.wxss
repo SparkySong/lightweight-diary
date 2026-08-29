@@ -1,6 +1,5 @@
 /* pages/recipe/recipe.wxss */
 @import "/styles/simple-theme.wxss";
-@import "/styles/theme.wxss";
 
 /* ========== 容器 ========== */
 .container {
@@ -11,13 +10,13 @@
 
 /* ========== 页面简介卡片 ========== */
 .intro-card {
-  background: var(--card-bg, #1E1E1E);
-  border-radius: 20rpx;
+  background: var(--bg-card, #1E1E1E);
+  border-radius: 24rpx;
   padding: 32rpx 28rpx;
   margin-bottom: 28rpx;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-sm);
 }
 
 .intro-card::before {
@@ -95,11 +94,11 @@
 
 /* ========== 分类卡片 ========== */
 .category-card {
-  background: var(--card-bg, #1E1E1E);
-  border-radius: 20rpx;
+  background: var(--bg-card, #1E1E1E);
+  border-radius: 24rpx;
   margin-bottom: 24rpx;
   overflow: hidden;
-  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-sm);
   position: relative;
   transition: box-shadow 0.3s ease;
 }
@@ -428,11 +427,11 @@
 
 /* ========== 每日搭配方案卡片 ========== */
 .daily-plan-card {
-  background: var(--card-bg, #1E1E1E);
-  border-radius: 20rpx;
+  background: var(--bg-card, #1E1E1E);
+  border-radius: 24rpx;
   margin-bottom: 24rpx;
   overflow: hidden;
-  box-shadow: 0 6rpx 28rpx rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-sm);
   opacity: 0;
   transform: translateY(30rpx);
   transition: all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -797,7 +796,7 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%) scale(0.8);
-  background: var(--card-bg, #1E1E1E);
+  background: var(--bg-card, #1E1E1E);
   border: 1rpx solid #22C55E;
   color: var(--accent-text);
   padding: 24rpx 48rpx;
@@ -822,7 +821,6 @@
    浅色主题
    ======================================== */
 .theme-light {
-  --card-bg: #FFFFFF;
   --item-bg: #F8FAF9;
   --item-bg-active: #F0F4F3;
   --bg-secondary: #F0F4F3;
@@ -834,11 +832,11 @@
 }
 
 .theme-light .intro-card {
-  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.06);
+  box-shadow: var(--shadow-sm);
 }
 
 .theme-light .intro-icon-wrap {
-  background: linear-gradient(135deg, rgba(74, 155, 138, 0.12), rgba(74, 155, 138, 0.04));
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.12), rgba(34, 197, 94, 0.04));
 }
 
 .theme-light .intro-icon {
@@ -855,7 +853,7 @@
 
 /* 分类卡片浅色 */
 .theme-light .category-card {
-  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.05);
+  box-shadow: var(--shadow-sm);
 }
 
 .theme-light .category-emoji {
@@ -867,7 +865,7 @@
 }
 
 .theme-light .daily-count-badge {
-  background: rgba(74, 155, 138, 0.08);
+  background: rgba(34, 197, 94, 0.08);
   color: var(--text-primary);
 }
 
@@ -886,14 +884,14 @@
 
 /* 分隔线浅色 */
 .theme-light .category-divider-breakfast { background: rgba(196, 154, 108, 0.12); }
-.theme-light .category-divider-lunch { background: rgba(74, 155, 138, 0.12); }
+.theme-light .category-divider-lunch { background: rgba(34, 197, 94, 0.12); }
 .theme-light .category-divider-dinner { background: rgba(122, 142, 159, 0.12); }
 .theme-light .category-divider-snack { background: rgba(184, 123, 123, 0.12); }
 
 /* 标签浅色 */
 .theme-light .tag-protein {
   color: var(--accent-text);
-  background: rgba(74, 155, 138, 0.08);
+  background: rgba(34, 197, 94, 0.08);
 }
 
 .theme-light .tag-lowfat {
@@ -918,7 +916,7 @@
 
 /* 热量标签浅色 */
 .theme-light .cal-wrap-breakfast { background: rgba(196, 154, 108, 0.08); }
-.theme-light .cal-wrap-lunch { background: rgba(74, 155, 138, 0.08); }
+.theme-light .cal-wrap-lunch { background: rgba(34, 197, 94, 0.08); }
 .theme-light .cal-wrap-dinner { background: rgba(122, 142, 159, 0.08); }
 .theme-light .cal-wrap-snack { background: rgba(184, 123, 123, 0.08); }
 
@@ -946,13 +944,13 @@
 
 /* 随机推荐按钮浅色 */
 .theme-light .btn-random {
-  background: linear-gradient(135deg, #22C55E, #3D8B7A);
-  box-shadow: 0 6rpx 24rpx rgba(74, 155, 138, 0.25);
+  background: linear-gradient(135deg, #22C55E, #4ADE80);
+  box-shadow: 0 6rpx 24rpx rgba(34, 197, 94, 0.25);
 }
 
 /* 每日搭配方案卡片浅色 */
 .theme-light .daily-plan-card {
-  box-shadow: 0 6rpx 28rpx rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow-sm);
 }
 
 .theme-light .plan-close {
@@ -960,7 +958,7 @@
 }
 
 .theme-light .plan-date-label {
-  background: rgba(74, 155, 138, 0.08);
+  background: rgba(34, 197, 94, 0.08);
   color: #3B82F6;
 }
 
@@ -970,7 +968,7 @@
 }
 
 .theme-light .plan-total-bar {
-  background: rgba(74, 155, 138, 0.06);
+  background: rgba(34, 197, 94, 0.06);
 }
 
 .theme-light .plan-total-num {
@@ -979,7 +977,7 @@
 
 .theme-light .hint-good {
   color: var(--text-secondary);
-  background: rgba(74, 155, 138, 0.1);
+  background: rgba(34, 197, 94, 0.1);
 }
 
 .theme-light .hint-normal {
@@ -998,11 +996,11 @@
 
 /* 换一餐按钮浅色 */
 .theme-light .plan-reshuffle-btn {
-  background: rgba(74, 155, 138, 0.06);
+  background: rgba(34, 197, 94, 0.06);
 }
 
 .theme-light .plan-reshuffle-btn:active {
-  background: rgba(74, 155, 138, 0.14);
+  background: rgba(34, 197, 94, 0.14);
 }
 
 .theme-light .reshuffle-text {
@@ -1014,7 +1012,7 @@
 }
 
 .theme-light .cal-dot-breakfast { background: rgba(196, 154, 108, 0.07); }
-.theme-light .cal-dot-lunch { background: rgba(74, 155, 138, 0.07); }
+.theme-light .cal-dot-lunch { background: rgba(34, 197, 94, 0.07); }
 .theme-light .cal-dot-dinner { background: rgba(122, 142, 159, 0.07); }
 .theme-light .cal-dot-snack { background: rgba(184, 123, 123, 0.07); }
 

@@ -54,21 +54,9 @@
     "van-icon": "/vant/icon/index",
     "van-toast": "/vant/toast/index",
     "van-dialog": "/vant/dialog/index",
-    "van-popup": "/vant/popup/index",
     "van-field": "/vant/field/index",
-    "van-cell": "/vant/cell/index",
-    "van-cell-group": "/vant/cell-group/index",
     "van-tag": "/vant/tag/index",
     "van-loading": "/vant/loading/index",
-    "van-empty": "/vant/empty/index",
-    "van-switch": "/vant/switch/index",
-    "van-slider": "/vant/slider/index",
-    "van-overlay": "/vant/overlay/index",
-    "van-transition": "/vant/transition/index",
-    "van-progress": "/vant/progress/index",
-    "van-picker": "/vant/picker/index",
-    "van-datetime-picker": "/vant/datetime-picker/index",
-    "van-stepper": "/vant/stepper/index",
-    "van-action-sheet": "/vant/action-sheet/index"
+    "van-empty": "/vant/empty/index"
   }
 }

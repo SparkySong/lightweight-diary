@@ -265,7 +265,7 @@
   background: var(--bg-card, rgba(30, 30, 30, 0.75));
   backdrop-filter: blur(20rpx);
   -webkit-backdrop-filter: blur(20rpx);
-  border-radius: 16rpx;
+  border-radius: 24rpx;
   padding: 24rpx 16rpx;
   text-align: center;
   border: 1rpx solid var(--border-color, rgba(255, 255, 255, 0.08));
@@ -275,7 +275,7 @@
 
 .stat-card:active {
   transform: scale(0.97);
-  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-sm);
 }
 
 .stat-label {
@@ -483,7 +483,7 @@
   background: var(--bg-card, rgba(30, 30, 30, 0.75));
   backdrop-filter: blur(20rpx);
   -webkit-backdrop-filter: blur(20rpx);
-  border-radius: 16rpx;
+  border-radius: 24rpx;
   padding: 28rpx 24rpx;
   border: 1rpx solid var(--border-color, rgba(255, 255, 255, 0.08));
   box-shadow: var(--shadow-md, 0 4rpx 24rpx rgba(0, 0, 0, 0.2));
@@ -1079,7 +1079,7 @@
   background: var(--bg-card, rgba(30, 30, 30, 0.75));
   backdrop-filter: blur(20rpx);
   -webkit-backdrop-filter: blur(20rpx);
-  border-radius: 16rpx;
+  border-radius: 24rpx;
   padding: 28rpx 20rpx;
   border: 1rpx solid var(--border-color, rgba(255, 255, 255, 0.08));
   box-shadow: var(--shadow-md, 0 4rpx 20rpx rgba(0, 0, 0, 0.18));
@@ -1089,7 +1089,7 @@
 
 .action-card:active {
   transform: scale(0.97);
-  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-sm);
 }
 
 .action-icon {
@@ -1259,6 +1259,17 @@
 /* History */
 .history-card { padding-bottom: 10rpx; }
 
+/* 打卡记录标题吸顶 */
+.history-card .card-title-wrap {
+  position: sticky;
+  top: calc(env(safe-area-inset-top) + 44px);
+  z-index: 5;
+  background: var(--bg-card);
+  margin: -32rpx -32rpx 8rpx;
+  padding: 28rpx 32rpx 20rpx;
+  border-radius: 24rpx 24rpx 0 0;
+}
+
 .empty-state {
   text-align: center;
   padding: 60rpx 20rpx;
@@ -1299,7 +1310,6 @@
 
 /* 记录列表滚动容器 - 隐藏滚动条 */
 .records-scroll {
-  height: 720rpx;
   margin-top: 8rpx;
 }
 
@@ -2036,7 +2046,7 @@
 }
 
 .theme-light .theme-menu-item.active {
-  background: rgba(74, 155, 138, 0.1);
+  background: rgba(34, 197, 94, 0.1);
 }
 
 .theme-light .theme-menu-text {
@@ -2058,7 +2068,7 @@
   backdrop-filter: blur(20rpx);
   -webkit-backdrop-filter: blur(20rpx);
   border-color: rgba(0, 0, 0, 0.06);
-  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.06);
+  box-shadow: var(--shadow-sm);
 }
 
 .theme-light .stat-label {
@@ -2079,7 +2089,7 @@
   backdrop-filter: blur(20rpx);
   -webkit-backdrop-filter: blur(20rpx);
   border-color: rgba(0, 0, 0, 0.06);
-  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.06);
+  box-shadow: var(--shadow-sm);
 }
 
 /* BMI 卡片 */
@@ -2124,7 +2134,7 @@
   backdrop-filter: blur(20rpx);
   -webkit-backdrop-filter: blur(20rpx);
   border-color: rgba(0, 0, 0, 0.06);
-  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.06);
+  box-shadow: var(--shadow-sm);
 }
 
 .theme-light .action-label {
@@ -2210,18 +2220,18 @@
 /* 确认按钮 */
 .theme-light .btn-primary {
   background: #16A34A;
-  box-shadow: 0 4rpx 16rpx rgba(74, 155, 138, 0.2);
+  box-shadow: 0 4rpx 16rpx rgba(34, 197, 94, 0.2);
 }
 
 .theme-light .btn-sm {
   background: #16A34A;
   color: #ffffff;
-  box-shadow: 0 4rpx 12rpx rgba(74, 155, 138, 0.2);
+  box-shadow: 0 4rpx 12rpx rgba(34, 197, 94, 0.2);
 }
 
 .theme-light .btn-goal {
   background: #16A34A;
-  box-shadow: 0 4rpx 12rpx rgba(74, 155, 138, 0.2);
+  box-shadow: 0 4rpx 12rpx rgba(34, 197, 94, 0.2);
 }
 
 .theme-light .btn-cancel-small {
@@ -2331,7 +2341,7 @@
 
 .theme-light.weight-popup .weight-popup-btn-confirm {
   background: #16A34A;
-  box-shadow: 0 4rpx 16rpx rgba(74, 155, 138, 0.2);
+  box-shadow: 0 4rpx 16rpx rgba(34, 197, 94, 0.2);
 }
 
 .theme-light.weight-popup .weight-popup-error {
@@ -2378,13 +2388,13 @@
 
 .theme-light.edit-panel .btn-save {
   background: #16A34A;
-  box-shadow: 0 4rpx 16rpx rgba(74, 155, 138, 0.2);
+  box-shadow: 0 4rpx 16rpx rgba(34, 197, 94, 0.2);
 }
 
 /* Toast */
 .theme-light .toast {
   background: #FFFFFF;
-  border-color: rgba(74, 155, 138, 0.3);
+  border-color: rgba(34, 197, 94, 0.3);
   color: var(--accent-text);
   box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.1);
 }
@@ -2416,7 +2426,7 @@
 
 .theme-light .edit-icon:active .icon-edit-small::before {
   border-left-color: #16A34A;
-  background: rgba(74, 155, 138, 0.1);
+  background: rgba(34, 197, 94, 0.1);
 }
 
 /* 图标颜色 */
@@ -2497,4 +2507,112 @@
   color: var(--color-error);
   font-size: 24rpx;
   margin-top: 8rpx;
+}
+
+/* ===== 首页垂直节奏与打卡输入行统一（2026-08-29） ===== */
+.container > .mint-card { margin-bottom: 24rpx; }
+.quick-actions { margin-bottom: 24rpx; }
+.input-row { margin-bottom: 24rpx; }
+
+.picker-btn {
+  flex: 1.2;
+  height: 88rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16rpx;
+  padding: 0 16rpx;
+  font-size: 28rpx;
+}
+
+.weight-input-wrap {
+  flex: 2;
+  height: 88rpx;
+  min-height: 88rpx;
+  border-radius: 16rpx;
+}
+
+.weight-input {
+  height: 88rpx;
+  line-height: 88rpx;
+  padding: 0 20rpx;
+  font-size: 28rpx;
+}
+
+.weight-placeholder {
+  left: 20rpx;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  font-size: 28rpx;
+}
+
+
+/* ===== 打卡输入（上下两行） ===== */
+.checkin-date-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10rpx;
+  padding: 8rpx 0 20rpx;
+}
+
+.checkin-date-text {
+  font-size: 26rpx;
+  color: var(--text-secondary);
+}
+
+.checkin-weight-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 8rpx;
+  padding-bottom: 16rpx;
+  margin-bottom: 24rpx;
+  border-bottom: 2rpx solid var(--color-primary);
+}
+
+.checkin-weight-input {
+  width: 240rpx;
+  text-align: center;
+  font-size: 56rpx;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.2;
+  background: transparent;
+}
+
+.checkin-ph {
+  color: var(--text-placeholder);
+  font-size: 56rpx;
+  font-weight: 700;
+}
+
+.checkin-unit {
+  font-size: 26rpx;
+  color: var(--text-tertiary);
+}
+
+/* ===== 首页重排：统计卡进度条 + 能量入口条 ===== */
+.entry-row {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+}
+
+.entry-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6rpx;
+}
+
+.entry-title {
+  font-size: 30rpx;
+  font-weight: 600;
+}
+
+.entry-desc {
+  font-size: 24rpx;
 }

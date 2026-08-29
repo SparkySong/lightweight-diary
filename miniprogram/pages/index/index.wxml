@@ -72,13 +72,33 @@
       <text class="stat-change {{goalReached ? 'down' : 'neutral'}}" wx:else>{{goalRemaining}}</text>
     </view>
     <view class="stat-card mint-card">
-      <text class="stat-label mint-text-secondary">已减</text>
+      <text class="stat-label mint-text-secondary">{{totalLost !== '--' && !totalLost.startsWith('+') ? '已减' : '变化'}}</text>
       <view class="stat-value-wrap">
         <text class="stat-value mint-text-primary" style="color:{{totalLostColor}}">{{totalLost}}</text>
         <text class="stat-unit mint-text-tertiary" wx:if="{{totalLost !== '--'}}">{{weightUnitLabel}}</text>
       </view>
-      <text class="stat-change mint-text-tertiary">{{daysCount}} 天</text>
+      <text class="stat-change mint-text-tertiary">累计打卡 {{daysCount}} 天</text>
     </view>
+  </view>
+
+  <!-- Checkin - 主行动上移 -->
+  <view class="mint-card checkin-card">
+    <view class="card-title-wrap">
+      <view class="title-icon icon-edit"></view>
+      <text class="card-title">今日打卡</text>
+    </view>
+    <picker mode="date" value="{{inputDate}}" bindchange="onDateChange">
+      <view class="checkin-date-row">
+        <van-icon name="calendar-o" size="30rpx" color="var(--accent-text)" />
+        <text class="checkin-date-text">{{inputDate || '选择日期'}}</text>
+        <van-icon name="arrow-down" size="24rpx" color="var(--text-tertiary)" />
+      </view>
+    </picker>
+    <view class="checkin-weight-row">
+      <input class="checkin-weight-input" type="digit" placeholder="0.0" placeholder-class="checkin-ph" value="{{inputWeight}}" bindinput="onWeightInput" confirm-type="done" bindconfirm="onCheckin" />
+      <text class="checkin-unit">{{weightUnitLabel}}</text>
+    </view>
+    <van-button type="primary" round block bindtap="onCheckin">打卡记录</van-button>
   </view>
 
   <!-- BMI Card - Vant组件版 -->
@@ -120,46 +140,14 @@
     </view>
   </view>
 
-  <!-- 今日能量概览 - Vant组件版 -->
-  <view class="mint-card energy-overview-card" bindtap="goToExercise">
-    <view class="card-header">
-      <view class="card-title-wrap">
-        <view class="title-icon icon-calorie-balance"></view>
-        <text class="card-title">今日能量</text>
-      </view>
-      <text class="energy-hint">消耗 {{todayTotalBurn || 0}} kcal</text>
+  <!-- 今日能量 - 入口条 -->
+  <view class="mint-card entry-row" bindtap="goToExercise">
+    <van-icon name="fire-o" color="var(--color-primary)" size="44rpx" />
+    <view class="entry-content">
+      <text class="entry-title mint-text-primary">今日能量</text>
+      <text class="entry-desc mint-text-tertiary">{{todayBalance <= 0 ? '还能吃 ' + (todayBalanceAbs || 0) + ' kcal' : '已超出 ' + (todayBalanceAbs || 0) + ' kcal'}} · 消耗 {{todayTotalBurn || 0}} kcal</text>
     </view>
-    <view class="energy-body">
-      <!-- 主数字：剩余可摄入 -->
-      <view class="energy-main">
-        <text class="energy-label">{{todayBalance <= 0 ? '今天还能吃' : '已超出消耗'}}</text>
-        <view class="energy-num-row">
-          <text class="energy-big-num {{todayBalance <= 0 ? 'ok' : 'over'}}">{{todayBalanceAbs || 0}}</text>
-          <text class="energy-unit">kcal</text>
-        </view>
-        <text class="energy-sub" wx:if="{{todayBalance > 0}}">建议适当运动或减少晚餐</text>
-        <text class="energy-sub" wx:elif="{{todayIntake > 0}}">保持当前节奏，继续加油</text>
-        <text class="energy-sub" wx:else>还没记录饮食哦～</text>
-      </view>
-    </view>
-    <!-- 能量构成条 -->
-    <view class="energy-bar-section">
-      <view class="energy-bar-row">
-        <view class="energy-bar-item">
-          <text class="bar-dot dot-intake"></text>
-          <text class="bar-label">已吃</text>
-          <text class="bar-val intake">{{todayIntake || 0}}</text>
-        </view>
-        <view class="energy-bar-item">
-          <text class="bar-dot dot-burn"></text>
-          <text class="bar-label">基础代谢</text>
-          <text class="bar-val burn">{{bmr || 0}}</text>
-        </view>
-      </view>
-      <view class="energy-progress-bar">
-        <view class="ep-fill ep-intake" style="width: {{(todayTotalBurn||1) > 0 ? Math.min(100, ((todayIntake||0) / (todayTotalBurn||1)) * 100) : 0}}%"></view>
-      </view>
-    </view>
+    <van-icon name="arrow" color="var(--text-tertiary)" size="32rpx" />
   </view>
 
   <!-- Chart - Vant组件版 -->
@@ -176,62 +164,6 @@
       </view>
     </view>
     <canvas canvas-id="chart" id="chart" class="chart-canvas" />
-  </view>
-
-  <!-- Checkin - Vant组件版 -->
-  <view class="mint-card checkin-card">
-    <view class="card-title-wrap">
-      <view class="title-icon icon-edit"></view>
-      <text class="card-title">今日打卡</text>
-    </view>
-    <view class="input-row">
-      <picker mode="date" value="{{inputDate}}" bindchange="onDateChange">
-        <view class="picker-btn">{{inputDate || '选择日期'}}</view>
-      </picker>
-      <view class="weight-input-wrap">
-        <text class="weight-placeholder" wx:if="{{!inputWeight}}">体重 ({{weightUnitLabel}})</text>
-        <input class="weight-input" type="digit" value="{{inputWeight}}" bindinput="onWeightInput" confirm-type="done" bindconfirm="onCheckin" />
-      </view>
-    </view>
-    <!-- 打卡按钮 -->
-<van-button type="primary" round block bindtap="onCheckin">打卡记录</van-button>
-  </view>
-
-  <!-- Goal - Vant组件版 -->
-  <view class="mint-card goal-card" >
-    <view class="goal-header">
-      <view class="card-title-wrap">
-        <view class="title-icon icon-target"></view>
-        <text class="card-title">目标体重</text>
-      </view>
-      <text catchtap="onEditGoal" class="goal-edit-hint" wx:if="{{goalWeight && !showGoalInput}}">
-        <view class="edit-icon-small"></view>
-        修改
-      </text>
-    </view>
-    <view class="goal-input-wrap" wx:if="{{showGoalInput}}" catchtap="stopPropagation">
-      <view class="input-row">
-        <view class="goal-input-with-unit">
-          <input class="weight-input goal-input" type="digit" placeholder="目标体重" value="{{inputGoal}}" bindinput="onGoalInput" confirm-type="done" bindconfirm="onSetGoal" />
-          <text class="goal-input-unit">{{weightUnitLabel}}</text>
-        </view>
-        <button class="btn-goal" bindtap="onSetGoal">设定</button>
-        <view class="btn-cancel-small" bindtap="onCancelGoal">取消</view>
-      </view>
-    </view>
-    <view wx:if="{{goalWeight && !showGoalInput}}">
-      <view class="goal-display">
-        <text class="goal-val">{{goalWeight}} {{weightUnitLabel}}</text>
-        <text class="goal-remaining {{goalReached ? 'down' : ''}}">{{goalRemaining}}</text>
-      </view>
-      <view class="progress-bar">
-        <view class="progress-fill" style="width: {{goalProgressWidth}}%;"></view>
-      </view>
-    </view>
-    <view class="goal-empty" wx:if="{{!goalWeight && !showGoalInput}}">
-      <view class="empty-icon icon-target-outline"></view>
-      <text>点击设置目标体重</text>
-    </view>
   </view>
 
   <!-- Quick Actions - 优化快捷操作 -->
@@ -261,15 +193,8 @@
       <van-empty description="还没有记录，开始你的第一次打卡吧" />
     </view>
     
-    <!-- 记录列表滚动容器 -->
-    <scroll-view 
-      class="records-scroll"
-      scroll-y
-      enhanced
-      disable-scroll
-      bindscrolltolower="onRecordsScrollToLower"
-      lower-threshold="100"
-      wx:if="{{records.length > 0}}">
+    <!-- 记录列表（随页面滚动，触底加载更多） -->
+    <view class="records-scroll" wx:if="{{records.length > 0}}">
       <view class="record-list">
         <view class="record-item" wx:for="{{records}}" wx:key="_id" wx:for-item="record" data-record="{{record}}" bindtap="onEditRecord">
           <view class="record-left">
@@ -304,7 +229,7 @@
         <text class="load-more-text mint-text-tertiary" wx:if="{{isLoadingMore}}">加载中...</text>
         <text class="load-more-text mint-text-tertiary" wx:elif="{{!hasMoreRecords}}">— 已加载全部 —</text>
       </view>
-    </scroll-view>
+    </view>
   </view>
 
   <view class="footer">

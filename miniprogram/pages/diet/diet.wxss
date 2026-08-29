@@ -1,6 +1,5 @@
 /* pages/diet/diet.wxss - Vant组件版 */
 @import "/styles/simple-theme.wxss";
-@import "/styles/theme.wxss";
 
 .container {
   padding: 30rpx;

@@ -1,6 +1,5 @@
 /* pages/profile/profile.wxss - 现代简约健康App风格 */
 @import "/styles/simple-theme.wxss";
-@import "/styles/theme.wxss";
 
 .container {
   padding: 30rpx;
@@ -965,7 +964,7 @@
 }
 
 .container.theme-light .menu-item:active {
-  background: rgba(74, 155, 138, 0.06);
+  background: rgba(34, 197, 94, 0.06);
 }
 
 .container.theme-light .menu-text {
@@ -1026,7 +1025,7 @@
 
 .theme-root.theme-light .popup-btn-confirm {
   background: #16A34A;
-  box-shadow: 0 4rpx 16rpx rgba(74, 155, 138, 0.2);
+  box-shadow: 0 4rpx 16rpx rgba(34, 197, 94, 0.2);
 }
 
 .theme-root.theme-light .form-input {
@@ -1058,7 +1057,7 @@
 }
 
 .theme-root.theme-light .setting-option.active {
-  background: rgba(74, 155, 138, 0.1);
+  background: rgba(34, 197, 94, 0.1);
   border-color: #16A34A;
   color: var(--accent-text);
 }
@@ -1069,7 +1068,7 @@
 }
 
 .theme-root.theme-light .theme-option.active {
-  background: rgba(74, 155, 138, 0.1);
+  background: rgba(34, 197, 94, 0.1);
   border-color: #16A34A;
 }
 
@@ -1110,7 +1109,7 @@
 }
 
 .theme-root.theme-light .about-feature::before {
-  background: linear-gradient(135deg, #16A34A, #3D8B7A);
+  background: linear-gradient(135deg, #16A34A, #4ADE80);
 }
 
 .theme-root.theme-light .about-contact {
@@ -1136,12 +1135,12 @@
 }
 
 .theme-root.theme-light .about-copy-btn:active {
-  background: rgba(74, 155, 138, 0.1);
+  background: rgba(34, 197, 94, 0.1);
 }
 
 .theme-root.theme-light .about-contact-btn {
-  background: linear-gradient(135deg, #16A34A 0%, #3D8B7A 100%);
-  box-shadow: 0 6rpx 20rpx rgba(74, 155, 138, 0.25);
+  background: linear-gradient(135deg, #16A34A 0%, #4ADE80 100%);
+  box-shadow: 0 6rpx 20rpx rgba(34, 197, 94, 0.25);
 }
 
 .theme-root.theme-light .help-q {
@@ -1162,7 +1161,7 @@
 
 .theme-root.theme-light .help-feedback-btn {
   background: #16A34A;
-  box-shadow: 0 4rpx 16rpx rgba(74, 155, 138, 0.2);
+  box-shadow: 0 4rpx 16rpx rgba(34, 197, 94, 0.2);
 }
 
 .theme-root.theme-light .agreement-text {
@@ -1192,7 +1191,7 @@
 
 /* 关于Logo */
 .theme-root.theme-light .about-logo-img {
-  box-shadow: 0 8rpx 24rpx rgba(74, 155, 138, 0.18);
+  box-shadow: 0 8rpx 24rpx rgba(34, 197, 94, 0.18);
 }
 
 

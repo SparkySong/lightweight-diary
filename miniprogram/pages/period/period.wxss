@@ -1,6 +1,5 @@
 /* pages/period/period.wxss */
 @import "/styles/simple-theme.wxss";
-@import "/styles/theme.wxss";
 
 .page-container {
   min-height: 100vh;
@@ -12,11 +11,10 @@
 
 /* 周期信息卡 */
 .cycle-card {
-  background: rgba(30,30,30,0.85); border: 1rpx solid rgba(255,255,255,0.06);
-  border-radius: 20rpx; padding: 32rpx 24rpx; margin-bottom: 24rpx;
+  background: var(--bg-card); border-radius: 24rpx; padding: 32rpx 24rpx; margin-bottom: 24rpx;
 }
 .theme-light .cycle-card {
-  background: #FFF; border-color: rgba(0,0,0,0.06); box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.04);
+  background: #FFF; border-color: rgba(0,0,0,0.06); box-shadow: var(--shadow-sm);
 }
 .cycle-info { display: flex; margin-bottom: 20rpx; }
 .cycle-stat { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4rpx; }
@@ -34,11 +32,10 @@
 
 /* 日历 */
 .calendar-card {
-  background: rgba(30,30,30,0.85); border: 1rpx solid rgba(255,255,255,0.06);
-  border-radius: 20rpx; padding: 24rpx; margin-bottom: 24rpx;
+  background: var(--bg-card); border-radius: 24rpx; padding: 24rpx; margin-bottom: 24rpx;
 }
 .theme-light .calendar-card {
-  background: #FFF; border-color: rgba(0,0,0,0.06); box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.04);
+  background: #FFF; border-color: rgba(0,0,0,0.06); box-shadow: var(--shadow-sm);
 }
 .calendar-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20rpx; }
 .cal-nav {
@@ -97,7 +94,7 @@
 }
 .theme-light .action-btn { background: #FFF; border-color: rgba(0,0,0,0.06); }
 .action-start { border-color: rgba(232,135,140,0.3); }
-.action-end { border-color: rgba(95,168,149,0.3); }
+.action-end { border-color: rgba(34,197,94,0.3); }
 .action-disabled { opacity: 0.4; }
 .action-icon { font-size: 36rpx; }
 .action-text { font-size: 26rpx; color: #D1D5DB; font-weight: 500; }

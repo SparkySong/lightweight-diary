@@ -1,6 +1,5 @@
 /* pages/achievements/achievements.wxss */
 @import "/styles/simple-theme.wxss";
-@import "/styles/theme.wxss";
 
 .page-container {
   min-height: 100vh;
@@ -71,7 +70,7 @@
 }
 
 .theme-light .stats-bar-fill {
-  background: linear-gradient(90deg, #22C55E, #3D8B7A);
+  background: linear-gradient(90deg, #22C55E, #4ADE80);
 }
 
 /* 加载状态 */
@@ -97,9 +96,8 @@
 
 .badge-card {
   width: 48%;
-  background: rgba(30,30,30,0.85);
-  border: 1rpx solid rgba(255,255,255,0.06);
-  border-radius: 20rpx;
+  background: var(--bg-card);
+  border-radius: 24rpx;
   padding: 24rpx 16rpx;
   display: flex;
   flex-direction: column;
@@ -110,19 +108,19 @@
 }
 
 .badge-card.badge-unlocked {
-  border-color: rgba(95,168,149,0.3);
-  box-shadow: 0 4rpx 20rpx rgba(95,168,149,0.15);
+  border-color: rgba(34,197,94,0.3);
+  box-shadow: 0 4rpx 20rpx rgba(34,197,94,0.15);
 }
 
 .theme-light .badge-card {
   background: #FFFFFF;
   border-color: rgba(0,0,0,0.06);
-  box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.04);
+  box-shadow: var(--shadow-sm);
 }
 
 .theme-light .badge-card.badge-unlocked {
-  border-color: rgba(74,155,138,0.3);
-  box-shadow: 0 4rpx 20rpx rgba(74,155,138,0.12);
+  border-color: rgba(34, 197, 94,0.3);
+  box-shadow: 0 4rpx 20rpx rgba(34, 197, 94,0.12);
 }
 
 .badge-icon-wrap {
@@ -138,7 +136,7 @@
 }
 
 .badge-icon-wrap.icon-active {
-  background: rgba(95,168,149,0.15);
+  background: rgba(34,197,94,0.15);
 }
 
 .theme-light .badge-icon-wrap {
@@ -146,7 +144,7 @@
 }
 
 .theme-light .badge-icon-wrap.icon-active {
-  background: rgba(74,155,138,0.12);
+  background: rgba(34, 197, 94,0.12);
 }
 
 .badge-icon {
@@ -261,7 +259,7 @@
   position: relative;
   width: 560rpx;
   background: linear-gradient(160deg, #1E1E1E 0%, #2A2A2A 100%);
-  border: 1rpx solid rgba(95,168,149,0.3);
+  border: 1rpx solid rgba(34,197,94,0.3);
   border-radius: 32rpx;
   padding: 60rpx 40rpx 48rpx;
   display: flex; flex-direction: column; align-items: center;
@@ -271,13 +269,13 @@
 
 .theme-light .unlock-card {
   background: linear-gradient(160deg, #FFF 0%, #F0F4F3 100%);
-  border-color: rgba(74,155,138,0.3);
+  border-color: rgba(34, 197, 94,0.3);
 }
 
 .unlock-glow {
   position: absolute; top: -60rpx; left: 50%; transform: translateX(-50%);
   width: 300rpx; height: 300rpx;
-  background: radial-gradient(circle, rgba(95,168,149,0.25) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(34,197,94,0.25) 0%, transparent 70%);
   pointer-events: none;
 }
 
@@ -313,7 +311,7 @@
 }
 
 .theme-light .unlock-btn {
-  background: linear-gradient(135deg, #22C55E, #3D8B7A);
+  background: linear-gradient(135deg, #22C55E, #4ADE80);
 }
 
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }

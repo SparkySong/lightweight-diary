@@ -9,7 +9,6 @@
 />
 <view class="theme-root {{currentTheme === 'light' ? 'theme-light' : ''}}">
 
-<view class="custom-nav-area"></view>
 
 <view class="container">
   <!-- 今日热量收支看板 -->
@@ -119,6 +118,8 @@
   title="添加运动"
   show-cancel-button
   use-slot
+  transition="fade"
+  confirm-button-color="{{currentTheme === 'light' ? '#16A34A' : '#22C55E'}}"
   bind:confirm="onSaveExercise"
   bind:cancel="onClosePopup"
   bind:close="onClosePopup"

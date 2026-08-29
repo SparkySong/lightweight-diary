@@ -361,7 +361,7 @@ Page({
         isLoadingMore: false
       });
       
-      this.updateStats(displayedRecords);
+      this.updateStats(allRecords);
       this.drawChart(allRecords);
       this.calcStreak(allRecords);
       // 确保 BMI 在数据设置完成后计算
@@ -442,12 +442,14 @@ Page({
       isLoadingMore: false
     });
     
-    this.updateStats(newDisplayedRecords);
+    this.updateStats(this.data.allRecords);
   },
 
   // 滚动到底部触发加载更多
-  onRecordsScrollToLower() {
-    this.loadMoreRecords();
+  onReachBottom() {
+    if (this.data.hasMoreRecords && !this.data.isLoadingMore) {
+      this.loadMoreRecords();
+    }
   },
 
   async loadGoal() {
@@ -547,7 +549,7 @@ Page({
     else if (bmi < 24) { 
       category = '正常'; 
       color = isDark ? '#4ADE80' : '#16A34A'; 
-      bgColor = isDark ? 'rgba(34, 197, 94, 0.2)' : 'rgba(74, 155, 138, 0.15)';
+      bgColor = isDark ? 'rgba(34, 197, 94, 0.2)' : 'rgba(34, 197, 94, 0.15)';
     }
     else if (bmi < 28) { 
       category = '偏胖'; 
@@ -824,6 +826,10 @@ Page({
     const first = sortedAsc[0];
     const totalDiff = latest.weight - first.weight;
     const isDark = this.data.currentTheme === 'dark';
+
+    // 累计打卡天数 = 有记录的实际天数（按日期去重）
+    const daysCount = new Set(records.map(r => r.date)).size;
+
     let totalLost = '0.0', totalLostColor = isDark ? '#9CA3AF' : '#6B7280';
     if (totalDiff < 0) { totalLost = Math.abs(totalDiff).toFixed(1); totalLostColor = isDark ? '#4ADE80' : '#16A34A'; }
     else if (totalDiff > 0) { totalLost = `+${totalDiff.toFixed(1)}`; totalLostColor = isDark ? '#F87171' : '#DC2626'; }
@@ -835,7 +841,7 @@ Page({
       currentWeight: displayWeight,
       lastChange, lastChangeClass,
       totalLost, totalLostColor,
-      daysCount: records.length
+      daysCount
     });
 
     if (this.data.goalWeight) this.updateGoalProgress(this.data.goalWeight);
@@ -1007,7 +1013,7 @@ Page({
     if (isDark) {
       ctx.setFillStyle(ctx.createLinearGradient(0, pad.t, 0, pad.t + cH, [[0, 'rgba(34, 197, 94, 0.15)'], [1, 'rgba(34, 197, 94, 0.02)']])); 
     } else {
-      ctx.setFillStyle(ctx.createLinearGradient(0, pad.t, 0, pad.t + cH, [[0, 'rgba(74, 155, 138, 0.12)'], [1, 'rgba(74, 155, 138, 0.01)']])); 
+      ctx.setFillStyle(ctx.createLinearGradient(0, pad.t, 0, pad.t + cH, [[0, 'rgba(34, 197, 94, 0.12)'], [1, 'rgba(34, 197, 94, 0.01)']])); 
     }
     ctx.fill();
 

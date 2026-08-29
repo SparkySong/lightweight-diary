@@ -210,13 +210,13 @@ Page({
     if (theme === 'light') {
       wx.setNavigationBarColor({
         frontColor: '#000000',
-        backgroundColor: '#f8f9fa',
+        backgroundColor: '#F8FAF9',
         animation: { duration: 0, timingFunc: 'linear' }
       });
     } else {
       wx.setNavigationBarColor({
         frontColor: '#ffffff',
-        backgroundColor: '#0f0f13',
+        backgroundColor: '#121212',
         animation: { duration: 0, timingFunc: 'linear' }
       });
     }
@@ -226,18 +226,18 @@ Page({
   setPullDownRefreshBg(theme) {
     if (theme === 'light') {
       wx.setBackgroundColor({
-        backgroundColor: '#f8f9fa',
-        backgroundColorTop: '#f8f9fa',
-        backgroundColorBottom: '#f8f9fa',
+        backgroundColor: '#F8FAF9',
+        backgroundColorTop: '#F8FAF9',
+        backgroundColorBottom: '#F8FAF9',
       });
       wx.setBackgroundTextStyle({
         textStyle: 'dark'
       });
     } else {
       wx.setBackgroundColor({
-        backgroundColor: '#0f0f13',
-        backgroundColorTop: '#0f0f13',
-        backgroundColorBottom: '#0f0f13',
+        backgroundColor: '#121212',
+        backgroundColorTop: '#121212',
+        backgroundColorBottom: '#121212',
       });
       wx.setBackgroundTextStyle({
         textStyle: 'light'
