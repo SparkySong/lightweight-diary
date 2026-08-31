@@ -1,3 +1,0 @@
-fix(index): 体重输入接入数字清洗并增加档案双写兜底
-fix(onboarding): 体重输入框改为digit类型并清洗非法字符
-fix(profile): 目标/当前体重输入改为digit类型并清洗非法字符
