@@ -118,6 +118,7 @@
     </view>
 
     <van-button type="primary" block round bindtap="onSubmit" style="margin-top: 24rpx;">保存记录</van-button>
+    <view class="panel-delete-btn" wx:if="{{isEditing}}" bindtap="onDeleteDiet">删除本条记录</view>
     </view>
   </view>
 
@@ -137,29 +138,27 @@
     bindscrolltolower="onScrollToLower"
     lower-threshold="100"
     wx:if="{{days.length > 0}}">
-    <view class="day-group" wx:for="{{days}}" wx:key="date" wx:for-item="day">
+    <view class="day-group" wx:for="{{days}}" wx:key="date" wx:for-item="day" wx:for-index="dayIdx">
       <view class="day-header">
-        <text class="day-date mint-text-primary">{{day.date}}</text>
+        <text class="day-date mint-text-primary">{{day.dayLabel || day.date}}</text>
         <text class="day-total mint-text-accent">{{day.totalCal}} kcal</text>
       </view>
 
-      <view class="mint-card meal-card" wx:for="{{day.records}}" wx:key="_id" wx:for-item="meal" data-meal="{{meal}}" bindtap="onEditDiet">
-        <view class="meal-header">
-          <view class="meal-label"><text>{{meal.mealLabel}}</text></view>
-          <view class="meal-actions">
+      <van-swipe-cell wx:for="{{day.records}}" wx:key="_id" wx:for-item="meal"
+            right-width="{{ 80 }}" custom-class="meal-swipe-cell" id="swipe-{{meal._id}}">
+        <view class="mint-card meal-card" bindtap="onEditDiet" data-meal="{{meal}}">
+          <view class="meal-header">
+            <view class="meal-label"><text>{{meal.mealLabel}}</text></view>
             <text class="meal-cal mint-text-primary">{{meal.totalCal}} kcal</text>
-            <view class="record-actions">
-              <text class="action-btn action-edit" catchtap="onEditDiet" data-meal="{{meal}}">编辑</text>
-              <text class="action-btn action-delete" data-id="{{meal._id}}" catchtap="onDeleteDiet">删除</text>
+          </view>
+          <view class="food-tags">
+            <view wx:for="{{meal.foods}}" wx:key="name" wx:for-item="food" class="food-chip">
+              {{food.name}} {{food.calories}}cal
             </view>
           </view>
         </view>
-        <view class="food-tags">
-          <view wx:for="{{meal.foods}}" wx:key="name" wx:for-item="food" class="food-chip">
-            {{food.name}} {{food.calories}}cal
-          </view>
-        </view>
-      </view>
+        <view slot="right" class="swipe-delete-btn" data-id="{{meal._id}}" catchtap="onDeleteDietById">删除</view>
+      </van-swipe-cell>
     </view>
 
     <view class="load-more" wx:if="{{hasMore || isLoadingMore}}">

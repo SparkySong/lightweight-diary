@@ -178,6 +178,15 @@
   margin: 16rpx 0;
 }
 
+/* 编辑态弹层底部删除入口 */
+.panel-delete-btn {
+  margin-top: 20rpx;
+  padding: 12rpx 0;
+  text-align: center;
+  font-size: 26rpx;
+  color: var(--color-error, #F87171);
+}
+
 /* 快捷添加 */
 .quick-add {
   margin: 16rpx 0;
@@ -201,27 +210,6 @@
 }
 
 .day-group {
-  margin-bottom: 30rpx;
-}
-
-.day-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16rpx 0;
-}
-
-.day-date {
-  font-size: 28rpx;
-  font-weight: 600;
-}
-
-.day-total {
-  font-size: 24rpx;
-  font-weight: 500;
-}
-
-.day-group {
   margin-bottom: 40rpx;
 }
 
@@ -231,7 +219,6 @@
   align-items: baseline;
   padding: 12rpx 8rpx;
   margin-bottom: 16rpx;
-  border-bottom: 1rpx solid var(--divider);
 }
 
 .day-date {
@@ -244,8 +231,25 @@
   font-weight: 500;
 }
 
-.meal-card {
+/* 左滑删除（van-swipe-cell） */
+.meal-swipe-cell {
   margin-bottom: 20rpx;
+}
+
+.swipe-delete-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 100%;
+  background: #F87171;
+  color: #fff;
+  font-size: 28rpx;
+  font-weight: 500;
+}
+
+.meal-card {
+  margin-bottom: 0;
 }
 
 .meal-header {
@@ -262,12 +266,6 @@
   font-size: 28rpx;
   font-weight: 500;
   color: var(--text-primary);
-}
-
-.meal-actions {
-  display: flex;
-  align-items: center;
-  gap: 16rpx;
 }
 
 .meal-cal {

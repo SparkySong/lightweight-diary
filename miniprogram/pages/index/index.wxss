@@ -825,7 +825,7 @@
 
 /* Checkin Card */
 .checkin-card .card-title-wrap {
-  margin-bottom: 20rpx;
+  margin-bottom: 0;
 }
 
 /* Input */
@@ -1306,8 +1306,6 @@
   color: var(--text-tertiary, #6B7280);
 }
 
-.record-list { margin-top: 8rpx; }
-
 /* 记录列表滚动容器 - 隐藏滚动条 */
 .records-scroll {
   margin-top: 8rpx;
@@ -1334,58 +1332,124 @@
   font-size: 24rpx;
   color: #6B7280;
 }
-.loading-spinner {
-  width: 32rpx;
-  height: 32rpx;
-  border: 3rpx solid rgba(255, 255, 255, 0.1);
-  border-top-color: #22C55E;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
+
+/* 分月分组（组间留白即可，纵向结构由时间轴承担） */
+.record-group + .record-group {
+  margin-top: 32rpx;
 }
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+
+.group-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 20rpx 8rpx 14rpx;
+}
+
+.group-month {
+  font-size: 27rpx;
+  font-weight: 600;
+  color: var(--text-secondary, #9CA3AF);
+}
+
+.group-meta {
+  display: flex;
+  align-items: baseline;
+  gap: 6rpx;
+  font-size: 21rpx;
+}
+
+.group-dot,
+.group-count {
+  color: var(--text-tertiary, #6B7280);
+}
+
+.group-net {
+  font-size: 22rpx;
+  font-weight: 500;
+}
+.group-net.down { color: var(--accent-text, #22C55E); }
+.group-net.up { color: var(--color-error, #F87171); }
+.group-net.neutral { color: var(--text-tertiary, #6B7280); }
+
+/* 左滑删除（van-swipe-cell） */
+.swipe-delete-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 100%;
+  background: #F87171;
+  color: #fff;
+  font-size: 28rpx;
+  font-weight: 500;
 }
 
 .record-item {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 24rpx 0;
-  border-top: 1rpx solid var(--divider, rgba(255, 255, 255, 0.06));
+  justify-content: space-between;
+  min-height: 88rpx;
+  padding: 12rpx 8rpx;
 }
+
+.record-item-hover {
+  background: var(--bg-hover, #333333);
+}
+
 .record-left {
   display: flex;
-  flex-direction: column;
-  gap: 4rpx;
+  align-items: baseline;
+  gap: 12rpx;
 }
-.record-date {
-  font-size: 24rpx;
-  color: var(--text-tertiary, #6B7280);
-}
-.record-weight {
-  font-size: 32rpx;
+.record-day {
+  width: 76rpx;
+  flex-shrink: 0;
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  font-size: 28rpx;
   font-weight: 600;
   color: var(--text-primary, #F5F5F5);
 }
-.record-right {
+.record-weekday {
+  width: 52rpx;
+  text-align: left;
+  font-size: 23rpx;
+  color: var(--text-tertiary, #6B7280);
+}
+.record-value {
   display: flex;
   align-items: center;
-  gap: 6rpx;
+  justify-content: flex-end;
+  gap: 18rpx;
+}
+.record-weight {
+  min-width: 116rpx;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--text-primary, #F5F5F5);
 }
 .record-diff {
-  font-size: 26rpx;
+  min-width: 84rpx;
+  padding: 6rpx 12rpx;
+  box-sizing: border-box;
+  border-radius: 999rpx;
+  font-size: 22rpx;
   font-weight: 500;
   display: flex;
   align-items: center;
-  gap: 6rpx;
+  justify-content: center;
+  gap: 5rpx;
   line-height: 1;
-  min-width: 90rpx;
-  justify-content: flex-end;
 }
-.record-diff.down { color: var(--accent-text, #22C55E); }
-.record-diff.up { color: var(--color-error, #F87171); }
-.record-diff.neutral { color: var(--text-tertiary, #6B7280); }
+/* 浅底胶囊，与食谱页 cal-dot 同一视觉体系 */
+.record-diff.down { color: var(--accent-text, #22C55E); background: rgba(34, 197, 94, 0.12); }
+.record-diff.up { color: var(--color-error, #F87171); background: rgba(248, 113, 113, 0.12); }
+/* 持平/无差值：纯文字或留空，不做胶囊 */
+.record-diff.neutral { color: var(--text-tertiary, #6B7280); background: none; }
+.record-diff.blank { background: none; }
 
 /* 趋势图标 */
 .trend-icon {
@@ -1407,95 +1471,6 @@
   border-left: 6rpx solid transparent;
   border-right: 6rpx solid transparent;
   border-bottom: 10rpx solid currentColor;
-}
-
-.trend-flat {
-  width: 10rpx;
-  height: 2rpx;
-  background: currentColor;
-  border-radius: 1rpx;
-}
-
-.delete-btn {
-  width: 48rpx;
-  height: 48rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  transition: all 0.2s;
-}
-.delete-btn:active { 
-  background: rgba(201, 139, 139, 0.15);
-}
-
-.icon-delete {
-  width: 16rpx;
-  height: 16rpx;
-  position: relative;
-}
-
-.icon-delete::before,
-.icon-delete::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 16rpx;
-  height: 2rpx;
-  background: var(--text-tertiary, #6B7280);
-  border-radius: 1rpx;
-}
-
-.icon-delete::before { transform: translate(-50%, -50%) rotate(45deg); }
-.icon-delete::after { transform: translate(-50%, -50%) rotate(-45deg); }
-
-.delete-btn:active .icon-delete::before,
-.delete-btn:active .icon-delete::after {
-  background: var(--color-error, #F87171);
-}
-
-/* 编辑图标 */
-.edit-icon {
-  width: 48rpx;
-  height: 48rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  transition: all 0.2s;
-}
-.edit-icon:active { 
-  background: var(--color-primary-bg, rgba(34, 197, 94, 0.15));
-}
-
-.icon-edit-small {
-  width: 18rpx;
-  height: 18rpx;
-  border: 2rpx solid var(--text-tertiary, #6B7280);
-  border-radius: 2rpx;
-  position: relative;
-}
-
-.icon-edit-small::before {
-  content: '';
-  position: absolute;
-  top: -4rpx;
-  right: -4rpx;
-  width: 8rpx;
-  height: 8rpx;
-  background: var(--bg-card, #1E1E1E);
-  border-left: 2rpx solid var(--text-tertiary, #6B7280);
-  transform: rotate(45deg);
-}
-
-.edit-icon:active .icon-edit-small {
-  border-color: var(--color-primary, #22C55E);
-}
-
-.edit-icon:active .icon-edit-small::before {
-  border-left-color: var(--color-primary, #22C55E);
-  background: var(--color-primary-bg, rgba(34, 197, 94, 0.15));
 }
 
 /* 编辑体重弹窗 */
@@ -1713,104 +1688,40 @@
     inset 0 2rpx 6rpx rgba(0, 0, 0, 0.15);
 }
 
-/* ====== AI 营养碗图标 ====== */
-.ai-bowl-icon {
+/* ====== AI 闪光星图标 ====== */
+.ai-spark {
   position: relative;
   width: 56rpx;
-  height: 52rpx;
+  height: 56rpx;
 }
 
-/* 碗身：下半圆 */
-.bowl-body {
+/* 主星：凹边四角闪光 */
+.spark-main {
   position: absolute;
   left: 50%;
-  bottom: 4rpx;
-  transform: translateX(-50%);
-  width: 48rpx;
-  height: 24rpx;
+  top: 50%;
+  width: 44rpx;
+  height: 44rpx;
+  transform: translate(-50%, -50%);
   background: #FFFFFF;
-  border-radius: 0 0 28rpx 28rpx;
-  box-shadow: inset 0 -3rpx 5rpx rgba(74, 140, 122, 0.18);
-  z-index: 3;
+  clip-path: polygon(50% 0%, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0% 50%, 38% 38%);
+  filter: drop-shadow(0 0 6rpx rgba(255, 255, 255, 0.55));
 }
 
-/* 碗口椭圆高光 */
-.bowl-rim {
-  position: absolute;
-  left: 50%;
-  bottom: 24rpx;
-  transform: translateX(-50%);
-  width: 48rpx;
-  height: 12rpx;
-  background: rgba(255, 255, 255, 0.55);
-  border: 2rpx solid #FFFFFF;
-  border-radius: 50%;
-  box-sizing: border-box;
-  z-index: 4;
-}
-
-/* 碗内食物点 */
-.food-dot {
-  position: absolute;
-  border-radius: 50%;
-  z-index: 2;
-}
-
-.food-dot-1 {
-  width: 14rpx; height: 14rpx;
-  bottom: 22rpx; left: 50%;
-  transform: translateX(-50%);
-  background: #FFC857;
-  box-shadow: 0 0 6rpx rgba(255, 200, 87, 0.6);
-}
-
-.food-dot-2 {
-  width: 11rpx; height: 11rpx;
-  bottom: 24rpx; left: 12rpx;
-  background: #FF8A65;
-}
-
-.food-dot-3 {
-  width: 11rpx; height: 11rpx;
-  bottom: 24rpx; right: 12rpx;
-  background: #A5D6A7;
-}
-
-/* 智能闪光（四角星） */
-.bowl-spark {
+/* 副星：右上角小闪光，呼吸闪烁 */
+.spark-sub {
   position: absolute;
   top: 0;
   right: 0;
   width: 16rpx;
   height: 16rpx;
-  z-index: 5;
+  background: #FFFFFF;
+  clip-path: polygon(50% 0%, 65% 35%, 100% 50%, 65% 65%, 50% 100%, 35% 65%, 0% 50%, 35% 35%);
   animation: sparkTwinkle 2.4s ease-in-out infinite;
 }
 
-.bowl-spark::before,
-.bowl-spark::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  background: #FFFFFF;
-  box-shadow: 0 0 6rpx rgba(255, 255, 255, 0.9);
-}
-
-.bowl-spark::before {
-  width: 16rpx; height: 4rpx;
-  transform: translate(-50%, -50%);
-  border-radius: 4rpx;
-}
-
-.bowl-spark::after {
-  width: 4rpx; height: 16rpx;
-  transform: translate(-50%, -50%);
-  border-radius: 4rpx;
-}
-
 @keyframes sparkTwinkle {
-  0%, 100% { opacity: 0.4; transform: scale(0.7) rotate(0deg); }
+  0%, 100% { opacity: 0.35; transform: scale(0.7) rotate(0deg); }
   50% { opacity: 1; transform: scale(1) rotate(90deg); }
 }
 
@@ -2190,26 +2101,31 @@
 }
 
 /* 记录列表 */
-.theme-light .record-item {
-  border-top-color: rgba(0, 0, 0, 0.06);
+.theme-light .record-item-hover {
+  background: #F3F4F6;
 }
 
-.theme-light .record-date {
+.theme-light .record-diff.down { background: rgba(34, 197, 94, 0.1); color: #16A34A; }
+.theme-light .record-diff.up { background: rgba(248, 113, 113, 0.1); color: #DC2626; }
+.theme-light .record-diff.neutral { background: none; color: #6B7280; }
+
+.theme-light .record-day,
+.theme-light .record-weight {
+  color: #1F2937;
+}
+
+.theme-light .record-weekday,
+.theme-light .group-count {
   color: #6B7280;
 }
 
-.theme-light .record-weight {
-  color: #1F2937;
+.theme-light .group-month {
+  color: #4B5563;
 }
 
 /* 加载更多 */
 .theme-light .load-more-text {
   color: #6B7280;
-}
-
-.theme-light .loading-spinner {
-  border-color: rgba(0, 0, 0, 0.1);
-  border-top-color: #16A34A;
 }
 
 /* 弹框遮罩 */
@@ -2399,36 +2315,6 @@
   box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.1);
 }
 
-/* 删除按钮 */
-.theme-light .icon-delete::before,
-.theme-light .icon-delete::after {
-  background: #9CA3AF;
-}
-
-.theme-light .delete-btn:active .icon-delete::before,
-.theme-light .delete-btn:active .icon-delete::after {
-  background: #DC2626;
-}
-
-/* 编辑图标 */
-.theme-light .icon-edit-small {
-  border-color: #9CA3AF;
-}
-
-.theme-light .icon-edit-small::before {
-  background: #FFFFFF;
-  border-left-color: #9CA3AF;
-}
-
-.theme-light .edit-icon:active .icon-edit-small {
-  border-color: #16A34A;
-}
-
-.theme-light .edit-icon:active .icon-edit-small::before {
-  border-left-color: #16A34A;
-  background: rgba(34, 197, 94, 0.1);
-}
-
 /* 图标颜色 */
 .theme-light .icon-chart,
 .theme-light .icon-trend,
@@ -2549,26 +2435,39 @@
 }
 
 
-/* ===== 打卡输入（上下两行） ===== */
-.checkin-date-row {
+/* ===== 打卡输入 ===== */
+.checkin-head {
+  justify-content: space-between;
+  margin-bottom: 8rpx;
+}
+.checkin-title-main {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 10rpx;
-  padding: 8rpx 0 20rpx;
+  gap: 12rpx;
+}
+
+/* 日期选择：标题行右侧的弱化 chip */
+.checkin-date-chip {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+  padding: 8rpx 16rpx;
+  border-radius: 999rpx;
+  background: var(--bg-hover, rgba(255, 255, 255, 0.06));
 }
 
 .checkin-date-text {
-  font-size: 26rpx;
+  font-size: 24rpx;
   color: var(--text-secondary);
+  white-space: nowrap;
 }
 
 .checkin-weight-row {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   justify-content: center;
-  gap: 8rpx;
-  padding-bottom: 16rpx;
+  gap: 10rpx;
+  padding: 12rpx 0 20rpx;
   margin-bottom: 24rpx;
   border-bottom: 2rpx solid var(--color-primary);
 }
@@ -2672,4 +2571,9 @@
 .privacy-cancel {
   font-size: 24rpx;
   color: var(--text-tertiary);
+}
+
+.height-btns {
+  display: flex;
+  gap: 12rpx;
 }

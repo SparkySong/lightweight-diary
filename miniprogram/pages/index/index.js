@@ -12,6 +12,9 @@ const PAGE_SIZE = 15;
 // 体重单位转换常量
 const KG_TO_JIN = 2; // 1kg = 2斤
 
+// 星期显示（索引对应 Date.getDay()，0 为周日）
+const WEEKDAY_NAMES = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+
 // 🔑 关键修复：从存储获取当前生效的主题（用于 data 初始值，避免闪烁）
 const getInitTheme = () => {
   const themeSetting = wx.getStorageSync('appTheme') || 'system';
@@ -49,6 +52,7 @@ const getTomorrowDateStr = () => {
 Page({
   data: {
     records: [],
+    recordGroups: [],   // 打卡记录按月分组：{ key, monthLabel, count, netText, netClass, records }
     currentWeight: '--',
     lastChange: '',
     lastChangeClass: 'neutral',
@@ -336,6 +340,7 @@ Page({
           // 对本地记录进行单位转换
           const formattedRecords = this.formatRecordsForDisplay(localRecords, weightUnit);
           this.setData({ records: formattedRecords, allRecords: formattedRecords });
+          this.buildRecordGroups();
           this.updateStats(formattedRecords);
           this.calcStreak(formattedRecords);
           this.drawChart(formattedRecords);
@@ -387,6 +392,7 @@ Page({
         isLoadingMore: false
       });
       
+      this.buildRecordGroups();
       this.updateStats(allRecords);
       this.drawChart(allRecords);
       this.calcStreak(allRecords);
@@ -397,6 +403,71 @@ Page({
     }
   },
   
+  // 按月分组打卡记录，分组标题带该月净变化
+  buildRecordGroups() {
+    const records = this.data.records || [];
+    const unit = this.data.weightUnitLabel;
+    const groups = [];
+    const groupMap = {};
+
+    [...records].sort((a, b) => b.date.localeCompare(a.date)).forEach(record => {
+      const parts = (record.date || '').split('-');
+      if (parts.length < 3) return;
+      const year = parseInt(parts[0]);
+      const month = parseInt(parts[1]);
+      const day = parseInt(parts[2]);
+      const key = `${year}-${month}`;
+
+      if (!groupMap[key]) {
+        groupMap[key] = {
+          key,
+          monthLabel: `${year}年${month}月`,
+          records: []
+        };
+        groups.push(groupMap[key]);
+      }
+      groupMap[key].records.push({
+        ...record,
+        dayLabel: `${day}日`,
+        weekday: WEEKDAY_NAMES[new Date(year, month - 1, day).getDay()]
+      });
+    });
+
+    // 月净变化基于该月全部记录计算，避免分页只加载半个月时数值失真
+    const monthAllMap = {};
+    (this.data.allRecords || []).forEach(record => {
+      const parts = (record.date || '').split('-');
+      if (parts.length < 3) return;
+      const key = `${parseInt(parts[0])}-${parseInt(parts[1])}`;
+      if (!monthAllMap[key]) monthAllMap[key] = [];
+      monthAllMap[key].push(record);
+    });
+
+    groups.forEach(group => {
+      const monthAll = [...(monthAllMap[group.key] || [])].sort((a, b) => a.date.localeCompare(b.date));
+      group.count = monthAll.length || group.records.length;
+      if (monthAll.length < 2) {
+        group.netText = '';
+        group.netClass = 'neutral';
+        return;
+      }
+      // allRecords 的 weight 已是当前显示单位（formatRecordsForDisplay 482 行转换），直接求差即可
+      const net = parseFloat((monthAll[monthAll.length - 1].weight - monthAll[0].weight).toFixed(1));
+      if (net < 0) {
+        group.netText = `净减${Math.abs(net)}${unit}`;
+        group.netClass = 'down';
+      } else if (net > 0) {
+        group.netText = `净增${net}${unit}`;
+        group.netClass = 'up';
+      } else {
+        group.netText = '体重持平';
+        group.netClass = 'neutral';
+      }
+    });
+
+    this.setData({ recordGroups: groups });
+  },
+
   // 格式化记录用于显示（根据体重单位转换）
   formatRecordsForDisplay(records, weightUnit) {
     const isJin = weightUnit === 'jin';
@@ -468,6 +539,7 @@ Page({
       isLoadingMore: false
     });
     
+    this.buildRecordGroups();
     this.updateStats(this.data.allRecords);
   },
 
@@ -484,7 +556,19 @@ Page({
     if (this.pendingPosterPath) {
       const p = this.pendingPosterPath;
       this.pendingPosterPath = null;
-      wx.saveImageToPhotosAlbum({ filePath: p, success: () => this.showToast('已保存到相册'), fail: e => this.showToast('保存失败 ' + (e.errMsg || '')) });
+      wx.saveImageToPhotosAlbum({
+        filePath: p,
+        success: () => this.showToast('已保存到相册'),
+        fail: e => {
+          const msg = e.errMsg || '';
+          if (msg.includes('cancel')) return; // 用户主动取消，不提示
+          if (msg.includes('auth')) {
+            wx.showModal({ title: '需要授权', content: '请在设置中允许保存到相册', confirmText: '去设置', success: r => { if (r.confirm) wx.openSetting(); } });
+          } else {
+            this.showToast('保存失败，请稍后重试');
+          }
+        }
+      });
     }
   },
 
@@ -528,8 +612,9 @@ Page({
 
   captureChart() {
     return new Promise(res => {
+      if (!this._chartCanvas) { res(null); return; }
       wx.canvasToTempFilePath({
-        canvasId: 'chart',
+        canvas: this._chartCanvas,
         success: r => res(r.tempFilePath),
         fail: () => res(null)
       });
@@ -556,7 +641,7 @@ Page({
         wx.canvasToTempFilePath({
           canvas,
           success: r => { wx.hideLoading(); this.posterReady(r.tempFilePath); },
-          fail: e => { wx.hideLoading(); this.showToast('生成失败 ' + (e.errMsg || '')); }
+          fail: () => { wx.hideLoading(); this.showToast('海报生成失败，请稍后重试'); }
         });
       });
     };
@@ -579,22 +664,29 @@ Page({
             filePath: path,
             success: () => this.showToast('已保存到相册'),
             fail: e => {
-              if ((e.errMsg || '').includes('auth')) {
+              const msg = e.errMsg || '';
+              if (msg.includes('cancel')) return; // 用户主动取消，不提示
+              if (msg.includes('auth')) {
                 wx.showModal({ title: '需要授权', content: '请在设置中允许保存到相册', confirmText: '去设置', success: r => { if (r.confirm) wx.openSetting(); } });
-              } else if ((e.errMsg || '').includes('privacy')) {
+              } else if (msg.includes('privacy')) {
                 this.pendingPosterPath = path;
                 this.showToast('请先同意隐私授权');
                 if (!this.data.showPrivacyPopup && !this.privacyResolve) this.showToast('请在弹窗中同意隐私授权后重试');
               } else {
-                this.showToast('保存失败 ' + (e.errMsg || ''));
+                this.showToast('保存失败，请稍后重试');
               }
             }
           });
         } else {
+          // 用户在分享菜单中主动取消（errMsg 含 cancel）时静默，不弹任何提示
+          const onShareFail = e => {
+            if ((e.errMsg || '').includes('cancel')) return;
+            this.showToast('分享失败，请稍后重试');
+          };
           if (typeof wx.showShareImageMenu === 'function') {
-            wx.showShareImageMenu({ path, fail: e => this.showToast('分享失败 ' + (e.errMsg || '')) });
+            wx.showShareImageMenu({ path, fail: onShareFail });
           } else if (typeof wx.shareImageMessage === 'function') {
-            wx.shareImageMessage({ filePath: path, fail: e => this.showToast('分享失败 ' + (e.errMsg || '')) });
+            wx.shareImageMessage({ filePath: path, fail: onShareFail });
           } else {
             this.showToast('当前微信版本不支持图片分享');
           }
@@ -750,6 +842,10 @@ Page({
   },
 
   onHeightInput(e) { this.setData({ inputHeight: e.detail.value }); },
+
+  onCancelHeight() {
+    this.setData({ showHeightInput: false });
+  },
 
   onEditHeight() {
     this.setData({ 
@@ -1049,18 +1145,22 @@ Page({
 
   // --- Chart ---
   drawChart(records) {
-    const query = wx.createSelectorQuery();
-    query.select('#chart').boundingClientRect();
-    query.exec(res => {
-      if (!res[0]) return;
-      const { width, height } = res[0];
+    // 使用新版 Canvas 2D（同层渲染），原生层级问题由此解决，弹窗遮罩可正常覆盖
+    wx.createSelectorQuery().select('#chart').fields({ node: true, size: true }).exec(res => {
+      if (!res || !res[0] || !res[0].node) return;
+      const { node: canvas, width, height } = res[0];
+      const dpr = (wx.getSystemInfoSync().pixelRatio) || 2;
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      const ctx = canvas.getContext('2d');
+      ctx.scale(dpr, dpr);
+      this._chartCanvas = canvas; // 供海报导出 canvasToTempFilePath 使用
       this.setData({ chartWidth: width, chartHeight: height });
-      this._drawChart(records, width, height);
+      this._drawChart(records, ctx, width, height);
     });
   },
 
-  _drawChart(data, W, H) {
-    const ctx = wx.createCanvasContext('chart');
+  _drawChart(data, ctx, W, H) {
     ctx.clearRect(0, 0, W, H);
 
     const { weightUnit } = this.data;
@@ -1076,11 +1176,10 @@ Page({
 
     if (sorted.length < 1) {
       const isDark = this.data.currentTheme === 'dark';
-      ctx.setFillStyle(isDark ? '#6B7280' : '#9CA3AF');
-      ctx.setFontSize(13);
-      ctx.setTextAlign('center');
+      ctx.fillStyle = isDark ? '#6B7280' : '#9CA3AF';
+      ctx.font = '13px sans-serif';
+      ctx.textAlign = 'center';
       ctx.fillText('记录数据后将显示趋势图', W / 2, H / 2);
-      ctx.draw();
       return;
     }
 
@@ -1103,34 +1202,34 @@ Page({
       const goalY = isJin ? originalGoal * KG_TO_JIN : originalGoal;
       if (goalY >= minW && goalY <= maxW) {
         const gy = pad.t + cH - ((goalY - minW) / (maxW - minW)) * cH;
-        ctx.setStrokeStyle('rgba(212, 165, 116, 0.3)');
-        ctx.setLineWidth(1);
-        ctx.setLineDash([6, 4], 0);
+        ctx.strokeStyle = 'rgba(212, 165, 116, 0.3)';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([6, 4]);
         ctx.beginPath(); ctx.moveTo(pad.l, gy); ctx.lineTo(W - pad.r, gy); ctx.stroke();
-        ctx.setLineDash([], 0);
-        ctx.setFillStyle('#FBBF24');
-        ctx.setFontSize(10);
-        ctx.setTextAlign('right');
+        ctx.setLineDash([]);
+        ctx.fillStyle = '#FBBF24';
+        ctx.font = '10px sans-serif';
+        ctx.textAlign = 'right';
         ctx.fillText(`目标 ${displayGoal.toFixed(1)}`, W - pad.r, gy - 4);
       }
     }
 
     // Grid - 使用浅灰色虚线
     const isDark = this.data.currentTheme === 'dark';
-    ctx.setStrokeStyle(isDark ? 'rgba(156, 163, 175, 0.15)' : 'rgba(156, 163, 175, 0.2)');
-    ctx.setLineWidth(1);
-    ctx.setLineDash([4, 4], 0);
+    ctx.strokeStyle = isDark ? 'rgba(156, 163, 175, 0.15)' : 'rgba(156, 163, 175, 0.2)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 4]);
     const gridLines = 4;
     for (let i = 0; i <= gridLines; i++) {
       const y = pad.t + (cH / gridLines) * i;
       ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(W - pad.r, y); ctx.stroke();
       const val = maxW - ((maxW - minW) / gridLines) * i;
-      ctx.setFillStyle(isDark ? '#6B7280' : '#9CA3AF');
-      ctx.setFontSize(10);
-      ctx.setTextAlign('right');
+      ctx.fillStyle = isDark ? '#6B7280' : '#9CA3AF';
+      ctx.font = '10px sans-serif';
+      ctx.textAlign = 'right';
       ctx.fillText(val.toFixed(1), pad.l - 6, y + 4);
     }
-    ctx.setLineDash([], 0);
+    ctx.setLineDash([]);
 
     const points = sorted.map((d, i) => ({
       x: sorted.length === 1 ? pad.l + cW / 2 : pad.l + (cW / (sorted.length - 1)) * i,
@@ -1167,18 +1266,17 @@ Page({
     ctx.closePath();
     
     // 渐变填充
-    if (isDark) {
-      ctx.setFillStyle(ctx.createLinearGradient(0, pad.t, 0, pad.t + cH, [[0, 'rgba(34, 197, 94, 0.15)'], [1, 'rgba(34, 197, 94, 0.02)']])); 
-    } else {
-      ctx.setFillStyle(ctx.createLinearGradient(0, pad.t, 0, pad.t + cH, [[0, 'rgba(34, 197, 94, 0.12)'], [1, 'rgba(34, 197, 94, 0.01)']])); 
-    }
+    const areaGrad = ctx.createLinearGradient(0, pad.t, 0, pad.t + cH);
+    areaGrad.addColorStop(0, isDark ? 'rgba(34, 197, 94, 0.15)' : 'rgba(34, 197, 94, 0.12)');
+    areaGrad.addColorStop(1, isDark ? 'rgba(34, 197, 94, 0.02)' : 'rgba(34, 197, 94, 0.01)');
+    ctx.fillStyle = areaGrad;
     ctx.fill();
 
     // Line - 使用 Catmull-Rom 样条曲线，确保经过每个数据点
-    ctx.setStrokeStyle(isDark ? '#4ADE80' : '#16A34A'); 
-    ctx.setLineWidth(2.5); 
-    ctx.setLineJoin('round');
-    ctx.setLineCap('round');
+    ctx.strokeStyle = isDark ? '#4ADE80' : '#16A34A';
+    ctx.lineWidth = 2.5;
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
     ctx.beginPath();
     
     if (points.length === 1) {
@@ -1210,28 +1308,27 @@ Page({
     // Dots - 优化数据点样式
     points.forEach((p, idx) => {
       // 外圈
-      ctx.beginPath(); 
+      ctx.beginPath();
       ctx.arc(p.x, p.y, 5, 0, Math.PI * 2);
-      ctx.setFillStyle(isDark ? '#121212' : '#FFFFFF'); 
+      ctx.fillStyle = isDark ? '#121212' : '#FFFFFF';
       ctx.fill();
       // 内圈
-      ctx.beginPath(); 
+      ctx.beginPath();
       ctx.arc(p.x, p.y, 3.5, 0, Math.PI * 2);
-      ctx.setFillStyle(isDark ? '#4ADE80' : '#16A34A'); 
+      ctx.fillStyle = isDark ? '#4ADE80' : '#16A34A';
       ctx.fill();
     });
 
     // Date labels
     const maxLabels = 6;
     const step = Math.max(1, Math.floor(sorted.length / maxLabels));
-    ctx.setFillStyle(isDark ? '#6B7280' : '#9CA3AF'); 
-    ctx.setFontSize(9); 
-    ctx.setTextAlign('center');
+    ctx.fillStyle = isDark ? '#6B7280' : '#9CA3AF';
+    ctx.font = '9px sans-serif';
+    ctx.textAlign = 'center';
     for (let i = 0; i < sorted.length; i += step) {
       const d = sorted[i].date;
       ctx.fillText(`${parseInt(d.slice(5, 7))}/${parseInt(d.slice(8, 10))}`, points[i].x, H - 6);
     }
-    ctx.draw();
   },
 
   // --- Events ---
@@ -1341,9 +1438,36 @@ Page({
     e && e.stopPropagation && e.stopPropagation();
   },
 
-  async onDelete(e) {
+  // ========== 左滑删除（van-swipe-cell） ==========
+  onDeleteById(e) {
     const id = e.currentTarget.dataset.id;
     const date = e.currentTarget.dataset.date;
+    if (!id) return;
+    wx.showModal({
+      title: '确认删除', content: `删除 ${date} 的记录？`,
+      success: async (res) => {
+        if (res.confirm) {
+          try {
+            await wx.cloud.callFunction({ name: 'deleteRecord', data: { id } });
+            this.showToast('已删除');
+            this.loadAll();
+          } catch (e) { this.showToast('删除失败'); }
+        } else {
+          const cell = this.selectComponent(`#swipe-${id}`);
+          if (cell) cell.close();
+        }
+      }
+    });
+  },
+
+  // 点击记录行：直接打开编辑弹框（删除已移至左滑）
+  onRecordTap(e) {
+    const record = e.currentTarget.dataset.record;
+    if (!record) return;
+    this.openEditPanel(record);
+  },
+
+  onDelete(id, date) {
     wx.showModal({
       title: '确认删除', content: `删除 ${date} 的记录？`,
       success: async (res) => {
@@ -1581,8 +1705,7 @@ Page({
   },
   
   // --- 编辑体重功能 ---
-  onEditRecord(e) {
-    const record = e.currentTarget.dataset.record;
+  openEditPanel(record) {
     // record.weight 已经是数值类型（转换后的），需要格式化为字符串显示
     this.setData({
       editRecordId: record._id,

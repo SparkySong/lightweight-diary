@@ -14,6 +14,20 @@ const MEAL_META = {
 };
 const MEAL_KEY_BY_TEXT = { '早餐': 'breakfast', '午餐': 'lunch', '晚餐': 'dinner', '加餐': 'snack' };
 
+const WEEKDAYS = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+
+function dayLabelOf(dateStr) {
+  const [y, m, d] = String(dateStr).split('-').map(Number);
+  if (!y || !m || !d) return dateStr;
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const date = new Date(y, m - 1, d);
+  const diff = Math.round((today - date) / 86400000);
+  if (diff === 0) return '今天';
+  if (diff === 1) return '昨天';
+  return `${m}月${d}日 ${WEEKDAYS[date.getDay()]}`;
+}
+
 function mealKeyOf(r) {
   const t = String(r.mealType || '');
   if (MEAL_META[t]) return t;
@@ -23,6 +37,7 @@ function mealKeyOf(r) {
 function normalizeMealDays(days) {
   return (days || []).map(d => ({
     ...d,
+    dayLabel: dayLabelOf(d.date),
     records: (d.records || []).map(r => {
       const key = mealKeyOf(r);
       const meta = key && MEAL_META[key];
@@ -851,8 +866,9 @@ Page({
     wx.hideLoading();
   },
 
-  async onDeleteDiet(e) {
-    const id = e.currentTarget.dataset.id;
+  onDeleteDiet() {
+    const id = this.data.editRecordId;
+    if (!id) return;
     wx.showModal({
       title: '确认删除',
       content: '删除这条饮食记录？',
@@ -861,6 +877,7 @@ Page({
           try {
             await wx.cloud.callFunction({ name: 'deleteDietRecord', data: { id } });
             this.showToast('已删除');
+            this.cancelEdit();
             this.loadRecords();
           } catch (e) {
             this.showToast('删除失败');
@@ -887,6 +904,31 @@ Page({
     });
     // 计算并显示总热量
     this.calcTotalCal();
+  },
+
+  // ========== 左滑删除（van-swipe-cell） ==========
+  onDeleteDietById(e) {
+    const id = e.currentTarget.dataset.id;
+    if (!id) return;
+    wx.showModal({
+      title: '确认删除',
+      content: '删除这条饮食记录？',
+      success: async (res) => {
+        if (res.confirm) {
+          try {
+            await wx.cloud.callFunction({ name: 'deleteDietRecord', data: { id } });
+            this.showToast('已删除');
+            this.loadRecords();
+          } catch (e) {
+            this.showToast('删除失败');
+          }
+        } else {
+          // 取消时关闭滑动
+          const cell = this.selectComponent(`#swipe-${id}`);
+          if (cell) cell.close();
+        }
+      }
+    });
   },
 
   // 取消编辑

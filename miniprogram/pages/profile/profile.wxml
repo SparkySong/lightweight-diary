@@ -60,7 +60,7 @@
       <!-- 个人信息设置 -->
       <view class="menu-item" bindtap="onMenuItemTap" data-action="profile">
         <view class="menu-item-left">
-          <van-icon class="menu-icon" name="contact" color="var(--accent-text)" size="36rpx" />
+          <van-icon class="menu-icon" name="contact-o" color="var(--accent-text)" size="36rpx" />
           <text class="menu-text">个人信息</text>
         </view>
         <view class="menu-item-right">
@@ -160,7 +160,7 @@
       <!-- 数据管理 -->
       <view class="menu-item" bindtap="onMenuItemTap" data-action="dataManage">
         <view class="menu-item-left">
-          <van-icon class="menu-icon" name="records" color="var(--accent-text)" size="36rpx" />
+          <van-icon class="menu-icon" name="records-o" color="var(--accent-text)" size="36rpx" />
           <text class="menu-text">数据管理</text>
         </view>
         <view class="menu-item-right">

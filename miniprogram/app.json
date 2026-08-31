@@ -58,6 +58,7 @@
     "van-field": "/vant/field/index",
     "van-tag": "/vant/tag/index",
     "van-loading": "/vant/loading/index",
-    "van-empty": "/vant/empty/index"
+    "van-empty": "/vant/empty/index",
+    "van-swipe-cell": "/vant/swipe-cell/index"
   }
 }

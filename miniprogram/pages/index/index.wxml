@@ -18,7 +18,7 @@
   <!-- Header -->
   <view class="header">
     <view class="header-title-row">
-      <text class="title">打卡记录</text>
+      <text class="title">轻体打卡</text>
       <!-- 切换主题图标 -->
       <!-- <view class="header-actions" style="padding-right: {{navBarRightPadding}}px;">
         <view class="theme-toggle" bindtap="onToggleThemeMenu">
@@ -84,25 +84,73 @@
 
   <!-- Checkin - 主行动上移 -->
   <view class="mint-card checkin-card">
-    <view class="card-title-wrap">
-      <view class="title-icon icon-edit"></view>
-      <text class="card-title">今日打卡</text>
-    </view>
-    <picker mode="date" value="{{inputDate}}" bindchange="onDateChange">
-      <view class="checkin-date-row">
-        <van-icon name="calendar-o" size="30rpx" color="var(--accent-text)" />
-        <text class="checkin-date-text">{{inputDate || '选择日期'}}</text>
-        <van-icon name="arrow-down" size="24rpx" color="var(--text-tertiary)" />
+    <view class="card-title-wrap checkin-head">
+      <view class="checkin-title-main">
+        <view class="title-icon icon-edit"></view>
+        <text class="card-title">今日打卡</text>
       </view>
-    </picker>
+      <picker mode="date" value="{{inputDate}}" bindchange="onDateChange">
+        <view class="checkin-date-chip">
+          <van-icon name="calendar-o" size="26rpx" color="var(--accent-text)" />
+          <text class="checkin-date-text">{{inputDate || '选择日期'}}</text>
+          <van-icon name="arrow-down" size="20rpx" color="var(--text-tertiary)" />
+        </view>
+      </picker>
+    </view>
     <view class="checkin-weight-row">
       <input class="checkin-weight-input" type="digit" placeholder="0.0" placeholder-class="checkin-ph" value="{{inputWeight}}" bindinput="onWeightInput" confirm-type="done" bindconfirm="onCheckin" />
       <text class="checkin-unit">{{weightUnitLabel}}</text>
     </view>
-    <van-button type="primary" round block bindtap="onCheckin">打卡记录</van-button>
+    <van-button type="primary" round block bindtap="onCheckin">今日打卡</van-button>
   </view>
 
-  <!-- BMI Card - Vant组件版 -->
+  <!-- Chart - Vant组件版 -->
+  <view class="mint-card chart-card">
+    <view class="card-header">
+      <view class="card-title-wrap">
+        <view class="title-icon icon-trend"></view>
+        <text class="card-title">体重趋势</text>
+      </view>
+      <view class="trend-header-right">
+      <van-icon name="share-o" size="36rpx" color="var(--accent-text)" bindtap="onShareTrend" />
+      <view class="range-btns">
+        <view class="range-btn {{chartRange === 7 ? 'active' : ''}}" data-range="7" bindtap="onRangeChange">7天</view>
+        <view class="range-btn {{chartRange === 30 ? 'active' : ''}}" data-range="30" bindtap="onRangeChange">30天</view>
+        <view class="range-btn {{chartRange === 'all' ? 'active' : ''}}" data-range="all" bindtap="onRangeChange">全部</view>
+      </view>
+      </view>
+    </view>
+    <canvas type="2d" id="chart" class="chart-canvas" />
+  </view>
+
+  <!-- 今日能量 - 入口条 -->
+  <view class="mint-card entry-row" bindtap="goToExercise">
+    <van-icon name="fire-o" color="var(--color-primary)" size="44rpx" />
+    <view class="entry-content">
+      <text class="entry-title mint-text-primary">今日能量</text>
+      <text class="entry-desc mint-text-tertiary">{{todayBalance <= 0 ? '还能吃 ' + (todayBalanceAbs || 0) + ' kcal' : '已超出 ' + (todayBalanceAbs || 0) + ' kcal'}} · 消耗 {{todayTotalBurn || 0}} kcal</text>
+    </view>
+    <van-icon name="arrow" color="var(--text-tertiary)" size="32rpx" />
+  </view>
+
+  <!-- Quick Actions - 优化快捷操作 -->
+  <view class="quick-actions">
+    <view class="action-card" bindtap="goToDiet">
+      <view class="action-icon icon-food"></view>
+      <text class="action-label">饮食记录</text>
+      <text class="action-desc tip-text">记录每日三餐
+热量一目了然</text>
+      <text class="action-link">去记录</text>
+    </view>
+    <view class="action-card tip-card" bindtap="onRefreshTip">
+      <view class="action-icon icon-tip"></view>
+      <text class="action-label">今日小贴士</text>
+      <text class="action-desc tip-text">{{healthTip}}</text>
+      <text class="action-link">换一条</text>
+    </view>
+  </view>
+
+  <!-- BMI Card - Vant组件版（低频参考，下沉到历史列表之前） -->
   <view class="mint-card bmi-card">
     <view class="card-header">
       <text class="card-title mint-text-primary">BMI 指数</text>
@@ -135,55 +183,12 @@
       </view>
       <view wx:else class="height-input-wrap" catchtap="stopPropagation">
         <van-field extra-event-params type="digit" placeholder="身高 (cm)" value="{{inputHeight}}" bind:input="onHeightInput" use-button-slot>
-          <van-button slot="button" size="small" type="primary" bindtap="onSetHeight">保存</van-button>
+          <view class="height-btns" slot="button">
+            <van-button size="small" bindtap="onCancelHeight">取消</van-button>
+            <van-button size="small" type="primary" bindtap="onSetHeight">保存</van-button>
+          </view>
         </van-field>
       </view>
-    </view>
-  </view>
-
-  <!-- 今日能量 - 入口条 -->
-  <view class="mint-card entry-row" bindtap="goToExercise">
-    <van-icon name="fire-o" color="var(--color-primary)" size="44rpx" />
-    <view class="entry-content">
-      <text class="entry-title mint-text-primary">今日能量</text>
-      <text class="entry-desc mint-text-tertiary">{{todayBalance <= 0 ? '还能吃 ' + (todayBalanceAbs || 0) + ' kcal' : '已超出 ' + (todayBalanceAbs || 0) + ' kcal'}} · 消耗 {{todayTotalBurn || 0}} kcal</text>
-    </view>
-    <van-icon name="arrow" color="var(--text-tertiary)" size="32rpx" />
-  </view>
-
-  <!-- Chart - Vant组件版 -->
-  <view class="mint-card chart-card">
-    <view class="card-header">
-      <view class="card-title-wrap">
-        <view class="title-icon icon-trend"></view>
-        <text class="card-title">体重趋势</text>
-      </view>
-      <view class="trend-header-right">
-      <van-icon name="share-o" size="36rpx" color="var(--accent-text)" bindtap="onShareTrend" />
-      <view class="range-btns">
-        <view class="range-btn {{chartRange === 7 ? 'active' : ''}}" data-range="7" bindtap="onRangeChange">7天</view>
-        <view class="range-btn {{chartRange === 30 ? 'active' : ''}}" data-range="30" bindtap="onRangeChange">30天</view>
-        <view class="range-btn {{chartRange === 'all' ? 'active' : ''}}" data-range="all" bindtap="onRangeChange">全部</view>
-      </view>
-      </view>
-    </view>
-    <canvas canvas-id="chart" id="chart" class="chart-canvas" />
-  </view>
-
-  <!-- Quick Actions - 优化快捷操作 -->
-  <view class="quick-actions">
-    <view class="action-card" bindtap="goToDiet">
-      <view class="action-icon icon-food"></view>
-      <text class="action-label">饮食记录</text>
-      <text class="action-desc tip-text">记录每日三餐
-热量一目了然</text>
-      <text class="action-link">去记录</text>
-    </view>
-    <view class="action-card tip-card" bindtap="onRefreshTip">
-      <view class="action-icon icon-tip"></view>
-      <text class="action-label">今日小贴士</text>
-      <text class="action-desc tip-text">{{healthTip}}</text>
-      <text class="action-link">换一条</text>
     </view>
   </view>
 
@@ -197,34 +202,44 @@
       <van-empty description="还没有记录，开始你的第一次打卡吧" />
     </view>
     
-    <!-- 记录列表（随页面滚动，触底加载更多） -->
+    <!-- 记录列表（按月分组，随页面滚动，触底加载更多） -->
     <view class="records-scroll" wx:if="{{records.length > 0}}">
-      <view class="record-list">
-        <view class="record-item" wx:for="{{records}}" wx:key="_id" wx:for-item="record" data-record="{{record}}" bindtap="onEditRecord">
-          <view class="record-left">
-            <text class="record-date">{{record.dateStr}}</text>
-            <text class="record-weight">{{record.displayWeight || record.weight}} {{weightUnitLabel}}</text>
-          </view>
-          <view class="record-right">
-            <view class="record-diff {{record.diffClass}}" wx:if="{{record.displayDiff !== undefined && record.displayDiff !== null}}">
-              <block wx:if="{{record.displayDiff < 0}}">
-                <view class="trend-icon trend-down"></view>
-                <text>{{(-record.displayDiff)}}</text>
-              </block>
-              <block wx:elif="{{record.displayDiff > 0}}">
-                <view class="trend-icon trend-up"></view>
-                <text>{{record.displayDiff}}</text>
-              </block>
-              <block wx:else>
-                <view class="trend-icon trend-flat"></view>
-              </block>
-            </view>
-            <view class="record-actions">
-              <text class="action-btn action-edit" catchtap="onEditRecord" data-record="{{record}}">编辑</text>
-              <text class="action-btn action-delete" data-id="{{record._id}}" data-date="{{record.date}}" catchtap="onDelete">删除</text>
-            </view>
+      <view class="record-group" wx:for="{{recordGroups}}" wx:key="key" wx:for-item="group">
+        <view class="group-header">
+          <text class="group-month">{{group.monthLabel}}</text>
+          <view class="group-meta">
+            <text class="group-net {{group.netClass}}" wx:if="{{group.netText}}">{{group.netText}}</text>
+            <text class="group-dot" wx:if="{{group.netText}}">·</text>
+            <text class="group-count">{{group.count}}次</text>
           </view>
         </view>
+        <van-swipe-cell wx:for="{{group.records}}" wx:key="_id" wx:for-item="record"
+              right-width="{{ 80 }}" custom-class="record-swipe-cell" id="swipe-{{record._id}}">
+          <view class="record-item" bindtap="onRecordTap" data-record="{{record}}" hover-class="record-item-hover">
+            <view class="record-left">
+              <text class="record-day">{{record.dayLabel}}</text>
+              <text class="record-weekday">{{record.weekday}}</text>
+            </view>
+            <view class="record-value">
+              <text class="record-weight">{{record.displayWeight || record.weight}}{{weightUnitLabel}}</text>
+              <view class="record-diff {{record.diffClass}}" wx:if="{{record.displayDiff !== undefined && record.displayDiff !== null}}">
+                <block wx:if="{{record.displayDiff < 0}}">
+                  <view class="trend-icon trend-down"></view>
+                  <text>{{(-record.displayDiff)}}</text>
+                </block>
+                <block wx:elif="{{record.displayDiff > 0}}">
+                  <view class="trend-icon trend-up"></view>
+                  <text>{{record.displayDiff}}</text>
+                </block>
+                <block wx:else>
+                  <text>持平</text>
+                </block>
+              </view>
+              <view class="record-diff blank" wx:else></view>
+            </view>
+          </view>
+          <view slot="right" class="swipe-delete-btn" data-id="{{record._id}}" data-date="{{record.date}}" catchtap="onDeleteById">删除</view>
+        </van-swipe-cell>
       </view>
       
       <!-- 加载更多提示 -->
@@ -251,18 +266,10 @@
   <view class="ai-fab-glow"></view>
   <!-- 主按钮 -->
   <view class="ai-fab-inner">
-    <!-- AI 营养碗图标 -->
-    <view class="ai-bowl-icon">
-      <!-- 碗内食物 -->
-      <view class="food-dot food-dot-1"></view>
-      <view class="food-dot food-dot-2"></view>
-      <view class="food-dot food-dot-3"></view>
-      <!-- 碗口高光椭圆 -->
-      <view class="bowl-rim"></view>
-      <!-- 碗身 -->
-      <view class="bowl-body"></view>
-      <!-- 智能闪光 -->
-      <view class="bowl-spark"></view>
+    <!-- AI 闪光星图标 -->
+    <view class="ai-spark">
+      <view class="spark-main"></view>
+      <view class="spark-sub"></view>
     </view>
   </view>
 </view>
