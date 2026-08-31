@@ -10,9 +10,11 @@ const SYSTEM_PROMPT = `你是轻体营养师。全程中文。回复简洁清晰
 
 【规则】数值必须来自用户数据，无数据则说"暂无"。自然亲切像朋友聊天。
 
+【安全边界】涉及疾病诊断、用药、孕产、哺乳、未成年人减重、进食障碍等问题时，只做一般性说明并明确建议咨询医生，不给出诊断、用药剂量或极端节食方案。
+
 【格式】用 - 列表展示要点，重点词加粗。每段最多1个emoji。
 
-【推荐追问】结尾附2-3个相关追问。`;
+【推荐追问】回复结尾另起一行，以【推荐追问】四个字开头（不加emoji、不加粗），之后每行一个问题，共2-3个。`;
 
 exports.main = async (event) => {
   const { messages, knowledgeBase } = event;
@@ -34,6 +36,7 @@ exports.main = async (event) => {
   const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
   let systemContent = SYSTEM_PROMPT + `\n\n当前日期：${todayStr}。`;
   let maxTokens = 600;
+  let temperature = 0.6; // 普通问答：语气自然
 
   // 检测特殊意图：周报分析 / 饮食计划
   const lastMsg = lastUserMsg ? lastUserMsg.content : '';
@@ -42,12 +45,14 @@ exports.main = async (event) => {
 
   if (isWeeklyReport) {
     systemContent += `\n\n【周报模式】生成本周健康周报：体重趋势、饮食分析、运动回顾、建议。用列表展示。`;
-    maxTokens = 800;
+    maxTokens = 1200;
+    temperature = 0.1; // 结构化输出求稳
   }
 
   if (isDietPlan) {
     systemContent += `\n\n【饮食计划模式】生成3天饮食建议，每天三餐，简明扼要。`;
-    maxTokens = 900;
+    maxTokens = 1200;
+    temperature = 0.1;
   }
 
   if (knowledgeBase) {
@@ -59,17 +64,26 @@ exports.main = async (event) => {
     ...messages
   ];
 
-  // 主模型 + 备用模型降级策略
+  // 模型降级策略（带限流冷却）：
+  // glm-4.7-flash 能力最强（免费，200K），优先使用；但免费档仅 1 并发，
+  // 高峰期返回 429。命中 429 后该模型冷却 60 秒（容器内全局记忆），
+  // 冷却期内直接走 glm-4-flash（免费、并发额度充足、稳定），不重复撞限流；
+  // 冷却结束自动重试强模型。claude 代理作为最后备用。
   const models = [
+    { name: 'glm-4.7-flash', label: '增强模型', host: 'open.bigmodel.cn', path: '/api/paas/v4/chat/completions', key: API_KEY, timeout: 25000, idleTimeout: 10000 },
     { name: 'glm-4-flash', label: '主模型', host: 'open.bigmodel.cn', path: '/api/paas/v4/chat/completions', key: API_KEY, timeout: 25000, idleTimeout: 10000 },
     { name: 'claude-opus-4-8', label: '备用模型', host: 'ai.loserbai.cn', path: '/v1/chat/completions', key: API_KEY_BACKUP, timeout: 20000, idleTimeout: 8000 }
   ];
 
   for (const model of models) {
+    // 限流冷却期内跳过该模型（429 冷却表见模块级 rateLimitCooldown）
+    const cooldownTable = global.rateLimitCooldown || {};
+    if (Date.now() < (cooldownTable[model.name] || 0)) continue;
+
     const requestBody = JSON.stringify({
       model: model.name,
       messages: fullMessages,
-      temperature: 0.1,
+      temperature: temperature,
       max_tokens: maxTokens,
       stream: true  // 流式模式：空闲超时可提前返回已有内容
     });
@@ -77,10 +91,18 @@ exports.main = async (event) => {
     try {
       // 流式调用：有空闲超时降级，不会一直等
       const reply = await callAPIStream(requestBody, model);
-      const cleanReply = stripMarkdown(reply);
-      return { success: true, reply: cleanReply, model: model.name };
+      // 返回前剥离推荐追问（不信任模型格式），追问以结构化字段返回给快捷栏
+      const { clean, followUps } = splitFollowUps(reply);
+      return { success: true, reply: stripMarkdown(clean), followUps, model: model.name };
     } catch (err) {
-      console.error(`[AI] ${model.label}失败:`, err.message);
+      // 429 限流：记录冷却时间，降级到下一模型（不当作错误刷屏）
+      if (/HTTP 429|1305|访问量过大|rate.?limit/i.test(err.message || '')) {
+        if (!global.rateLimitCooldown) global.rateLimitCooldown = {};
+        global.rateLimitCooldown[model.name] = Date.now() + 60 * 1000;
+        console.warn(`[AI] ${model.label}限流，60秒内自动降级，稍后重试更强模型`);
+      } else {
+        console.error(`[AI] ${model.label}失败:`, err.message);
+      }
       if (model === models[models.length - 1]) {
         return { success: false, error: err.message };
       }
@@ -88,6 +110,68 @@ exports.main = async (event) => {
   }
   return { success: false, error: 'AI 服务暂时不可用，请稍后重试' };
 };
+
+// ====== 推荐追问处理：定位关键词，剥离正文 + 结构化返回 =====
+// 模型输出的头部格式高度不稳定（emoji/加粗/列表符/括号/冒号任意组合，
+// 甚至会把"推荐追问】"接在正文句末同一行）。因此不猜整行格式，
+// 而是逐行找关键词：关键词之后只允许装饰字符，关键词之前为空或正文以句末标点结束。
+const FU_KEYS = ['你还可以问我', '推荐追问', '相关追问', '继续追问', '相关问题', '推荐问题', '延伸问题', '你可能想问', '继续问我', '还想问我', '追问'];
+
+// 关键词之后允许出现的"装饰"（所有标点、符号emoji、空白；\p写法对代理对安全）
+const DECOR_U = /[\s\p{P}\p{S}]/gu;
+// 句末标点（正文在此结束后才接关键词，说明关键词是头部而非正文一部分）
+const SENTENCE_END = /[。！？!?；;…]$/;
+
+function splitFollowUps(text) {
+  if (!text || typeof text !== 'string') return { clean: text || '', followUps: [] };
+  const lines = text.split('\n');
+
+  let headerIdx = -1, headerPrefix = '';
+  outer:
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    for (const key of FU_KEYS) {
+      const idx = line.indexOf(key);
+      if (idx === -1) continue;
+      const after = line.slice(idx + key.length);
+      // 关键词后还有文字/数字（如"推荐追问：1.如何吃"）→ 不是纯头部，交给行内兜底
+      if (after.replace(DECOR_U, '') !== '') continue;
+      const before = line.slice(0, idx);
+      const beforeRtrim = before.replace(/\s+$/u, '');
+      const beforeCore = before.replace(/[\s\p{P}\p{S}\d]/gu, '');
+      if (beforeCore === '') {
+        // 关键词前只有装饰/序号 → 整行就是头部
+        headerIdx = i; headerPrefix = '';
+        break outer;
+      }
+      if (SENTENCE_END.test(beforeRtrim)) {
+        // 关键词前是完整句子（正文句末直接接头部，如"超过这个数值。推荐追问】"）
+        headerIdx = i; headerPrefix = beforeRtrim;
+        break outer;
+      }
+    }
+  }
+
+  if (headerIdx === -1) {
+    // 兜底：行内格式 "推荐追问：1.xxx 2.yyy"（头部和问题同一行）
+    const m = text.match(/(?:推荐追问|相关追问|继续追问)[ \t]*[：:]/);
+    if (m) {
+      const after = text.substring(text.indexOf(m[0]) + m[0].length);
+      const qs = after.split(/\n+|\s*\d+[.、)]\s*/)
+        .map(x => x.trim()).filter(x => x.length > 1 && x.length <= 30);
+      return { clean: text.substring(0, text.indexOf(m[0])).trim(), followUps: qs.slice(0, 4) };
+    }
+    return { clean: text, followUps: [] };
+  }
+
+  const questions = lines.slice(headerIdx + 1)
+    .map(l => l.replace(/^[^\p{L}\p{N}]+/u, '').replace(/^\d+[.、)）]\s*/, '').trim())
+    .filter(q => q.length > 1 && q.length <= 30);
+
+  const cleanLines = lines.slice(0, headerIdx);
+  if (headerPrefix) cleanLines.push(headerPrefix);
+  return { clean: cleanLines.join('\n').trim(), followUps: questions.slice(0, 4) };
+}
 
 // 清理 AI 回复（保留前端渲染需要的格式标记：*标题*、**加粗**、-列表）
 function stripMarkdown(text) {

@@ -284,6 +284,7 @@
   use-slot
   transition="fade"
   confirm-button-color="{{currentTheme === 'light' ? '#16A34A' : '#22C55E'}}"
+  cancel-button-color="{{currentTheme === 'light' ? '#6B7280' : '#A0A0A0'}}"
   bind:confirm="onSaveEdit"
   bind:cancel="closeEditPanel"
   bind:close="closeEditPanel"
@@ -306,6 +307,7 @@
   use-slot
   transition="fade"
   confirm-button-color="{{currentTheme === 'light' ? '#16A34A' : '#22C55E'}}"
+  cancel-button-color="{{currentTheme === 'light' ? '#6B7280' : '#A0A0A0'}}"
   bind:confirm="saveWeightPopup"
   bind:cancel="closeWeightPopup"
   bind:close="closeWeightPopup"

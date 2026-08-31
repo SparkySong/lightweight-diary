@@ -149,6 +149,26 @@
   border-radius: 24rpx 4rpx 24rpx 24rpx;
 }
 
+/* 失败重试按钮（错误气泡内，文字下方软底胶囊） */
+.retry-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8rpx;
+  align-self: flex-start;
+  margin-top: 18rpx;
+  padding: 10rpx 28rpx;
+  font-size: 24rpx;
+  line-height: 1.4;
+  color: #22C55E;
+  background: rgba(34, 197, 94, 0.1);
+  border-radius: 999rpx;
+}
+
+.retry-btn:active {
+  opacity: 0.75;
+  background: rgba(34, 197, 94, 0.18);
+}
+
 /* 纯文本（用户消息） */
 .bubble-text {
   font-size: 28rpx;

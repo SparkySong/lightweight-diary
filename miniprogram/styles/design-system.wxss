@@ -207,6 +207,20 @@ page,
   --loading-text-color: var(--text-tertiary);
 }
 
+/* ---------- Vant 硬编码样式补丁 ----------
+   hairline 分割线颜色 #ebedf0 写死在组件 wxss 中、不走 CSS 变量，
+   深色主题下会变成刺眼的亮白线（dialog 底部分隔/按钮间竖线等），
+   这里统一覆盖为主题分割线色 --divider（深色 #2A2A2A / 浅色 #F3F4F6）。 */
+.van-hairline--top:after,
+.van-hairline--bottom:after,
+.van-hairline--left:after,
+.van-hairline--right:after,
+.van-hairline--top-bottom:after,
+.van-hairline--surround:after,
+.van-hairline:after {
+  border-color: var(--divider) !important;
+}
+
 /* ---------- 通用工具类 ---------- */
 
 /* 卡片 */

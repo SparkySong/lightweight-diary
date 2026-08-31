@@ -44,7 +44,8 @@ Page({
     const welcomeMsg = { role: 'assistant', content: WELCOME_MSG };
     if (savedMessages && savedMessages.length > 0) {
       // 修复旧消息：为缺少 richNodes 的 AI 消息生成富文本，同时剥离推荐追问
-      const fixed = savedMessages.map(m => {
+      // isError 的错误气泡是临时态，恢复时丢弃
+      const fixed = savedMessages.filter(m => !m.isError).map(m => {
         if (m.role === 'assistant' && m.content && !m.cardType) {
           // 先剥离 content 中可能残留的推荐追问
           const cleanContent = this._stripRecommendationBlock(m.content);
@@ -159,13 +160,24 @@ Page({
     }
   },
 
+  async loadPeriods() {
+    try {
+      const res = await wx.cloud.callFunction({ name: 'getPeriods', data: { limit: 12 } });
+      this._periodRecords = (res.result && res.result.data) || [];
+    } catch (e) {
+      // console.warn('加载经期数据失败', e);
+    }
+  },
+
   async refreshWeightFromCloud() {
     try {
       const res = await wx.cloud.callFunction({
-        name: 'getRecords', data: { range: 1 }, timeout: 10000
+        name: 'getRecords', data: { range: 30 }, timeout: 10000
       });
       const records = res.result.data || [];
       if (records.length > 0) {
+        // 保存近 30 天体重记录，供 AI 分析趋势
+        this._weightRecords = records;
         const latestKg = parseFloat(records[0].weight);
         if (latestKg) {
           const weightData = wx.getStorageSync('weightData') || {};
@@ -182,15 +194,22 @@ Page({
 
   _detectIntent(text) {
     const t = text.toLowerCase().trim();
-    // 食品安全/健康咨询类问题 → 走 AI，不要用模板
+    if (!t) return 'general';
+
+    // 开放性/咨询类问题（建议、趋势、标准范围、计划、方法、原因等）一律走 AI，
+    // AI 能结合用户数据回答，模板只适合"查当前数值/查记录"这类确定请求
+    if (/怎么|怎样|如何|为什么|为啥|建议|推荐|合适|好不好|能不能|可不可以|应该|计划|安排|食谱|范围|标准|趋势|变化|有效|方法|经验|怎么办|减.*多少|瘦.*多少|吃什么|吃啥/.test(t)) return 'general';
+    // 食品安全/健康咨询类问题 → 走 AI
     if (/隔夜|放冰箱|冷藏|加热.*吃|微波炉|变质|坏了|能.*吃|可以.*吃|安全吗|有没有毒|细菌|保质期|过期|剩菜|剩饭|外卖|路边摊|卫生|食物中毒/.test(t)) return 'general';
-    if (/bmi|体质指数|体重指数/.test(t)) return 'bmi';
-    if (/体重|多重|多重了|目前多重|当前多重|减了|瘦了|胖了/.test(t) && !/饮食|吃|食谱|建议|怎么/.test(t)) return 'weight';
-    // today_diet 排除：不是在问"我今天吃了什么/记录"，而是其他涉及"吃"的问题
+
+    // 以下为"查数值/查记录"类确定请求，命中本地模板，即时响应
     if (/(今天|今日).*(饮食|吃了什么|摄入|热量)/.test(t) || /今天吃.*怎么样|今天吃得/.test(t)) return 'today_diet';
-    if (/分析.*情况|整体.*情况|我的情况|综合.*分析|全面.*分析/.test(t)) return 'overview';
     if (/饮食记录|吃了什么|最近.*吃|昨天.*吃|前天.*吃/.test(t)) return 'diet_history';
-    if (/目标|还差多少|距目标|还要减|还.*减/.test(t) && !/怎么|如何|建议/.test(t)) return 'goal';
+    if (/分析.*情况|整体.*情况|我的情况|综合.*分析|全面.*分析/.test(t)) return 'overview';
+    if (/bmi|体质指数|体重指数/.test(t)) return 'bmi';
+    if (/还差多少|距目标|距离目标|还要减|目标进度|目标还差/.test(t)) return 'goal';
+    if (/现在.*(体重|多重)|当前.*(体重|多重)|今天.*(体重|多重)|目前.*(体重|多重)|体重多少|多重了|有?多重/.test(t)) return 'weight';
+
     return 'general';
   },
 
@@ -372,6 +391,10 @@ Page({
   buildKnowledgeBase() {
     const sections = [];
     sections.push(this._buildProfileSection());
+    const weightSection = this._buildWeightSection();
+    if (weightSection) sections.push(weightSection);
+    const periodSection = this._buildPeriodSection();
+    if (periodSection) sections.push(periodSection);
     const dietSection = this._buildDietSection();
     if (dietSection) sections.push(dietSection);
     const exerciseSection = this._buildExerciseSection();
@@ -382,18 +405,95 @@ Page({
     return kb;
   },
 
+  // 连续打卡天数：从今天往回数，今天未打卡则从昨天起算（给 AI 展示真实连续链）
+  _calcStreak(records) {
+    if (!records || !records.length) return 0;
+    const dates = [...new Set(records.map(r => this.formatDate(r.date)))];
+    const fmt = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    const today = new Date();
+    let check = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    if (!dates.includes(fmt(check))) check.setDate(check.getDate() - 1);
+    let streak = 0;
+    for (let i = 0; i < 365; i++) {
+      if (dates.includes(fmt(check))) { streak++; check.setDate(check.getDate() - 1); }
+      else break;
+    }
+    return streak;
+  },
+
+  // 经期状态：上次经期、当前是否在经期、平均周期与下次预测
+  _buildPeriodSection() {
+    const records = this._periodRecords;
+    if (!records || !records.length) return null;
+    const sorted = [...records].sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
+    const last = sorted[0];
+    const start = new Date(last.startDate);
+    if (isNaN(start.getTime())) return null;
+    const now = new Date();
+    const daysAgo = Math.floor((now - start) / 86400000);
+    if (daysAgo < 0 || daysAgo > 180) return null;
+
+    const fmt = d => `${d.getMonth() + 1}月${d.getDate()}日`;
+    const parts = [];
+    parts.push(`上次经期${fmt(start)}开始（${daysAgo}天前）`);
+
+    const duration = last.endDate
+      ? Math.max(1, Math.round((new Date(last.endDate) - start) / 86400000) + 1)
+      : 5;
+    if (daysAgo < duration) parts.push(`目前处于经期第${daysAgo + 1}天`);
+
+    // 平均周期（取最近最多6个间隔，过滤异常值）
+    let avgCycle = null;
+    if (sorted.length >= 2) {
+      let total = 0, count = 0;
+      for (let i = 0; i < sorted.length - 1 && count < 6; i++) {
+        const diff = Math.round((new Date(sorted[i].startDate) - new Date(sorted[i + 1].startDate)) / 86400000);
+        if (diff >= 15 && diff <= 60) { total += diff; count++; }
+      }
+      if (count > 0) avgCycle = Math.round(total / count);
+    }
+    if (avgCycle) {
+      const next = new Date(start);
+      next.setDate(next.getDate() + avgCycle);
+      const daysTo = Math.round((next - now) / 86400000);
+      parts.push(`平均周期${avgCycle}天，下次预计${fmt(next)}（${daysTo >= 0 ? `约${daysTo + 1}天后` : `已推迟${-daysTo}天`}）`);
+    }
+    return '【经期】' + parts.join('，');
+  },
+
+  // 近期待体重记录（按日期升序），供 AI 分析变化趋势
+  _buildWeightSection() {
+    const records = this._weightRecords;
+    if (!records || !records.length) return null;
+    const lines = [...records]
+      .sort((a, b) => new Date(a.date) - new Date(b.date))
+      .slice(-15)
+      .map(r => {
+        const kg = parseFloat(r.weight);
+        if (isNaN(kg)) return null;
+        return `${this.formatDate(r.date).slice(5)} ${(kg * 2).toFixed(1)}斤`;
+      })
+      .filter(Boolean);
+    if (!lines.length) return null;
+    return '【近期待体重记录，日期由早到晚，单位斤】\n' + lines.join('\n');
+  },
+
   _buildProfileSection() {
     const parts = [];
     const height = wx.getStorageSync('userHeight');
+    const gender = wx.getStorageSync('userGender');
     const weightData = wx.getStorageSync('weightData') || {};
     const cw = weightData.currentWeight;
     const tw = weightData.targetWeight;
     const goalCal = wx.getStorageSync('localCalorieGoal');
     if (!height && !cw) return '【档案】暂无';
+    if (gender === 'male' || gender === 'female') parts.push(gender === 'male' ? '男' : '女');
     if (height) parts.push(`身高${height}cm`);
     if (cw) { parts.push(`体重${cw.toFixed(1)}kg`); if (tw) { const d=cw-tw; parts.push(`目标差${d.toFixed(1)}kg`); } }
     if (height && cw) { const bmi=cw/Math.pow(height/100,2); parts.push(`BMI ${bmi.toFixed(1)}`); }
     if (goalCal) parts.push(`日目标${goalCal}kcal`);
+    const streak = this._calcStreak(this._weightRecords);
+    if (streak > 0) parts.push(`连续打卡${streak}天`);
     return '【档案】' + parts.join('，') || '【档案】暂无';
   },
 
@@ -454,25 +554,76 @@ Page({
     return dateStr;
   },
 
-  // ===== 推荐追问剥离 =====
+  // ===== 推荐追问处理 =====
 
-    /**
-   * 剥离【推荐追问】区块（气泡不展示，只给快捷栏用）
-   * 支持：【推荐追问】/ **相关追问** / **追问** / 追问： 等多种格式
+  // 追问头部关键词（云端同款逻辑，双端一致；长词在前，避免"推荐追问"被"追问"先命中）
+  _FU_KEYS: ['你还可以问我', '推荐追问', '相关追问', '继续追问', '相关问题', '推荐问题', '延伸问题', '你可能想问', '继续问我', '还想问我', '追问'],
+  _FU_DECOR_U: /[\s\p{P}\p{S}]/gu,
+  _FU_SENTENCE_END: /[。！？!?；;…]$/,
+
+  /**
+   * 定位追问头部并拆分：逐行找关键词，关键词之后只允许标点/符号/空白，
+   * 关键词之前为空/纯装饰（或序号）、或正文以句末标点收尾
+   * （模型可能把头部接在正文句末同一行，甚至只输出半个括号）。
+   * 模型输出格式不稳定，逐条猜正则永远猜不全，这是唯一可靠的做法。
+   */
+  _splitFollowUps(text) {
+    if (!text || typeof text !== 'string') return { clean: text || '', followUps: [] };
+    const lines = text.split('\n');
+    const DECOR = this._FU_DECOR_U, SENT_END = this._FU_SENTENCE_END;
+
+    let headerIdx = -1, headerPrefix = '';
+    outer:
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      for (const key of this._FU_KEYS) {
+        const idx = line.indexOf(key);
+        if (idx === -1) continue;
+        const after = line.slice(idx + key.length);
+        // 关键词后还有文字/数字（如"推荐追问：1.如何吃"）→ 交给行内兜底
+        if (after.replace(DECOR, '') !== '') continue;
+        const before = line.slice(0, idx);
+        const beforeRtrim = before.replace(/\s+$/u, '');
+        const beforeCore = before.replace(/[\s\p{P}\p{S}\d]/gu, '');
+        if (beforeCore === '') {
+          // 关键词前只有装饰/序号 → 整行就是头部
+          headerIdx = i; headerPrefix = '';
+          break outer;
+        }
+        if (SENT_END.test(beforeRtrim)) {
+          // 关键词前是完整句子（正文句末直接接头部）
+          headerIdx = i; headerPrefix = beforeRtrim;
+          break outer;
+        }
+      }
+    }
+
+    if (headerIdx === -1) {
+      const m = text.match(/(?:推荐追问|相关追问|继续追问)[ \t]*[：:]/);
+      if (m) {
+        const after = text.substring(text.indexOf(m[0]) + m[0].length);
+        const qs = after.split(/\n+|\s*\d+[.、)]\s*/)
+          .map(x => x.trim()).filter(x => x.length > 1 && x.length <= 30);
+        return { clean: text.substring(0, text.indexOf(m[0])).trim(), followUps: qs.slice(0, 4) };
+      }
+      return { clean: text, followUps: [] };
+    }
+
+    const questions = lines.slice(headerIdx + 1)
+      .map(l => l.replace(/^[^\p{L}\p{N}]+/u, '').replace(/^\d+[.、)）]\s*/, '').trim())
+      .filter(q => q.length > 1 && q.length <= 30);
+
+    const cleanLines = lines.slice(0, headerIdx);
+    if (headerPrefix) cleanLines.push(headerPrefix);
+    return { clean: cleanLines.join('\n').trim(), followUps: questions.slice(0, 4) };
+  },
+
+  /**
+   * 剥离追问区块（气泡不展示），与 _splitFollowUps 同源
    */
   _stripRecommendationBlock(text) {
     if (!text) return text;
-    let cleaned = text;
-    // 标准格式
-    cleaned = cleaned.replace(/【推荐追问】[\s\S]*$/, '');
-    cleaned = cleaned.replace(/[🌟💡⭐✨📌][ \t]*推荐追问[\s\S]*$/i, '');
-    // markdown 加粗格式 + 任何"追问"变体
-    cleaned = cleaned.replace(/\n\*\*(?:推荐追问|相关追问|追问)\*\*[：:][\s\S]*$/i, '');
-    // 纯文本格式
-    cleaned = cleaned.replace(/\n(?:推荐追问|相关追问|追问)[：:][\s\S]*$/i, '');
-    // 兜底：行首的推荐追问
-    cleaned = cleaned.replace(/^[^\n]*(?:推荐追问|相关追问|追问)[：:][\s\S]*$/im, '');
-    return cleaned.trim();
+    return this._splitFollowUps(text).clean;
   },
   // ===== 交互：快捷提问 / 输入 =====
 
@@ -484,7 +635,7 @@ Page({
 
     /**
    * 从 AI 回复中解析推荐追问区块，更新快捷推荐
-   * 支持：【推荐追问】/ **相关追问** / 追问： 等多种格式
+   * 与剥离共用 _splitFollowUps，保证"气泡不显示"和"快捷栏显示"两者一致
    */
   _updateDynamicQuickQuestions(messages) {
     const msgs = messages || this.data.messages;
@@ -493,26 +644,11 @@ Page({
     const lastAiReply = [...msgs].reverse().find(m => m.role === 'assistant' && m.content);
     if (!lastAiReply) return;
 
-    const content = lastAiReply.content;
-
-    // 统一的"追问"关键词正则，匹配所有变体
-    const headerRe = /(?:【推荐追问】|[🌟💡⭐✨📌][ \t]*推荐追问|\*\*(?:推荐追问|相关追问|追问)\*\*|推荐追问|相关追问|追问)[：:]?\s*\n/;
-
-    const match = content.match(headerRe);
-    if (match) {
-      const afterHeader = content.substring(content.indexOf(match[0]) + match[0].length);
-      // 贪婪匹配到字符串末尾，确保所有问题都被捕获
-      const questions = afterHeader
-        .split('\n')
-        .map(line => line.replace(/^[-\d\.\)、\s*]+/, '').trim())
-        .filter(q => q.length > 1 && q.length <= 30);
-
-      if (questions.length > 0) {
-        const qqs = questions.slice(0, 4);
-        this.setData({ quickQuestions: qqs });
-        wx.setStorageSync('aiChatQuickQuestions', qqs);
-        return;
-      }
+    const { followUps } = this._splitFollowUps(lastAiReply.content);
+    if (followUps.length > 0) {
+      this.setData({ quickQuestions: followUps });
+      wx.setStorageSync('aiChatQuickQuestions', followUps);
+      return;
     }
 
     // ===== 智能回退：AI 未输出推荐追问时，根据 AI 回复内容动态生成 =====
@@ -530,7 +666,7 @@ Page({
     ];
 
     for (const t of themeTests) {
-      if (t.test.test(content)) {
+      if (t.test.test(lastAiReply.content)) {
         suggestions.push(...t.questions);
         if (suggestions.length >= 3) break;
       }
@@ -597,12 +733,13 @@ Page({
     if (cacheAge > 30000) {
       // 超过30秒才重新加载
       try {
-        await Promise.all([this.loadDietData(), this.refreshWeightFromCloud(), this.loadExerciseData()]);
+        await Promise.all([this.loadDietData(), this.refreshWeightFromCloud(), this.loadExerciseData(), this.loadPeriods()]);
         this._lastDataLoadTime = Date.now();
       } catch(e) {}
     }
     const kb = this.buildKnowledgeBase();
-    const recentMsgs = messages.slice(-3).map(m => ({ role: m.role, content: m.content }));
+    // 近 6 条上下文，保证"推荐早餐→换一个"这类多轮追问不丢上文
+    const recentMsgs = messages.slice(-6).map(m => ({ role: m.role, content: m.content }));
 
     try {
       const res = await wx.cloud.callFunction({
@@ -615,17 +752,36 @@ Page({
         // 检测是否为结构化卡片内容
         const cardInfo = this._detectCardType(text, result.reply);
         if (cardInfo) {
-          this._renderStructuredCard(cardInfo, messages, result.reply);
+          this._renderStructuredCard(cardInfo, messages, result.reply, result.followUps);
         } else {
-          this._startStreamEffect(result.reply, messages);
+          this._startStreamEffect(result.reply, messages, result.followUps);
         }
       } else {
-        this._showFriendlyError(result.error || '未知错误');
+        this._showFriendlyError(result.error || '未知错误', text);
       }
     } catch (err) {
       console.error('调用 AI 失败:', err);
-      this._showFriendlyError(err.message || '网络异常');
+      this._showFriendlyError(err.message || '网络异常', text);
     }
+  },
+
+  // 失败重试：移除错误气泡，重发最后一条用户消息
+  onRetrySend() {
+    if (this.data.isLoading || this.data.isStreaming) return;
+    const msgs = [...this.data.messages];
+    while (msgs.length && msgs[msgs.length - 1].role === 'assistant' && msgs[msgs.length - 1].isError) msgs.pop();
+    const question = this._lastFailedQuestion;
+    if (!question) return;
+    // 找最后一条用户消息，用重发模式原样替换（等价于重新发送）
+    let idx = -1;
+    for (let i = msgs.length - 1; i >= 0; i--) {
+      if (msgs[i].role === 'user') { idx = i; break; }
+    }
+    if (idx < 0) return;
+    this.setData({ messages: msgs, editIndex: idx }, () => {
+      this._lastSendTime = 0; // 重试不受 3 秒发送限流影响
+      this.sendMessage(question, true);
+    });
   },
 
   // ===== 核心功能：打字机流式输出效果 =====
@@ -875,9 +1031,12 @@ Page({
   /**
    * 渲染结构化卡片消息（跳过流式，直接显示卡片）
    */
-  _renderStructuredCard(cardInfo, baseMessages, fallbackText) {
-    // 1. 用原始 AI 回复文本解析推荐追问（必须在剥离之前）
-    if (fallbackText) {
+  _renderStructuredCard(cardInfo, baseMessages, fallbackText, presetQuestions) {
+    // 1. 快捷栏：优先用云端结构化追问；否则从原文解析
+    if (Array.isArray(presetQuestions) && presetQuestions.length > 0) {
+      this.setData({ quickQuestions: presetQuestions });
+      wx.setStorageSync('aiChatQuickQuestions', presetQuestions);
+    } else if (fallbackText) {
       const tempMsgs = [...baseMessages, { role: 'assistant', content: fallbackText }];
       this._updateDynamicQuickQuestions(tempMsgs);
     }
@@ -886,7 +1045,7 @@ Page({
     if (!cardInfo.sections || cardInfo.sections.length === 0) {
       // console.log('[Chat] 卡片解析为空，降级为文本展示');
       if (fallbackText) {
-        this._startStreamEffect(fallbackText, baseMessages);
+        this._startStreamEffect(fallbackText, baseMessages, presetQuestions);
         return;
       }
     }
@@ -906,15 +1065,21 @@ Page({
 
   /**
    * 打字机效果：收到完整文本后逐字显示，模拟流式体验
+   * presetQuestions：云端已结构化解析好的追问，优先使用（不再猜测格式）
    */
-  _startStreamEffect(fullText, baseMessages) {
+  _startStreamEffect(fullText, baseMessages, presetQuestions) {
     const aiIndex = baseMessages.length;
 
-    // 1. 先从原始回复中解析推荐追问（必须在剥离之前，否则丢失）
-    const tempMsgs = [...baseMessages, { role: 'assistant', content: fullText }];
-    this._updateDynamicQuickQuestions(tempMsgs);
+    // 1. 快捷栏：优先用云端结构化追问；否则从原文解析（模板回复等场景）
+    if (Array.isArray(presetQuestions) && presetQuestions.length > 0) {
+      this.setData({ quickQuestions: presetQuestions });
+      wx.setStorageSync('aiChatQuickQuestions', presetQuestions);
+    } else {
+      const tempMsgs = [...baseMessages, { role: 'assistant', content: fullText }];
+      this._updateDynamicQuickQuestions(tempMsgs);
+    }
 
-    // 2. 剥离推荐追问，只展示纯净回复给用户
+    // 2. 剥离推荐追问，只展示纯净回复给用户（云端已剥离过，这里幂等兜底）
     const cleanText = this._stripRecommendationBlock(fullText);
 
     // 插入 streaming 状态的空消息
@@ -1034,16 +1199,8 @@ Page({
 
   // ===== 辅助方法 =====
 
-  _showError(errMsg) {
-    const msg = { role: 'assistant', content: `抱歉出了点问题：${errMsg}\n请稍后再试试～` };
-    const updated = [...this.data.messages, msg];
-    this.setData({ messages: updated, isLoading: false, isStreaming: false });
-    this.saveMessages(updated);
-    this.scrollToBottom();
-  },
-
   // 把技术性错误转成用户友好提示
-  _showFriendlyError(rawErr) {
+  _showFriendlyError(rawErr, lastQuestion) {
     let tip = 'AI 暂时有点忙，请稍后再试试～';
     if (/429|限流|速率限制/.test(rawErr)) {
       tip = '问得太快啦，等一会再试试吧～';
@@ -1054,7 +1211,11 @@ Page({
     } else if (/网络错误|network/.test(rawErr)) {
       tip = '网络连接有点问题，检查一下网络再试试～';
     }
-    this._showError(tip);
+    if (lastQuestion) this._lastFailedQuestion = lastQuestion;
+    // 以错误气泡形式展示，提供一键重试（不弹 toast，避免打断对话流）
+    const msgs = [...this.data.messages, { role: 'assistant', content: tip, isError: true }];
+    this.setData({ messages: msgs, isLoading: false }, () => this._queryScrollToBottom());
+    this.saveMessages(msgs);
   },
 
   scrollToBottom() {

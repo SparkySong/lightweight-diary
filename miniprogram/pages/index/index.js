@@ -161,6 +161,8 @@ Page({
   },
 
   onShow() {
+    // 显式开启页面分享能力（发送给朋友 + 朋友圈），配合 onShareAppMessage/onShareTimeline
+    wx.showShareMenu({ menus: ['shareAppMessage', 'shareTimeline'] });
     // 🔑 关键修复：立即同步刷新主题，再加载数据
     this.initWeightUnit();
     this.initTheme(); // 在数据加载前立即同步主题

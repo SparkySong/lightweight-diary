@@ -89,10 +89,15 @@
 
             <!-- AI消息：普通富文本 -->
             <rich-text wx:elif="{{item.role === 'assistant'}}" nodes="{{item.richNodes || (item.displayContent || item.content)}}" class="bubble-rich" user-select></rich-text>
+            <!-- 失败重试按钮 -->
+            <view class="retry-btn" wx:if="{{item.isError}}" catchtap="onRetrySend">
+              <van-icon name="replay" size="24rpx" color="#22C55E" />
+              <text>重试</text>
+            </view>
             <!-- 流式光标 -->
             <text class="stream-cursor" wx:if="{{item.streaming}}">|</text>
             <!-- 复制按钮 -->
-            <view class="copy-btn {{copiedIndex === index ? 'copied' : ''}}" wx:if="{{item.role === 'assistant' && !item.streaming && !item.cardType}}" data-text="{{item.content}}" data-index="{{index}}" catchtap="onCopyMessage">
+            <view class="copy-btn {{copiedIndex === index ? 'copied' : ''}}" wx:if="{{item.role === 'assistant' && !item.streaming && !item.cardType && !item.isError}}" data-text="{{item.content}}" data-index="{{index}}" catchtap="onCopyMessage">
               <view class="copy-icon-lines" wx:if="{{copiedIndex !== index}}"></view>
               <view class="copy-icon-check" wx:if="{{copiedIndex === index}}"></view>
             </view>
@@ -114,12 +119,7 @@
       <!-- AI 正在回复指示器 -->
       <view class="msg-row msg-ai" wx:if="{{isLoading && !isStreaming}}">
         <view class="avatar avatar-ai">
-          <view class="ai-icon">
-            <view class="ai-icon-circle"></view>
-            <view class="ai-icon-line ai-icon-line-1"></view>
-            <view class="ai-icon-line ai-icon-line-2"></view>
-            <view class="ai-icon-dot"></view>
-          </view>
+          <van-icon name="chat-o" size="48rpx" color="#22C55E" />
         </view>
         <view class="bubble bubble-ai typing-bubble">
           <view class="typing-indicator">
