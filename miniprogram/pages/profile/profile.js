@@ -110,6 +110,10 @@ Page({
     editNickname: '',
   },
 
+  num(v) {
+    return String(v).replace(/[，,。．]/g, '.').replace(/[^\d.]/g, '').replace(/\.{2,}/g, '.');
+  },
+
   onLoad() {
     // 接力主题切换的 loading 遮罩，覆盖 reLaunch 瓦解瞬间的系统壳层过渡帧
     if (wx.getStorageSync('pendingThemeToast')) {
@@ -637,11 +641,11 @@ loadStats(goalWeight) {
   },
 
   onGoalWeightInput(e) {
-    this.setData({ editGoalWeight: e.detail.value });
+    this.setData({ editGoalWeight: this.num(e.detail.value) });
   },
 
   onCurrentWeightInput(e) {
-    this.setData({ editCurrentWeight: e.detail.value });
+    this.setData({ editCurrentWeight: this.num(e.detail.value) });
   },
 
   async onSaveProfile() {

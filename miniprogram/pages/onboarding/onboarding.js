@@ -12,6 +12,10 @@ Page({
     error: ''
   },
 
+  num(v) {
+    return String(v).replace(/[，,。．]/g, '.').replace(/[^\d.]/g, '').replace(/\.{2,}/g, '.');
+  },
+
   onLoad() {
     this.setData({ currentTheme: app.getEffectiveTheme() });
   },
@@ -29,11 +33,11 @@ Page({
   },
 
   onCurrent(e) {
-    this.setData({ currentWeight: e.detail.value, error: '' });
+    this.setData({ currentWeight: this.num(e.detail.value), error: '' });
   },
 
   onGoal(e) {
-    this.setData({ goalWeight: e.detail.value, error: '' });
+    this.setData({ goalWeight: this.num(e.detail.value), error: '' });
   },
 
   back() {

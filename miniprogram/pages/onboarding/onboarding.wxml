@@ -37,7 +37,7 @@
       </view>
       <text class="ob-label">当前体重 ({{unit === 'jin' ? '斤' : 'kg'}})</text>
       <view class="ob-big-row">
-        <input class="ob-big-input" type="text" placeholder="0.0" value="{{currentWeight}}" bindinput="onCurrent" cursor-spacing="150" />
+        <input class="ob-big-input" type="digit" placeholder="0.0" value="{{currentWeight}}" bindinput="onCurrent" cursor-spacing="150" />
         <text class="ob-unit">{{unit === 'jin' ? '斤' : 'kg'}}</text>
       </view>
     </view>
@@ -46,7 +46,7 @@
     <view class="ob-card mint-card" wx:if="{{step === 3}}">
       <text class="ob-label">目标体重 ({{unit === 'jin' ? '斤' : 'kg'}}，可跳过)</text>
       <view class="ob-big-row">
-        <input class="ob-big-input" type="text" placeholder="0.0" value="{{goalWeight}}" bindinput="onGoal" cursor-spacing="150" />
+        <input class="ob-big-input" type="digit" placeholder="0.0" value="{{goalWeight}}" bindinput="onGoal" cursor-spacing="150" />
         <text class="ob-unit">{{unit === 'jin' ? '斤' : 'kg'}}</text>
       </view>
       <text class="ob-tip mint-text-tertiary">设置目标后可以追踪进度，之后也能随时修改</text>

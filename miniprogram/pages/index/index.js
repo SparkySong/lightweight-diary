@@ -128,6 +128,10 @@ Page({
     bmr: 0,
   },
 
+  num(v) {
+    return String(v).replace(/[，,。．]/g, '.').replace(/[^\d.]/g, '').replace(/\.{2,}/g, '.');
+  },
+
   onLoad() {
     // 接力主题切换的 loading 遮罩，覆盖 reLaunch 瓦解瞬间的系统壳层过渡帧
     if (wx.getStorageSync('pendingThemeToast')) {
@@ -1093,7 +1097,7 @@ Page({
 
   // --- Events ---
   onDateChange(e) { this.setData({ inputDate: e.detail.value }); },
-  onWeightInput(e) { this.setData({ inputWeight: e.detail.value }); },
+  onWeightInput(e) { this.setData({ inputWeight: this.num(e.detail.value) }); },
 
   async afterCheckinSuccess(recordDate) {
     await this.loadAll();
@@ -1450,7 +1454,7 @@ Page({
   },
 
   onEditWeightInput(e) {
-    this.setData({ editWeight: e.detail.value });
+    this.setData({ editWeight: this.num(e.detail.value) });
   },
 
   closeEditPanel() {
@@ -1550,7 +1554,7 @@ Page({
 
   // 体重输入
   onWeightPopupInput(e) {
-    this.setData({ weightInputValue: e.detail.value });
+    this.setData({ weightInputValue: this.num(e.detail.value) });
   },
 
   // 保存体重
@@ -1608,6 +1612,13 @@ Page({
           await wx.cloud.callFunction({ name: 'setGoal', data: { goal: weightData.targetWeight } });
         } catch (e) {
           console.warn('同步目标体重到云端失败', e);
+        }
+
+        // 双写用户档案，setGoal 云函数异常时仍有兜底
+        try {
+          await wx.cloud.callFunction({ name: 'saveUserSettings', data: { goalWeight: weightData.targetWeight } });
+        } catch (e2) {
+          console.warn('同步目标到用户档案失败', e2);
         }
         
         this.showToast('目标体重已设置');
