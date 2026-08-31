@@ -9,6 +9,7 @@
   page-style="position: relative;"
 />
 <view class="theme-root {{currentTheme === 'light' ? 'theme-light' : ''}}">
+  <view class="theme-bg-fixed"></view>
 
 <!-- 自定义导航栏区域 -->
 <view class="custom-nav-area"></view>

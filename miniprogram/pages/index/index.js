@@ -154,6 +154,7 @@ Page({
     this.initWeightUnit();
     this.initTheme(); // 在数据加载前立即同步主题
     this.showPendingThemeToast(); // 显示 reLaunch 后的主题切换提示
+    app.applyThemeToTabBar(); // onShow 无条件重应用，防 reLaunch 后 tabBar 主题丢失
 
     // 首次使用引导：本地无数据时云端探测，老账号清缓存也不打扰
     const hasExistingData = wx.getStorageSync('userHeight') || wx.getStorageSync('localGoal') || (wx.getStorageSync('localRecords') || []).length > 0;

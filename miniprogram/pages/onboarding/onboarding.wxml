@@ -5,6 +5,7 @@
   navigation-bar-style="{{currentTheme === 'light' ? 'dark' : 'light'}}"
 />
 <view class="theme-root {{currentTheme === 'light' ? 'theme-light' : ''}}">
+  <view class="theme-bg-fixed"></view>
   <view class="ob-wrap">
     <view class="ob-head">
       <text class="ob-title">轻体日记</text>

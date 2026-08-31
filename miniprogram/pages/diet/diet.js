@@ -413,6 +413,7 @@ Page({
     // 🔑 关键修复：立即同步刷新主题，再加载数据
     this.initTheme();
     this.showPendingThemeToast(); // 显示 reLaunch 后的主题切换提示
+    app.applyThemeToTabBar(); // onShow 无条件重应用，防 reLaunch 后 tabBar 主题丢失
     
     
     this.loadRecords();

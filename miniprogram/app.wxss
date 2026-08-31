@@ -83,3 +83,15 @@ page.theme-light {
   stroke-linecap: round;
   stroke-linejoin: round;
 }
+
+/* 固定遮罩：覆盖 page 节点深色底，下拉时 fixed 不随内容移动（iOS），变量自动跟主题 */
+.theme-bg-fixed {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+  background-color: var(--bg-page, #121212);
+  pointer-events: none;
+}

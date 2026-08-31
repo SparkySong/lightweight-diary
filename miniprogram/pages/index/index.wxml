@@ -9,6 +9,7 @@
   navigation-bar-style="{{currentTheme === 'light' ? 'dark' : 'light'}}"
 />
 <view class="theme-root {{currentTheme === 'light' ? 'theme-light' : ''}}" bindtap="onPageTap" catchtap="onCancelGoalInput">
+  <view class="theme-bg-fixed"></view>
 
 <!-- 自定义导航栏区域 -->
 <view class="custom-nav-area"></view>

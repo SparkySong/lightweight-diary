@@ -161,6 +161,7 @@ Page({
   onShow() {
     this.initTheme();
     this.showPendingThemeToast(); // 显示 reLaunch 后的主题切换提示
+    app.applyThemeToTabBar(); // onShow 无条件重应用，防 reLaunch 后 tabBar 主题丢失
     
     
     // 每次显示都同步刷新本地数据（确保其他页面修改后数据最新）

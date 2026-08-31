@@ -8,6 +8,7 @@
   navigation-bar-style="{{currentTheme === 'light' ? 'dark' : 'light'}}"
 />
 <view class="theme-root {{currentTheme === 'light' ? 'theme-light' : ''}}">
+  <view class="theme-bg-fixed"></view>
 
 
 <view class="container">
