@@ -158,6 +158,10 @@ Page({
     this.loadStats(goalWeightKg);
   },
 
+  onShareAppMessage() {
+    return { title: '轻体日记 · 你的减脂小助手', path: '/pages/index/index' };
+  },
+
   onShow() {
     this.initTheme();
     this.showPendingThemeToast(); // 显示 reLaunch 后的主题切换提示

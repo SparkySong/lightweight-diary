@@ -4,6 +4,7 @@ const _ = db.command;
 const Toast = require('../../vant/toast/toast').default;
 
 const app = getApp();
+const { drawPoster } = require('../../utils/poster.js');
 
 // 分页配置
 const PAGE_SIZE = 15;
@@ -133,6 +134,12 @@ Page({
   },
 
   onLoad() {
+    if (wx.onNeedPrivacyAuthorization) {
+      wx.onNeedPrivacyAuthorization(resolve => {
+        this.privacyResolve = resolve;
+        this.setData({ showPrivacyPopup: true });
+      });
+    }
     // 接力主题切换的 loading 遮罩，覆盖 reLaunch 瓦解瞬间的系统壳层过渡帧
     if (wx.getStorageSync('pendingThemeToast')) {
       wx.showLoading({ title: '切换中...', mask: true });
@@ -465,6 +472,137 @@ Page({
   },
 
   // 滚动到底部触发加载更多
+  onCancelPrivacy() {
+    this.setData({ showPrivacyPopup: false });
+    this.privacyResolve = null;
+    this.pendingPosterPath = null;
+  },
+
+  onAgreePrivacy() {
+    this.setData({ showPrivacyPopup: false });
+    if (this.privacyResolve) { this.privacyResolve(); this.privacyResolve = null; }
+    if (this.pendingPosterPath) {
+      const p = this.pendingPosterPath;
+      this.pendingPosterPath = null;
+      wx.saveImageToPhotosAlbum({ filePath: p, success: () => this.showToast('已保存到相册'), fail: e => this.showToast('保存失败 ' + (e.errMsg || '')) });
+    }
+  },
+
+  getPosterData() {
+    const { currentWeight, totalLost, streak, weightUnitLabel, allRecords, chartRange } = this.data;
+    const sorted = [...(allRecords || [])].sort((a, b) => a.date.localeCompare(b.date));
+    const pts = chartRange === 'all' ? sorted : sorted.slice(-Number(chartRange));
+    const rangeText = ({ 7: '近7天', 30: '近30天', all: '全部' })[chartRange] || '近7天';
+    return {
+      currentWeight, totalLost, streak,
+      unit: weightUnitLabel,
+      points: pts.map(r => ({ d: r.date, v: r.weight })),
+      rangeLabel: rangeText
+    };
+  },
+
+  fetchQrPath() {
+    if (this._qrPath !== undefined) return Promise.resolve(this._qrPath || null);
+    return wx.cloud.callFunction({ name: 'getPosterQrcode' })
+      .then(r => {
+        const fileID = r.result && r.result.fileID;
+        if (!fileID) throw new Error('no fileID');
+        return wx.cloud.downloadFile({ fileID });
+      })
+      .then(d => { this._qrPath = d.tempFilePath; return d.tempFilePath; })
+      .catch(() => { this._qrPath = null; return null; });
+  },
+
+  loadQrImage(canvas) {
+    if (this._qrImg) return Promise.resolve(this._qrImg);
+    return this.fetchQrPath().then(path => {
+      if (!path || !canvas.createImage) return null;
+      return new Promise(res => {
+        const img = canvas.createImage();
+        img.onload = () => { this._qrImg = img; res(img); };
+        img.onerror = () => res(null);
+        img.src = path;
+      });
+    });
+  },
+
+  captureChart() {
+    return new Promise(res => {
+      wx.canvasToTempFilePath({
+        canvasId: 'chart',
+        success: r => res(r.tempFilePath),
+        fail: () => res(null)
+      });
+    });
+  },
+
+  onShareTrend() {
+    wx.showLoading({ title: '生成中...', mask: true });
+    const dpr = wx.getSystemInfoSync().pixelRatio || 2;
+    const done = canvas => {
+      Promise.all([
+        this.loadQrImage(canvas),
+        this.captureChart().then(path => {
+          if (!path || !canvas.createImage) return null;
+          return new Promise(res => {
+            const img = canvas.createImage();
+            img.onload = () => res(img);
+            img.onerror = () => res(null);
+            img.src = path;
+          });
+        })
+      ]).then(([qr, chart]) => {
+        drawPoster(canvas, dpr, this.getPosterData(), qr, chart);
+        wx.canvasToTempFilePath({
+          canvas,
+          success: r => { wx.hideLoading(); this.posterReady(r.tempFilePath); },
+          fail: e => { wx.hideLoading(); this.showToast('生成失败 ' + (e.errMsg || '')); }
+        });
+      });
+    };
+    if (wx.createOffscreenCanvas) {
+      done(wx.createOffscreenCanvas({ type: '2d', width: 750 * dpr, height: 1080 * dpr }));
+    } else {
+      wx.createSelectorQuery().select('#posterCanvas').fields({ node: true, size: true }).exec(res => {
+        if (!res || !res[0] || !res[0].node) { wx.hideLoading(); this.showToast('生成失败'); return; }
+        done(res[0].node);
+      });
+    }
+  },
+
+  posterReady(path) {
+    wx.showActionSheet({
+      itemList: ['保存到相册', '分享给朋友'],
+      success: s => {
+        if (s.tapIndex === 0) {
+          wx.saveImageToPhotosAlbum({
+            filePath: path,
+            success: () => this.showToast('已保存到相册'),
+            fail: e => {
+              if ((e.errMsg || '').includes('auth')) {
+                wx.showModal({ title: '需要授权', content: '请在设置中允许保存到相册', confirmText: '去设置', success: r => { if (r.confirm) wx.openSetting(); } });
+              } else if ((e.errMsg || '').includes('privacy')) {
+                this.pendingPosterPath = path;
+                this.showToast('请先同意隐私授权');
+                if (!this.data.showPrivacyPopup && !this.privacyResolve) this.showToast('请在弹窗中同意隐私授权后重试');
+              } else {
+                this.showToast('保存失败 ' + (e.errMsg || ''));
+              }
+            }
+          });
+        } else {
+          if (typeof wx.showShareImageMenu === 'function') {
+            wx.showShareImageMenu({ path, fail: e => this.showToast('分享失败 ' + (e.errMsg || '')) });
+          } else if (typeof wx.shareImageMessage === 'function') {
+            wx.shareImageMessage({ filePath: path, fail: e => this.showToast('分享失败 ' + (e.errMsg || '')) });
+          } else {
+            this.showToast('当前微信版本不支持图片分享');
+          }
+        }
+      }
+    });
+  },
+
   onReachBottom() {
     if (this.data.hasMoreRecords && !this.data.isLoadingMore) {
       this.loadMoreRecords();

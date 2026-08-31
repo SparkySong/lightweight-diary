@@ -409,6 +409,10 @@ Page({
     this.loadCustomFoods();
   },
 
+  onShareAppMessage() {
+    return { title: '今天吃了啥？来记一笔', path: '/pages/index/index' };
+  },
+
   onShow() {
     // 🔑 关键修复：立即同步刷新主题，再加载数据
     this.initTheme();
