@@ -615,12 +615,37 @@ Page({
   captureChart() {
     return new Promise(res => {
       if (!this._chartCanvas) { res(null); return; }
+      // 海报底卡为白色：深色主题下数据点外圈是黑色（为暗底设计），截图贴上白底会变成黑点，
+      // 故截图前临时按浅色配色重绘，截完再恢复当前主题
+      const restore = () => {
+        if (this.data.currentTheme === 'dark') {
+          try { this._redrawChart(false); } catch (e) {}
+        }
+      };
+      try {
+        if (this.data.currentTheme === 'dark') this._redrawChart(true);
+      } catch (e) {
+        res(null);
+        return;
+      }
       wx.canvasToTempFilePath({
         canvas: this._chartCanvas,
-        success: r => res(r.tempFilePath),
-        fail: () => res(null)
+        success: r => { restore(); res(r.tempFilePath); },
+        fail: () => { restore(); res(null); }
       });
     });
+  },
+
+  // 在已缓存的趋势 canvas 上按指定配色重绘（forceLight=true 时强制浅色，供海报截图）
+  _redrawChart(forceLight) {
+    const canvas = this._chartCanvas;
+    if (!canvas || !this._chartW || !this._chartH || !this._chartDpr || !this.data.allRecords) return;
+    // 重设画布尺寸会清空内容并重置变换矩阵（避免使用兼容性不佳的 setTransform）
+    canvas.width = this._chartW * this._chartDpr;
+    canvas.height = this._chartH * this._chartDpr;
+    const ctx = canvas.getContext('2d');
+    ctx.scale(this._chartDpr, this._chartDpr);
+    this._drawChart(this.data.allRecords, ctx, this._chartW, this._chartH, forceLight);
   },
 
   onShareTrend() {
@@ -645,6 +670,9 @@ Page({
           success: r => { wx.hideLoading(); this.posterReady(r.tempFilePath); },
           fail: () => { wx.hideLoading(); this.showToast('海报生成失败，请稍后重试'); }
         });
+      }).catch(() => {
+        wx.hideLoading();
+        this.showToast('海报生成失败，请稍后重试');
       });
     };
     if (wx.createOffscreenCanvas) {
@@ -1157,13 +1185,19 @@ Page({
       const ctx = canvas.getContext('2d');
       ctx.scale(dpr, dpr);
       this._chartCanvas = canvas; // 供海报导出 canvasToTempFilePath 使用
+      this._chartDpr = dpr;
+      this._chartW = width;
+      this._chartH = height;
       this.setData({ chartWidth: width, chartHeight: height });
       this._drawChart(records, ctx, width, height);
     });
   },
 
-  _drawChart(data, ctx, W, H) {
+  // forceLight=true 时强制按浅色配色绘制（海报截图用，海报底卡为白色）
+  _drawChart(data, ctx, W, H, forceLight) {
     ctx.clearRect(0, 0, W, H);
+
+    const isDark = !forceLight && this.data.currentTheme === 'dark';
 
     const { weightUnit } = this.data;
     const isJin = weightUnit === 'jin';
@@ -1177,7 +1211,6 @@ Page({
     }
 
     if (sorted.length < 1) {
-      const isDark = this.data.currentTheme === 'dark';
       ctx.fillStyle = isDark ? '#6B7280' : '#9CA3AF';
       ctx.font = '13px sans-serif';
       ctx.textAlign = 'center';
@@ -1217,7 +1250,6 @@ Page({
     }
 
     // Grid - 使用浅灰色虚线
-    const isDark = this.data.currentTheme === 'dark';
     ctx.strokeStyle = isDark ? 'rgba(156, 163, 175, 0.15)' : 'rgba(156, 163, 175, 0.2)';
     ctx.lineWidth = 1;
     ctx.setLineDash([4, 4]);

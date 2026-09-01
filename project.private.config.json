@@ -29,11 +29,18 @@
     "miniprogram": {
       "list": [
         {
-          "name": "pages/onboarding/onboarding",
-          "pathName": "pages/onboarding/onboarding",
+          "name": "pages/ai-chat/ai-chat",
+          "pathName": "pages/ai-chat/ai-chat",
           "query": "",
           "scene": null,
           "launchMode": "default"
+        },
+        {
+          "name": "pages/onboarding/onboarding",
+          "pathName": "pages/onboarding/onboarding",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
         },
         {
           "name": "pages/ai-chat/ai-chat",
