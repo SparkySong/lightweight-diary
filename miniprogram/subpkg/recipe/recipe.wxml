@@ -1,4 +1,4 @@
-<!--pages/recipe/recipe.wxml-->
+<!--subpkg/recipe/recipe.wxml-->
 <page-meta
   background-text-style="{{currentTheme === 'light' ? 'dark' : 'light'}}"
   background-color="{{currentTheme === 'light' ? '#F8FAF9' : '#121212'}}"

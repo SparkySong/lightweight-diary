@@ -942,11 +942,11 @@ Page({
   },
 
   goToAiChat() {
-    wx.navigateTo({ url: '/pages/ai-chat/ai-chat' });
+    wx.navigateTo({ url: '/subpkg/ai-chat/ai-chat' });
   },
 
   goToExercise() {
-    wx.navigateTo({ url: '/pages/exercise/exercise' });
+    wx.navigateTo({ url: '/subpkg/exercise/exercise' });
   },
 
   // 加载今日热量收支数据

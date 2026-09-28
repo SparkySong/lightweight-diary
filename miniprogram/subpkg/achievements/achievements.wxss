@@ -1,4 +1,4 @@
-/* pages/achievements/achievements.wxss */
+/* subpkg/achievements/achievements.wxss */
 @import "/styles/simple-theme.wxss";
 
 .page-container {

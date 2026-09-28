@@ -977,14 +977,14 @@ Page({
   // 跳转到热量分析页面
   goToCalorieAnalysis() {
     wx.navigateTo({
-      url: '/pages/calorie-detail/calorie-detail'
+      url: '/subpkg/calorie-detail/calorie-detail'
     });
   },
 
   // 跳转到 AI 营养师聊天页面
   goToAiChat() {
     wx.navigateTo({
-      url: '/pages/ai-chat/ai-chat'
+      url: '/subpkg/ai-chat/ai-chat'
     });
   },
   

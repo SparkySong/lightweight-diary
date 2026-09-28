@@ -1,4 +1,4 @@
-// pages/achievements/achievements.js
+// subpkg/achievements/achievements.js
 const app = getApp();
 
 const getInitTheme = () => {

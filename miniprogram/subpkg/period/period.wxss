@@ -1,4 +1,4 @@
-/* pages/period/period.wxss */
+/* subpkg/period/period.wxss */
 @import "/styles/simple-theme.wxss";
 
 .page-container {

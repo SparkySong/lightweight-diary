@@ -579,16 +579,16 @@ loadStats(goalWeight) {
         this.setData({ showThemeSetting: true });
         break;
       case 'aiChat':
-        wx.navigateTo({ url: '/pages/ai-chat/ai-chat' });
+        wx.navigateTo({ url: '/subpkg/ai-chat/ai-chat' });
         break;
       case 'achievements':
-        wx.navigateTo({ url: '/pages/achievements/achievements' });
+        wx.navigateTo({ url: '/subpkg/achievements/achievements' });
         break;
       case 'report':
-        wx.navigateTo({ url: '/pages/report/report' });
+        wx.navigateTo({ url: '/subpkg/report/report' });
         break;
       case 'period':
-        wx.navigateTo({ url: '/pages/period/period' });
+        wx.navigateTo({ url: '/subpkg/period/period' });
         break;
       case 'dataManage':
         this.setData({ showDataManage: true });

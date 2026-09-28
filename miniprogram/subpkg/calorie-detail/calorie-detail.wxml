@@ -1,4 +1,4 @@
-<!--pages/calorie-detail/calorie-detail.wxml-->
+<!--subpkg/calorie-detail/calorie-detail.wxml-->
 <page-meta
   background-text-style="{{currentTheme === 'light' ? 'dark' : 'light'}}"
   background-color="{{currentTheme === 'light' ? '#F8FAF9' : '#121212'}}"

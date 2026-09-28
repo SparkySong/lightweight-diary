@@ -1,4 +1,4 @@
-// pages/exercise/exercise.js
+// subpkg/exercise/exercise.js
 const app = getApp();
 const db = wx.cloud.database();
 const Toast = require('../../vant/toast/toast').default;

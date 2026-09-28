@@ -1,5 +1,5 @@
 const Toast = require("../../vant/toast/toast").default;
-// pages/ai-chat/ai-chat.js —— 混合模式：数据问题用模板，开放问题用 AI + 流式输出
+// subpkg/ai-chat/ai-chat.js —— 混合模式：数据问题用模板，开放问题用 AI + 流式输出
 const app = getApp();
 
 // 欢迎消息
@@ -1244,7 +1244,7 @@ Page({
     const lastAi = [...this.data.messages].reverse().find(m => m.role === 'assistant');
     return {
       title: lastAi ? lastAi.content.slice(0,30) + (lastAi.content.length>30?'...':'') : '营养师为你解答饮食健康问题',
-      path: '/pages/ai-chat/ai-chat',
+      path: '/subpkg/ai-chat/ai-chat',
       imageUrl: '/images/share-ai-chat.png'
     };
   },

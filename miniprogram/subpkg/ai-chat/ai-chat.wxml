@@ -1,4 +1,4 @@
-<!--pages/ai-chat/ai-chat.wxml-->
+<!--subpkg/ai-chat/ai-chat.wxml-->
 <!-- 页面元信息，在 JS 中动态设置背景色和状态栏（必须作为页面第一个节点）-->
 <page-meta
   background-text-style="{{currentTheme === 'light' ? 'dark' : 'light'}}"

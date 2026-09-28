@@ -1,5 +1,5 @@
 const Toast = require("../../vant/toast/toast").default;
-// pages/calorie-detail/calorie-detail.js
+// subpkg/calorie-detail/calorie-detail.js
 const app = getApp();
 
 const getInitTheme = () => {
@@ -723,7 +723,7 @@ Page({
   // 查看食谱
   goToRecipe() {
     wx.navigateTo({
-      url: '/pages/recipe/recipe'
+      url: '/subpkg/recipe/recipe'
     });
   },
 

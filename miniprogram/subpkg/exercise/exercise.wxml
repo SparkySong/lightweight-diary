@@ -1,4 +1,4 @@
-<!--pages/exercise/exercise.wxml-->
+<!--subpkg/exercise/exercise.wxml-->
 <page-meta
   background-text-style="{{currentTheme === 'light' ? 'dark' : 'light'}}"
   background-color="{{currentTheme === 'light' ? '#F8FAF9' : '#121212'}}"

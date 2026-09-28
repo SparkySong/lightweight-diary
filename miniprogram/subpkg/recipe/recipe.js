@@ -1,5 +1,5 @@
 const Toast = require("../../vant/toast/toast").default;
-// pages/recipe/recipe.js
+// subpkg/recipe/recipe.js
 const app = getApp();
 
 const getInitTheme = () => {

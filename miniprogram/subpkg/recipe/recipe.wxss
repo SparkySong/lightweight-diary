@@ -1,4 +1,4 @@
-/* pages/recipe/recipe.wxss */
+/* subpkg/recipe/recipe.wxss */
 @import "/styles/simple-theme.wxss";
 
 /* ========== 容器 ========== */

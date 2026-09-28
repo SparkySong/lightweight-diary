@@ -1,4 +1,4 @@
-/* pages/exercise/exercise.wxss - Vant组件版 */
+/* subpkg/exercise/exercise.wxss - Vant组件版 */
 @import "/styles/simple-theme.wxss";
 
 .container {

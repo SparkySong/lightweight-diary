@@ -1,5 +1,5 @@
 const Toast = require("../../vant/toast/toast").default;
-// pages/period/period.js
+// subpkg/period/period.js
 const app = getApp();
 
 const getInitTheme = () => {

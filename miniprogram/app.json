@@ -3,14 +3,21 @@
     "pages/index/index",
     "pages/onboarding/onboarding",
     "pages/diet/diet",
-    "pages/profile/profile",
-    "pages/calorie-detail/calorie-detail",
-    "pages/recipe/recipe",
-    "pages/ai-chat/ai-chat",
-    "pages/exercise/exercise",
-    "pages/achievements/achievements",
-    "pages/report/report",
-    "pages/period/period"
+    "pages/profile/profile"
+  ],
+  "subPackages": [
+    {
+      "root": "subpkg",
+      "pages": [
+        "calorie-detail/calorie-detail",
+        "recipe/recipe",
+        "ai-chat/ai-chat",
+        "exercise/exercise",
+        "achievements/achievements",
+        "report/report",
+        "period/period"
+      ]
+    }
   ],
   "window": {
     "navigationBarBackgroundColor": "#121212",

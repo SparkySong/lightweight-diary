@@ -1,4 +1,4 @@
-/* pages/report/report.wxss */
+/* subpkg/report/report.wxss */
 @import "/styles/simple-theme.wxss";
 
 .page-container {
