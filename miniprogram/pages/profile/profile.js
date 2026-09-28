@@ -888,11 +888,22 @@ loadStats(goalWeight) {
         if (res.confirm) {
           wx.showLoading({ title: '清空中...' });
           try {
-            // 清空云端数据
+            // 清空云端数据：必须确认云端清空成功后才清本地缓存，避免"假清空"
+            let cloudOk = false;
             try {
-              await wx.cloud.callFunction({ name: 'clearAllData' });
+              const cloudRes = await wx.cloud.callFunction({ name: 'clearAllData' });
+              const result = cloudRes && cloudRes.result;
+              cloudOk = !!(result && result.success);
+              if (!cloudOk) {
+                console.error('云端数据清空失败', result);
+              }
             } catch (e) {
-              console.warn('清空云端数据失败', e);
+              console.error('云端数据清空失败', e);
+            }
+            if (!cloudOk) {
+              wx.hideLoading();
+              this.showToast('云端数据清空失败');
+              return;
             }
 
             // 清空本地存储
