@@ -124,6 +124,7 @@
 │   ├── getUserSettings         # 获取用户设置
 │   ├── saveUserSettings        # 保存用户设置（含性别）
 │   ├── getProfile              # 获取用户档案（含性别、身高）
+│   ├── clearAllData            # 清空当前用户全部云端数据（按 openid 过滤）
 │   ├── subscribeReminder       # 管理/取消订阅提醒
 │   ├── sendReminder            # 定时触发器：批量发送提醒
 │   ├── aiChat                  # AI 大模型调用（Claude）
