@@ -27,3 +27,7 @@ Thumbs.db
 .codebuddy/
 .lingma/
 .claude/
+.workbuddy/
+
+# 微信开发者工具私有配置
+project.private.config.json
