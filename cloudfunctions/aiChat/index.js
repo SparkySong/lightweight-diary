@@ -3,7 +3,6 @@ const https = require('https');
 const { matchKnowledge } = require('./knowledge-base');
 
 const API_KEY = '9dd5302e8467401ea52c91d3cedb8b2c.6hoEdWuhxR2aXIEl';
-const API_KEY_BACKUP = 'sk-43f98e89b7017525e80286fe7959b857690a6a7f99466f1ff37fc8161fc44bc3';
 
 // ====== System Prompt（强制结构化输出）======
 const SYSTEM_PROMPT = `你是轻体营养师。全程中文。回复简洁清晰，重点突出。
@@ -63,49 +62,40 @@ exports.main = async (event) => {
     { role: 'system', content: systemContent },
     ...messages
   ];
+  // 长对话会稀释系统提示词的约束力：利用近因效应在上下文末尾再钉一次格式要求，
+  // 防止模型把追问头部挤到正文同一行（曾导致剥离失败、脏格式回流历史自我强化）
+  fullMessages.push({ role: 'system', content: '【格式提醒】结尾的推荐追问必须单独另起一行：该行只写"【推荐追问】"，之后每行一个问题共2-3个；正文中不得出现该标记或与其同行。' });
 
-  // 模型降级策略（带限流冷却）：
-  // glm-4.7-flash 能力最强（免费，200K），优先使用；但免费档仅 1 并发，
-  // 高峰期返回 429。命中 429 后该模型冷却 60 秒（容器内全局记忆），
-  // 冷却期内直接走 glm-4-flash（免费、并发额度充足、稳定），不重复撞限流；
-  // 冷却结束自动重试强模型。claude 代理作为最后备用。
-  const models = [
-    { name: 'glm-4.7-flash', label: '增强模型', host: 'open.bigmodel.cn', path: '/api/paas/v4/chat/completions', key: API_KEY, timeout: 25000, idleTimeout: 10000 },
-    { name: 'glm-4-flash', label: '主模型', host: 'open.bigmodel.cn', path: '/api/paas/v4/chat/completions', key: API_KEY, timeout: 25000, idleTimeout: 10000 },
-    { name: 'claude-opus-4-8', label: '备用模型', host: 'ai.loserbai.cn', path: '/v1/chat/completions', key: API_KEY_BACKUP, timeout: 20000, idleTimeout: 8000 }
-  ];
+  // 模型：glm-4-flash（智谱官方、免费、稳定、无 WAF 拦截、非思考模型），作为唯一主模型
+  const model = { name: 'glm-4-flash', host: 'open.bigmodel.cn', path: '/api/paas/v4/chat/completions', key: API_KEY, timeout: 25000, idleTimeout: 10000 };
 
-  for (const model of models) {
-    // 限流冷却期内跳过该模型（429 冷却表见模块级 rateLimitCooldown）
-    const cooldownTable = global.rateLimitCooldown || {};
-    if (Date.now() < (cooldownTable[model.name] || 0)) continue;
-
+  let useStream = true;
+  // 尝试策略（最多 2 次）：1) 流式（首字节快、体验好）；2) 流式空响应时切非流式重试（智谱流式与非流式是两套代码路径，其一偶发空响应）
+  for (let attempt = 1; attempt <= 2; attempt++) {
     const requestBody = JSON.stringify({
       model: model.name,
       messages: fullMessages,
       temperature: temperature,
       max_tokens: maxTokens,
-      stream: true  // 流式模式：空闲超时可提前返回已有内容
+      stream: useStream
     });
-
     try {
-      // 流式调用：有空闲超时降级，不会一直等
-      const reply = await callAPIStream(requestBody, model);
+      // 流式调用：有空闲超时降级，不会一直等；非流式：一次性拿全量
+      const reply = useStream
+        ? await callAPIStream(requestBody, model)
+        : await callAPINormal(requestBody, model);
       // 返回前剥离推荐追问（不信任模型格式），追问以结构化字段返回给快捷栏
       const { clean, followUps } = splitFollowUps(reply);
       return { success: true, reply: stripMarkdown(clean), followUps, model: model.name };
     } catch (err) {
-      // 429 限流：记录冷却时间，降级到下一模型（不当作错误刷屏）
-      if (/HTTP 429|1305|访问量过大|rate.?limit/i.test(err.message || '')) {
-        if (!global.rateLimitCooldown) global.rateLimitCooldown = {};
-        global.rateLimitCooldown[model.name] = Date.now() + 60 * 1000;
-        console.warn(`[AI] ${model.label}限流，60秒内自动降级，稍后重试更强模型`);
-      } else {
-        console.error(`[AI] ${model.label}失败:`, err.message);
+      // 流式空响应：切非流式重试一次
+      if (/未返回有效回复|无数据返回|无响应/.test(err.message || '') && useStream && attempt === 1) {
+        useStream = false;
+        console.warn(`[AI] glm-4-flash 流式空响应，切换非流式重试: ${err.message}`);
+        continue;
       }
-      if (model === models[models.length - 1]) {
-        return { success: false, error: err.message };
-      }
+      console.error('[AI] glm-4-flash 失败:', err.message);
+      return { success: false, error: err.message || 'AI 服务暂时不可用，请稍后重试' };
     }
   }
   return { success: false, error: 'AI 服务暂时不可用，请稍后重试' };
@@ -144,9 +134,16 @@ function splitFollowUps(text) {
         headerIdx = i; headerPrefix = '';
         break outer;
       }
-      if (SENTENCE_END.test(beforeRtrim)) {
-        // 关键词前是完整句子（正文句末直接接头部，如"超过这个数值。推荐追问】"）
+      if (SENTENCE_END.test(beforeRtrim) || SENTENCE_END.test(before.replace(/[\s\p{S}]+$/u, ''))) {
+        // 关键词前是完整句子（正文句末直接接头部，如"超过这个数值。推荐追问】"）；
+        // 句末标点与关键词之间隔 emoji/符号（如"…哦！🌟 【推荐追问】"）同样判定为头部
         headerIdx = i; headerPrefix = beforeRtrim;
+        break outer;
+      }
+      if (before.endsWith('【') && after.startsWith('】')) {
+        // 关键词被【】完整包裹（头部标记完整），即使正文同行也强制拆分；
+        // 保留前置正文时去掉悬空的半括号
+        headerIdx = i; headerPrefix = beforeRtrim.replace(/【$/u, '');
         break outer;
       }
     }
@@ -236,10 +233,10 @@ function callAPINormal(body, modelConfig) {
           if (content) {
             resolve(content);
           } else {
-            reject(new Error('AI 未返回有效回复'));
+            reject(new Error(`AI 未返回有效回复(原始响应: ${data.substring(0, 120) || '空'})`));
           }
         } catch (e) {
-          reject(new Error('解析响应失败'));
+          reject(new Error(`解析响应失败(原始响应: ${data.substring(0, 120)})`));
         }
       });
     });
@@ -279,8 +276,8 @@ function callAPIStream(body, modelConfig) {
         'Accept': 'text/event-stream'
       }
     };
-
     let fullText = '';
+    let rawHead = '';  // 原始响应头部采样：空响应时带入报错信息，便于看穿实际返回了什么
     let resolved = false;
     let destroyed = false;
 
@@ -324,7 +321,12 @@ function callAPIStream(body, modelConfig) {
       if (res.statusCode !== 200) {
         let errData = '';
         res.on('data', chunk => { errData += chunk; });
-        res.on('end', () => { if (!resolved) { cleanup(); reject(new Error(`HTTP ${res.statusCode}: ${errData.substring(0, 200)}`)); } });
+        res.on('end', () => {
+          if (!resolved) {
+            cleanup();
+            reject(new Error(`HTTP ${res.statusCode}: ${errData.substring(0, 200)}`));
+          }
+        });
         return;
       }
 
@@ -332,6 +334,7 @@ function callAPIStream(body, modelConfig) {
         if (destroyed) return;
         resetIdleTimer();
         const text = chunk.toString();
+        if (rawHead.length < 200) rawHead = (rawHead + text).slice(0, 200);
         const lines = text.split('\n');
         for (const line of lines) {
           if (!line.startsWith('data: ')) continue;
@@ -357,7 +360,7 @@ function callAPIStream(body, modelConfig) {
         if (!resolved) {
           cleanup();
           if (fullText.trim()) resolve(fullText);
-          else reject(new Error('AI 未返回有效回复'));
+          else reject(new Error(`AI 未返回有效回复(原始响应: ${rawHead.slice(0, 120) || '空'})`));
         }
       });
     });
@@ -386,3 +389,6 @@ function callAPIStream(body, modelConfig) {
     resetIdleTimer();
   });
 }
+
+// 供测试暴露：追问剥离
+exports._splitFollowUps = splitFollowUps;

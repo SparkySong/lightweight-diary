@@ -42,10 +42,11 @@ Page({
   async onLoad(options) {
     const savedMessages = wx.getStorageSync('aiChatMessages');
     const welcomeMsg = { role: 'assistant', content: WELCOME_MSG };
+    let restored = [];
     if (savedMessages && savedMessages.length > 0) {
       // 修复旧消息：为缺少 richNodes 的 AI 消息生成富文本，同时剥离推荐追问
       // isError 的错误气泡是临时态，恢复时丢弃
-      const fixed = savedMessages.filter(m => !m.isError).map(m => {
+      restored = savedMessages.filter(m => !m.isError).map(m => {
         if (m.role === 'assistant' && m.content && !m.cardType) {
           // 先剥离 content 中可能残留的推荐追问
           const cleanContent = this._stripRecommendationBlock(m.content);
@@ -58,7 +59,7 @@ Page({
         }
         return m;
       });
-      this.setData({ messages: fixed });
+      this.setData({ messages: restored });
     } else {
       this.setData({ messages: [welcomeMsg] });
     }
@@ -68,10 +69,32 @@ Page({
       this.setData({ userAvatar: savedAvatar });
     }
 
-    // 恢复快捷提问（上次 AI 动态更新后的状态）
-    const savedQuickQuestions = wx.getStorageSync('aiChatQuickQuestions');
-    if (savedQuickQuestions && savedQuickQuestions.length > 0) {
-      this.setData({ quickQuestions: savedQuickQuestions });
+    // 恢复快捷推荐：优先取最后一条 AI 消息上随消息持久化的 quickQuestions，
+    // 保证重进页面与退出前展示完全一致
+    let restoredQuick = null;
+    for (let i = restored.length - 1; i >= 0; i--) {
+      const m = restored[i];
+      if (m.role === 'assistant' && Array.isArray(m.quickQuestions) && m.quickQuestions.length > 0) {
+        restoredQuick = m.quickQuestions;
+        break;
+      }
+    }
+    if (!restoredQuick) {
+      // 旧版本消息未内嵌 quickQuestions，回退读独立 storage；
+      // 但若推荐项已被用户当作问题问过，说明 storage 停留在更早的回复（旧版兜底推荐未落盘导致），判定过期
+      const savedQuickQuestions = wx.getStorageSync('aiChatQuickQuestions');
+      const asked = new Set(restored.filter(m => m.role === 'user').map(m => m.content));
+      if (savedQuickQuestions && savedQuickQuestions.length > 0 && !savedQuickQuestions.some(q => asked.has(q))) {
+        restoredQuick = savedQuickQuestions;
+      }
+    }
+    if (!restoredQuick && restored.length > 0) {
+      // 最后兜底：按最后一条 AI 回复重新生成（content 已剥离追问，走主题回退）
+      const lastAi = [...restored].reverse().find(m => m.role === 'assistant' && m.content && !m.isError && !m.cardType);
+      if (lastAi) restoredQuick = this._computeQuickQuestions(lastAi.content);
+    }
+    if (restoredQuick && restoredQuick.length > 0) {
+      this._applyQuickQuestions(restoredQuick);
     }
 
     try {
@@ -590,9 +613,16 @@ Page({
           headerIdx = i; headerPrefix = '';
           break outer;
         }
-        if (SENT_END.test(beforeRtrim)) {
-          // 关键词前是完整句子（正文句末直接接头部）
+        if (SENT_END.test(beforeRtrim) || SENT_END.test(before.replace(/[\s\p{S}]+$/u, ''))) {
+          // 关键词前是完整句子（正文句末直接接头部）；
+          // 句末标点与关键词之间隔 emoji/符号（如"…哦！🌟 【推荐追问】"）同样判定为头部
           headerIdx = i; headerPrefix = beforeRtrim;
+          break outer;
+        }
+        if (before.endsWith('【') && after.startsWith('】')) {
+          // 关键词被【】完整包裹（头部标记完整），即使正文同行也强制拆分；
+          // 保留前置正文时去掉悬空的半括号
+          headerIdx = i; headerPrefix = beforeRtrim.replace(/【$/u, '');
           break outer;
         }
       }
@@ -634,22 +664,21 @@ Page({
   },
 
     /**
-   * 从 AI 回复中解析推荐追问区块，更新快捷推荐
-   * 与剥离共用 _splitFollowUps，保证"气泡不显示"和"快捷栏显示"两者一致
+   * 快捷推荐唯一写入口：展示与落盘同步，避免"看到的"和"重进后看到的"不一致
    */
-  _updateDynamicQuickQuestions(messages) {
-    const msgs = messages || this.data.messages;
-    if (!msgs || msgs.length === 0) return;
+  _applyQuickQuestions(list) {
+    this.setData({ quickQuestions: list });
+    wx.setStorageSync('aiChatQuickQuestions', list);
+  },
 
-    const lastAiReply = [...msgs].reverse().find(m => m.role === 'assistant' && m.content);
-    if (!lastAiReply) return;
-
-    const { followUps } = this._splitFollowUps(lastAiReply.content);
-    if (followUps.length > 0) {
-      this.setData({ quickQuestions: followUps });
-      wx.setStorageSync('aiChatQuickQuestions', followUps);
-      return;
-    }
+  /**
+   * 根据一段 AI 回复计算推荐追问：优先解析回复自带的追问区块，
+   * 否则按回复主题智能回退生成
+   */
+  _computeQuickQuestions(text) {
+    if (!text) return [];
+    const { followUps } = this._splitFollowUps(text);
+    if (followUps.length > 0) return followUps;
 
     // ===== 智能回退：AI 未输出推荐追问时，根据 AI 回复内容动态生成 =====
     const suggestions = [];
@@ -666,7 +695,7 @@ Page({
     ];
 
     for (const t of themeTests) {
-      if (t.test.test(lastAiReply.content)) {
+      if (t.test.test(text)) {
         suggestions.push(...t.questions);
         if (suggestions.length >= 3) break;
       }
@@ -675,8 +704,24 @@ Page({
     if (suggestions.length === 0) {
       suggestions.push('今天吃了什么', '今天运动了吗', '本周体重变化', '热量缺口怎么算');
     }
+    return suggestions.slice(0, 4);
+  },
 
-    this.setData({ quickQuestions: suggestions.slice(0, 4) });
+  /**
+   * 从最后一条 AI 回复计算推荐追问并更新快捷栏（含落盘），返回计算结果
+   * 与剥离共用 _splitFollowUps，保证"气泡不显示"和"快捷栏显示"两者一致
+   */
+  _updateDynamicQuickQuestions(messages) {
+    const msgs = messages || this.data.messages;
+    if (!msgs || msgs.length === 0) return null;
+
+    const lastAiReply = [...msgs].reverse().find(m => m.role === 'assistant' && m.content);
+    if (!lastAiReply) return null;
+
+    const quick = this._computeQuickQuestions(lastAiReply.content);
+    if (quick.length === 0) return null;
+    this._applyQuickQuestions(quick);
+    return quick;
   },
   onInput(e) {
     this.setData({ inputValue: e.detail.value });
@@ -1032,13 +1077,14 @@ Page({
    * 渲染结构化卡片消息（跳过流式，直接显示卡片）
    */
   _renderStructuredCard(cardInfo, baseMessages, fallbackText, presetQuestions) {
-    // 1. 快捷栏：优先用云端结构化追问；否则从原文解析
+    // 1. 快捷栏：优先用云端结构化追问；否则从原文解析；结果随消息持久化
+    let quick = null;
     if (Array.isArray(presetQuestions) && presetQuestions.length > 0) {
-      this.setData({ quickQuestions: presetQuestions });
-      wx.setStorageSync('aiChatQuickQuestions', presetQuestions);
+      quick = presetQuestions;
+      this._applyQuickQuestions(quick);
     } else if (fallbackText) {
       const tempMsgs = [...baseMessages, { role: 'assistant', content: fallbackText }];
-      this._updateDynamicQuickQuestions(tempMsgs);
+      quick = this._updateDynamicQuickQuestions(tempMsgs);
     }
 
     // 兜底：解析出的内容为空时，降级为普通文本展示
@@ -1055,7 +1101,8 @@ Page({
       content: '', // 原始文本不展示
       cardType: cardInfo.type,
       cardData: cardInfo.sections,
-      streaming: false
+      streaming: false,
+      quickQuestions: quick || this.data.quickQuestions
     };
     const updated = [...baseMessages, cardMsg];
     this.setData({ messages: updated, isLoading: false, isStreaming: false });
@@ -1071,19 +1118,21 @@ Page({
     const aiIndex = baseMessages.length;
 
     // 1. 快捷栏：优先用云端结构化追问；否则从原文解析（模板回复等场景）
+    // 计算结果随消息一起持久化，重进页面可原样恢复
+    let quick = null;
     if (Array.isArray(presetQuestions) && presetQuestions.length > 0) {
-      this.setData({ quickQuestions: presetQuestions });
-      wx.setStorageSync('aiChatQuickQuestions', presetQuestions);
+      quick = presetQuestions;
+      this._applyQuickQuestions(quick);
     } else {
       const tempMsgs = [...baseMessages, { role: 'assistant', content: fullText }];
-      this._updateDynamicQuickQuestions(tempMsgs);
+      quick = this._updateDynamicQuickQuestions(tempMsgs);
     }
 
     // 2. 剥离推荐追问，只展示纯净回复给用户（云端已剥离过，这里幂等兜底）
     const cleanText = this._stripRecommendationBlock(fullText);
 
     // 插入 streaming 状态的空消息
-    const streamMsg = { role: 'assistant', content: cleanText, displayContent: '', streaming: true };
+    const streamMsg = { role: 'assistant', content: cleanText, displayContent: '', streaming: true, quickQuestions: quick || this.data.quickQuestions };
     const updated = [...baseMessages, streamMsg];
 
     this.setData({
@@ -1274,9 +1323,9 @@ Page({
             '生成周报',
             '帮我制定饮食计划'
           ];
-          this.setData({ messages: msgs, knowledgeBase: '', isStreaming: false, quickQuestions: defaultQuestions });
+          this.setData({ messages: msgs, knowledgeBase: '', isStreaming: false });
           this.saveMessages(msgs);
-          wx.setStorageSync('aiChatQuickQuestions', defaultQuestions);
+          this._applyQuickQuestions(defaultQuestions);
         }
       }
     });
