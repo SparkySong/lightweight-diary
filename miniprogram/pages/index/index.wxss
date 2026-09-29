@@ -2523,56 +2523,6 @@
   gap: 16rpx;
 }
 
-/* 隐私授权弹窗 */
-.privacy-overlay {
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.5);
-  z-index: 12000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.privacy-card {
-  width: 560rpx;
-  background: var(--bg-card);
-  border-radius: 24rpx;
-  padding: 48rpx 40rpx;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 24rpx;
-}
-
-.privacy-title {
-  font-size: 32rpx;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.privacy-text {
-  font-size: 26rpx;
-  color: var(--text-secondary);
-  line-height: 1.6;
-}
-
-.privacy-btn {
-  width: 100%;
-  background: var(--color-primary);
-  color: #fff;
-  border-radius: 999rpx;
-  font-size: 28rpx;
-  border: none;
-}
-
-.privacy-btn::after { border: none; }
-
-.privacy-cancel {
-  font-size: 24rpx;
-  color: var(--text-tertiary);
-}
-
 .height-btns {
   display: flex;
   gap: 12rpx;

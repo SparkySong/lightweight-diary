@@ -138,12 +138,6 @@ Page({
   },
 
   onLoad() {
-    if (wx.onNeedPrivacyAuthorization) {
-      wx.onNeedPrivacyAuthorization(resolve => {
-        this.privacyResolve = resolve;
-        this.setData({ showPrivacyPopup: true });
-      });
-    }
     // 接力主题切换的 loading 遮罩，覆盖 reLaunch 瓦解瞬间的系统壳层过渡帧
     if (wx.getStorageSync('pendingThemeToast')) {
       wx.showLoading({ title: '切换中...', mask: true });
@@ -545,35 +539,6 @@ Page({
     this.updateStats(this.data.allRecords);
   },
 
-  // 滚动到底部触发加载更多
-  onCancelPrivacy() {
-    this.setData({ showPrivacyPopup: false });
-    this.privacyResolve = null;
-    this.pendingPosterPath = null;
-  },
-
-  onAgreePrivacy() {
-    this.setData({ showPrivacyPopup: false });
-    if (this.privacyResolve) { this.privacyResolve(); this.privacyResolve = null; }
-    if (this.pendingPosterPath) {
-      const p = this.pendingPosterPath;
-      this.pendingPosterPath = null;
-      wx.saveImageToPhotosAlbum({
-        filePath: p,
-        success: () => this.showToast('已保存到相册'),
-        fail: e => {
-          const msg = e.errMsg || '';
-          if (msg.includes('cancel')) return; // 用户主动取消，不提示
-          if (msg.includes('auth')) {
-            wx.showModal({ title: '需要授权', content: '请在设置中允许保存到相册', confirmText: '去设置', success: r => { if (r.confirm) wx.openSetting(); } });
-          } else {
-            this.showToast('保存失败，请稍后重试');
-          }
-        }
-      });
-    }
-  },
-
   getPosterData() {
     const { currentWeight, totalLost, streak, weightUnitLabel, allRecords, chartRange } = this.data;
     const sorted = [...(allRecords || [])].sort((a, b) => a.date.localeCompare(b.date));
@@ -699,9 +664,8 @@ Page({
               if (msg.includes('auth')) {
                 wx.showModal({ title: '需要授权', content: '请在设置中允许保存到相册', confirmText: '去设置', success: r => { if (r.confirm) wx.openSetting(); } });
               } else if (msg.includes('privacy')) {
-                this.pendingPosterPath = path;
-                this.showToast('请先同意隐私授权');
-                if (!this.data.showPrivacyPopup && !this.privacyResolve) this.showToast('请在弹窗中同意隐私授权后重试');
+                // 用户在官方隐私弹窗中未同意：提示重试，再次点击保存会重新触发授权
+                this.showToast('未同意隐私授权，已取消保存，重试可再次发起');
               } else {
                 this.showToast('保存失败，请稍后重试');
               }
@@ -942,11 +906,11 @@ Page({
   },
 
   goToAiChat() {
-    wx.navigateTo({ url: '/subpkg/ai-chat/ai-chat' });
+    wx.navigateTo({ url: '/pages/ai-chat/ai-chat' });
   },
 
   goToExercise() {
-    wx.navigateTo({ url: '/subpkg/exercise/exercise' });
+    wx.navigateTo({ url: '/pages/exercise/exercise' });
   },
 
   // 加载今日热量收支数据

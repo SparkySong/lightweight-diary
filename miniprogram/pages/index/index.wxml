@@ -320,13 +320,4 @@
 </van-dialog>
   <!-- 分享海报离屏画布 -->
   <canvas type="2d" id="posterCanvas" style="position: fixed; left: -9999px; top: 0; width: 750px; height: 1000px;"></canvas>
-<!-- 隐私授权弹窗 -->
-<view class="privacy-overlay" wx:if="{{showPrivacyPopup}}">
-  <view class="privacy-card">
-    <text class="privacy-title">隐私授权说明</text>
-    <text class="privacy-text">保存海报到相册需要您授权「写入相册」权限，仅用于保存您主动生成的分享图片。</text>
-    <button class="privacy-btn" open-type="agreePrivacyAuthorization" bindagreeprivacyauthorization="onAgreePrivacy">同意并继续</button>
-    <view class="privacy-cancel" bindtap="onCancelPrivacy">暂不同意</view>
-  </view>
-</view>
 </view>
